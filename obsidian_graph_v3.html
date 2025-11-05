@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toán Học - Obsidian Graph (Full Sync)</title>
+    <script src="https://unpkg.com/force-graph"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #1E1E1E; color: #E5E7EB; overflow: hidden; }
+        #graph { width: 100vw; height: 100vh; }
+        .ui-panel { position: fixed; background: rgba(40,44,52,0.95); padding: 18px 22px; border-radius: 12px; border: 1px solid rgba(106,142,174,0.3); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.5); transition: 0.3s; z-index: 100; }
+        .ui-panel:hover { border-color: rgba(106,142,174,0.6); }
+        h3, h4 { color: #D1A15A; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; }
+        h3 { font-size: 14px; margin-bottom: 14px; } h4 { font-size: 13px; margin-bottom: 10px; }
+        #info { top: 20px; left: 20px; max-width: 280px; }
+        #info p { margin: 8px 0; font-size: 13px; color: #B8BEC8; display: flex; justify-content: space-between; }
+        #info p strong { color: #6A8EAE; } #info p span { background: rgba(106,142,174,0.2); padding: 3px 10px; border-radius: 8px; color: #D1A15A; font-weight: 600; }
+        #search { top: 20px; right: 20px; }
+        #search input { background: rgba(30,30,30,0.8); border: 1px solid rgba(106,142,174,0.2); color: #E5E7EB; padding: 10px 16px; border-radius: 8px; width: 280px; font-size: 13px; }
+        #search input:focus { outline: none; border-color: #6A8EAE; box-shadow: 0 0 0 3px rgba(106,142,174,0.15); }
+        #controls { bottom: 20px; right: 20px; display: flex; gap: 8px; padding: 12px 16px; }
+        button { background: linear-gradient(135deg, #6A8EAE, #5A7A9A); color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; box-shadow: 0 2px 8px rgba(106,142,174,0.3); }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(106,142,174,0.5); }
+        button.active { background: linear-gradient(135deg, #D1A15A, #B8904A); }
+        #legend { bottom: 20px; left: 20px; }
+        .legend-item { display: flex; align-items: center; margin: 6px 0; font-size: 12px; }
+        .legend-color { width: 16px; height: 16px; border-radius: 50%; margin-right: 10px; border: 1px solid rgba(255,255,255,0.2); }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30,30,30,0.95); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 1; transition: 0.5s; }
+        .loading-overlay.hide { opacity: 0; pointer-events: none; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(106,142,174,0.2); border-top-color: #6A8EAE; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #tooltip {
+            position: absolute; background: rgba(30,30,30,0.95); color: #E5E7EB; padding: 14px 18px;
+            border-radius: 10px; border: 1px solid rgba(106,142,174,0.3); font-size: 13px; pointer-events: none;
+            max-width: 320px; box-shadow: 0 6px 24px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.2s;
+            backdrop-filter: blur(12px); z-index: 1000; line-height: 1.5;
+        }
+        .missing { color: #E05A8E !important; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loading"><div class="spinner"></div></div>
+    <div id="graph"></div>
+    <div id="tooltip"></div>
+
+    <div id="info" class="ui-panel">
+        <h3>THỐNG KÊ</h3>
+        <p><strong>Nodes:</strong> <span id="node-count">0</span></p>
+        <p><strong>Links:</strong> <span id="link-count">0</span></p>
+        <p><strong>File thật:</strong> <span id="real-count">0</span></p>
+        <p><strong>Chưa tạo:</strong> <span id="missing-count">0</span></p>
+    </div>
+
+    <div id="search" class="ui-panel">
+        <input type="text" id="search-input" placeholder="Tìm kiếm...">
+    </div>
+
+    <div id="controls" class="ui-panel">
+        <button onclick="Graph.zoomToFit(1000, 80)">Reset View</button>
+        <button id="physics-btn" onclick="togglePhysics()" class="active">Physics</button>
+        <button id="labels-btn" onclick="toggleLabels()" class="active">Labels</button>
+    </div>
+
+    <div id="legend" class="ui-panel">
+        <h4>CHÚ THÍCH</h4>
+        <div class="legend-item"><div class="legend-color" style="background: #D1A15A; border: 2px solid #FFD700;"></div><span>File thật (viền vàng)</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #E05A8E; border: 2px dashed #FF6B9D;"></div><span>Chưa tạo (viền đỏ)</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #D1A15A;"></div><span>Hub (>10)</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #6A8EAE;"></div><span>Quan trọng (6-10)</span></div>
+    </div>
+
+    <script>
+        // === DỮ LIỆU TỪ OBSIDIAN ===
+        const rawFiles = [
+            {
+                name: "Tích vô hướng của hai vectơ.md",
+                content: `# Tích vô hướng của hai vectơ
+
+- [[Giá trị lượng giác của một góc bất kỳ từ 0° đến 180°]]
+- [[Tích vô hướng của hai vec tơ]]
+- [[Các hệ thức lượng trong tam giác]]
+
+---
+
+## Liên kết kiến thức
+
+### Kiến thức tiên quyết (Nền tảng)
+- [[Vectơ]]
+- [[Cung, góc và công thức lượng giác]]
+- [[Phương pháp tọa độ trong mặt phẳng]]
+
+### Kiến thức kế thừa (Ứng dụng)
+- [[Phương pháp tọa độ trong không gian]]
+- [[Vectơ và quan hệ vuông góc trong không gian]]
+- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]`
+            },
+            // ... (giữ nguyên 6 file còn lại như trước)
+            {
+                name: "Tổ hợp và Xác suất.md",
+                content: `---
+tags:
+  - MOC
+  - Đại_số_11
+---
+# Chương 2: Tổ hợp và Xác suất
+## Các đơn vị kiến thức
+- [[Quy tắc đếm]]
+- [[Hoán vị, Chỉnh hợp, Tổ hợp]]
+- [[Nhị thức Niu-tơn]]
+- [[Phép thử và biến cố]]
+- [[Xác suất của biến cố]]
+---
+Quay về: [[Toán 11]]
+---
+## Liên kết kiến thức
+### Kiến thức tiên quyết (Nền tảng)
+- [[Mệnh đề. Tập hợp]]
+### Kiến thức kế thừa (Ứng dụng)
+- [[Thống kê]]`
+            },
+            { name: "Thống kê.md", content: `- [[Khái niệm cơ bản về thống kê]] 
+- [[Phương sai và độ lệch chuẩn]]
+---
+## Liên kết kiến thức
+### Kiến thức tiên quyết (Nền tảng)
+- [[Mệnh đề. Tập hợp]]
+### Kiến thức kế thừa (Ứng dụng)
+- [[Tổ hợp và Xác suất]]` },
+            { name: "Toán phổ thông.md", content: `[[Toán 10]]
+[[Toán 11]]
+[[Toán 12]]` },
+            { name: "Toán 12.md", content: `## Phần 1: Giải tích 12
+- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]
+- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]
+- [[Nguyên hàm, Tích phân và Ứng dụng]]
+- [[Số phức]]
+## Phần 2: Hình học 12
+- [[Khối đa diện]]
+- [[Mặt nón, Mặt trụ, Mặt cầu]]
+- [[Phương pháp tọa độ trong không gian]]` },
+            { name: "Toán 11.md", content: `## Phần 1: Đại số và Giải tích 11
+- [[Hàm số lượng giác và phương trình lượng giác]]
+- [[Tổ hợp và Xác suất]]
+- [[Dãy số, Cấp số cộng và Cấp số nhân]]
+- [[Giới hạn]]
+- [[Đạo hàm]]
+## Phần 2: Hình học 11
+- [[Phép dời hình và phép đồng dạng trong mặt phẳng]]
+- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]
+- [[Vectơ và quan hệ vuông góc trong không gian]]` },
+            { name: "Toán 10.md", content: `- [[Hàm số bậc nhất và bậc hai]] 
+- [[Mệnh đề. Tập hợp]] 
+- [[Phương trình, Hệ phương trình]] 
+- [[Bất đẳng thức. Bất phương trình]] 
+- [[Thống kê]]  
+- [[Cung, góc và công thức lượng giác]]
+- [[Vectơ]] 
+- [[Tích vô hướng của hai vectơ]] 
+- [[Phương pháp tọa độ trong mặt phẳng]]` }
+        ];
+
+        // === PHÂN TÍCH ===
+        const fileNames = rawFiles.map(f => f.name.replace('.md', ''));
+        const allNodes = new Map();
+        const allLinks = new Set();
+        const fileContentMap = new Map();
+
+        rawFiles.forEach(file => {
+            const name = file.name.replace('.md', '');
+            fileContentMap.set(name, file.content);
+
+            allNodes.set(name, {
+                id: name,
+                label: name,
+                isFile: true,
+                content: file.content,
+                group: getGroup(name)
+            });
+
+            const matches = file.content.match(/\[\[([^\]\]]+)\]\]/g) || [];
+            matches.forEach(m => {
+                const link = m.slice(2, -2).trim();
+                const exists = fileNames.includes(link) || allNodes.has(link);
+
+                if (!allNodes.has(link)) {
+                    allNodes.set(link, {
+                        id: link,
+                        label: link,
+                        isFile: false,
+                        content: `<span class="missing">Chưa có file: <code>${link}.md</code></span>`,
+                        group: getGroup(link)
+                    });
+                }
+
+                const key = `${name}→${link}`;
+                if (!allLinks.has(key)) allLinks.add(key);
+            });
+        });
+
+        function getGroup(name) {
+            if (/Toán 10|10/.test(name)) return 'toan10';
+            if (/Toán 11|11/.test(name)) return 'toan11';
+            if (/Toán 12|12/.test(name)) return 'toan12';
+            return 'common';
+        }
+
+        const graphData = {
+            nodes: Array.from(allNodes.values()),
+            links: Array.from(allLinks).map(k => {
+                const [s, t] = k.split('→');
+                return { source: s, target: t };
+            })
+        };
+
+        // === GRAPH ===
+        const Graph = ForceGraph();
+        let showLabels = true;
+        let physicsEnabled = true;
+        const tooltip = document.getElementById('tooltip');
+
+        function initializeGraph() {
+            const nodeDegrees = {};
+            graphData.nodes.forEach(n => nodeDegrees[n.id] = 0);
+            graphData.links.forEach(l => { nodeDegrees[l.source]++; nodeDegrees[l.target]++; });
+
+            const realCount = graphData.nodes.filter(n => n.isFile).length;
+            const missingCount = graphData.nodes.filter(n => !n.isFile).length;
+
+            document.getElementById('node-count').textContent = graphData.nodes.length;
+            document.getElementById('link-count').textContent = graphData.links.length;
+            document.getElementById('real-count').textContent = realCount;
+            document.getElementById('missing-count').textContent = missingCount;
+
+            const getNodeColor = n => {
+                const deg = nodeDegrees[n.id] || 0;
+                if (deg > 10) return '#D1A15A';
+                if (deg > 5) return '#6A8EAE';
+                if (deg > 2) return '#5A9D9A';
+                return '#7A8A9A';
+            };
+
+            const getNodeSize = n => n.isFile ? Math.max(7, Math.sqrt(nodeDegrees[n.id] || 0) * 4.5) : 3.5;
+
+            Graph(document.getElementById('graph'))
+                .graphData(graphData)
+                .nodeId('id')
+                .nodeVal(getNodeSize)
+                .nodeColor(getNodeColor)
+                .nodeLabel('label')
+                .nodeCanvasObject((node, ctx, scale) => {
+                    const size = getNodeSize(node);
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, size, 0, 2 * Math.PI);
+                    ctx.fillStyle = getNodeColor(node);
+                    ctx.strokeStyle = node.isFile ? '#FFD700' : '#FF6B9D';
+                    ctx.lineWidth = node.isFile ? 2.5 : 2;
+                    ctx.setLineDash(node.isFile ? [] : [4, 4]);
+                    ctx.fill(); ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    if (showLabels && scale > 0.6) {
+                        const fontSize = Math.max(10, 13 / scale);
+                        ctx.font = `${node.isFile ? '600' : '400'} ${fontSize}px Inter`;
+                        ctx.fillStyle = node.isFile ? '#E5E7EB' : '#FF6B9D';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(node.label, node.x, node.y + size + fontSize * 0.8);
+                    }
+                })
+                .linkWidth(1.3)
+                .linkColor(() => 'rgba(180,200,220,0.2)')
+                .linkDirectionalParticles(1)
+                .linkDirectionalParticleWidth(1.6)
+                .linkDirectionalParticleSpeed(0.004)
+                .backgroundColor('#1E1E1E')
+                .d3Force('charge', d3.forceManyBody().strength(-220))
+                .d3Force('link', d3.forceLink().distance(85).strength(1))
+                .d3Force('center', d3.forceCenter())
+                .onEngineStop(() => {
+                    document.getElementById('loading').classList.add('hide');
+                    Graph.zoomToFit(1000, 100);
+                })
+                .onNodeHover(node => {
+                    if (!node) {
+                        tooltip.style.opacity = 0;
+                        return;
+                    }
+                    tooltip.innerHTML = `<strong style="color:${node.isFile ? '#D1A15A' : '#E05A8E'}">${node.label}</strong>
+                        <hr style="border:0;border-top:1px solid #444;margin:8px 0;">
+                        <div style="max-height:300px;overflow-y:auto;font-size:12.5px;line-height:1.6;">
+                            ${node.content.replace(/\n/g, '<br>')}
+                        </div>`;
+                    tooltip.style.opacity = 1;
+                });
+
+            document.getElementById('graph').addEventListener('mousemove', e => {
+                if (tooltip.style.opacity > 0) {
+                    tooltip.style.left = (e.clientX + 15) + 'px';
+                    tooltip.style.top = (e.clientY + 15) + 'px';
+                }
+            });
+
+            document.getElementById('search-input').addEventListener('input', e => {
+                const term = e.target.value.toLowerCase().trim();
+                if (!term) return;
+                const matched = graphData.nodes.find(n => n.label.toLowerCase().includes(term));
+                if (matched) {
+                    Graph.centerAt(matched.x, matched.y, 800);
+                    Graph.zoom(4, 800);
+                }
+            });
+        }
+
+        function togglePhysics() { physicsEnabled = !physicsEnabled; document.getElementById('physics-btn').classList.toggle('active'); physicsEnabled ? Graph.resumeAnimation() : Graph.pauseAnimation(); }
+        function toggleLabels() { showLabels = !showLabels; document.getElementById('labels-btn').classList.toggle('active'); Graph.refresh(); }
+
+        window.onload = initializeGraph;
+    </script>
+</body>
+</html>

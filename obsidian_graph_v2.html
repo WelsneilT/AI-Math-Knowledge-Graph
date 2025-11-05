@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toán Phổ Thông - Knowledge Graph</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        #graph-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Control Panel */
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .controls h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Stats Panel */
+        .stats {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            min-width: 250px;
+        }
+
+        .stats h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .legend h4 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #333;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 2000;
+            max-width: 300px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .tooltip h4 {
+            margin-bottom: 8px;
+            color: #ffd700;
+            font-size: 15px;
+        }
+
+        .tooltip-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .tooltip-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        /* SVG Styles */
+        .link {
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-width: 1.5px;
+            transition: all 0.3s;
+        }
+
+        .link.highlighted {
+            stroke: #ffd700;
+            stroke-width: 3px;
+        }
+
+        .node {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .node circle {
+            stroke: white;
+            stroke-width: 2px;
+        }
+
+        .node:hover circle {
+            stroke: #ffd700;
+            stroke-width: 4px;
+        }
+
+        .node text {
+            font-size: 11px;
+            pointer-events: none;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+            fill: white;
+            font-weight: 600;
+        }
+
+        .node.dimmed {
+            opacity: 0.2;
+        }
+
+        /* Search Box */
+        .search-box {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .search-box input {
+            width: 400px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+
+        .search-box input:focus {
+            box-shadow: 0 4px 24px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div id="graph-container"></div>
+
+    <!-- Search Box -->
+    <div class="search-box">
+        <input type="text" id="search-input" placeholder="🔍 Tìm kiếm chủ đề...">
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <h2>🎛️ Bộ lọc</h2>
+        
+        <div class="filter-group">
+            <label>Khối lớp:</label>
+            <div class="filter-buttons" id="grade-filters">
+                <button class="filter-btn active" data-grade="all">Tất cả</button>
+                <button class="filter-btn" data-grade="10">Lớp 10</button>
+                <button class="filter-btn" data-grade="11">Lớp 11</button>
+                <button class="filter-btn" data-grade="12">Lớp 12</button>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <label>Loại:</label>
+            <div class="filter-buttons" id="category-filters">
+                <button class="filter-btn active" data-category="all">Tất cả</button>
+                <button class="filter-btn" data-category="moc">MOC</button>
+                <button class="filter-btn" data-category="algebra">Đại số</button>
+                <button class="filter-btn" data-category="analysis">Giải tích</button>
+                <button class="filter-btn" data-category="geometry">Hình học</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <h3>📊 Thống kê</h3>
+        <div class="stat-item">
+            <span class="stat-label">Tổng chủ đề:</span>
+            <span class="stat-value" id="total-nodes">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Tổng liên kết:</span>
+            <span class="stat-value" id="total-links">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Đang hiển thị:</span>
+            <span class="stat-value" id="visible-nodes">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Chủ đề được chọn:</span>
+            <span class="stat-value" id="selected-node">-</span>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+        <h4>📌 Chú thích</h4>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ff6b6b;"></div>
+            <span>Lớp 10</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4ecdc4;"></div>
+            <span>Lớp 11</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #45b7d1;"></div>
+            <span>Lớp 12</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #f9ca24;"></div>
+            <span>Tất cả khối</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #a29bfe; border: 3px solid #ffd700;"></div>
+            <span>MOC (Map of Content)</span>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Paste your JSON data here
+        const graphData = {
+  "nodes": [
+    {
+      "id": "Khái niệm số phức.md",
+      "name": "Khái niệm số phức",
+      "path": "Khái niệm số phức.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Giá trị lớn nhất và giá trị nhỏ nhất của hàm số.md",
+      "name": "Giá trị lớn nhất và giá trị nhỏ nhất của hàm số",
+      "path": "Giá trị lớn nhất và giá trị nhỏ nhất của hàm số.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "name": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số",
+      "path": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Đạo hàm.md",
+      "name": "Đạo hàm",
+      "path": "Đạo hàm.md",
+      "tags": [
+        "MOC",
+        "Giải_tích_11"
+      ],
+      "grade": "11",
+      "category": "moc"
+    },
+    {
+      "id": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "name": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian",
+      "path": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "tags": [
+        "MOC",
+        "Hình_học_11"
+      ],
+      "grade": "11",
+      "category": "moc"
+    },
+    {
+      "id": "Vectơ.md",
+      "name": "Vectơ",
+      "path": "Vectơ.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "name": "Vectơ và quan hệ vuông góc trong không gian",
+      "path": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Tổ hợp và Xác suất.md",
+      "name": "Tổ hợp và Xác suất",
+      "path": "Tổ hợp và Xác suất.md",
+      "tags": [
+        "MOC",
+        "Đại_số_11"
+      ],
+      "grade": "11",
+      "category": "moc"
+    },
+    {
+      "id": "Toán 12.md",
+      "name": "Toán 12",
+      "path": "Toán 12.md",
+      "tags": [],
+      "grade": "12",
+      "category": "general"
+    },
+    {
+      "id": "Tích vô hướng của hai vectơ.md",
+      "name": "Tích vô hướng của hai vectơ",
+      "path": "Tích vô hướng của hai vectơ.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Toán phổ thông.md",
+      "name": "Toán phổ thông",
+      "path": "Toán phổ thông.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Toán 11.md",
+      "name": "Toán 11",
+      "path": "Toán 11.md",
+      "tags": [],
+      "grade": "11",
+      "category": "general"
+    },
+    {
+      "id": "Thống kê.md",
+      "name": "Thống kê",
+      "path": "Thống kê.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Toán 10.md",
+      "name": "Toán 10",
+      "path": "Toán 10.md",
+      "tags": [],
+      "grade": "10",
+      "category": "general"
+    },
+    {
+      "id": "Sự đồng biến, nghịch biến của hàm số.md",
+      "name": "Sự đồng biến, nghịch biến của hàm số",
+      "path": "Sự đồng biến, nghịch biến của hàm số.md",
+      "tags": [
+        "Khảo_sát_hàm_số",
+        "Giải_tích_12"
+      ],
+      "grade": "12",
+      "category": "analysis"
+    },
+    {
+      "id": "Số phức.md",
+      "name": "Số phức",
+      "path": "Số phức.md",
+      "tags": [
+        "MOC",
+        "Giải_tích_12"
+      ],
+      "grade": "12",
+      "category": "moc"
+    },
+    {
+      "id": "Phương trình, Hệ phương trình.md",
+      "name": "Phương trình, Hệ phương trình",
+      "path": "Phương trình, Hệ phương trình.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Phương pháp tọa độ trong mặt phẳng.md",
+      "name": "Phương pháp tọa độ trong mặt phẳng",
+      "path": "Phương pháp tọa độ trong mặt phẳng.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Phương pháp tọa độ trong không gian.md",
+      "name": "Phương pháp tọa độ trong không gian",
+      "path": "Phương pháp tọa độ trong không gian.md",
+      "tags": [
+        "MOC",
+        "Hình_học_12"
+      ],
+      "grade": "12",
+      "category": "moc"
+    },
+    {
+      "id": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "name": "Phép dời hình và phép đồng dạng trong mặt phẳng",
+      "path": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "tags": [
+        "MOC",
+        "Hình_học_11"
+      ],
+      "grade": "11",
+      "category": "moc"
+    },
+    {
+      "id": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "name": "Nguyên hàm, Tích phân và Ứng dụng",
+      "path": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "tags": [
+        "MOC",
+        "Giải_tích_12"
+      ],
+      "grade": "12",
+      "category": "moc"
+    },
+    {
+      "id": "Mệnh đề. Tập hợp.md",
+      "name": "Mệnh đề. Tập hợp",
+      "path": "Mệnh đề. Tập hợp.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "name": "Mặt nón, Mặt trụ, Mặt cầu",
+      "path": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "tags": [
+        "MOC",
+        "Hình_học_12"
+      ],
+      "grade": "12",
+      "category": "moc"
+    },
+    {
+      "id": "Khối đa diện.md",
+      "name": "Khối đa diện",
+      "path": "Khối đa diện.md",
+      "tags": [
+        "MOC",
+        "Hình_học_12"
+      ],
+      "grade": "12",
+      "category": "moc"
+    },
+    {
+      "id": "Hàm số lượng giác và phương trình lượng giác.md",
+      "name": "Hàm số lượng giác và phương trình lượng giác",
+      "path": "Hàm số lượng giác và phương trình lượng giác.md",
+      "tags": [
+        "MOC",
+        "Giải_tích_11"
+      ],
+      "grade": "11",
+      "category": "moc"
+    },
+    {
+      "id": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "name": "Hàm số lũy thừa, hàm số mũ và hàm số logarit",
+      "path": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "tags": [
+        "MOC",
+        "Giải_tích_12"
+      ],
+      "grade": "12",
+      "category": "moc"
+    },
+    {
+      "id": "Hàm số bậc nhất và bậc hai.md",
+      "name": "Hàm số bậc nhất và bậc hai",
+      "path": "Hàm số bậc nhất và bậc hai.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Giới hạn.md",
+      "name": "Giới hạn",
+      "path": "Giới hạn.md",
+      "tags": [
+        "MOC",
+        "Giải_tích_11"
+      ],
+      "grade": "11",
+      "category": "moc"
+    },
+    {
+      "id": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "name": "Dãy số, Cấp số cộng và Cấp số nhân",
+      "path": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "tags": [
+        "MOC",
+        "Đại_số_11"
+      ],
+      "grade": "11",
+      "category": "moc"
+    },
+    {
+      "id": "Giá trị lượng giác của một cung.md",
+      "name": "Giá trị lượng giác của một cung",
+      "path": "Giá trị lượng giác của một cung.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Cung, góc và công thức lượng giác.md",
+      "name": "Cung, góc và công thức lượng giác",
+      "path": "Cung, góc và công thức lượng giác.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    },
+    {
+      "id": "Bất đẳng thức. Bất phương trình.md",
+      "name": "Bất đẳng thức. Bất phương trình",
+      "path": "Bất đẳng thức. Bất phương trình.md",
+      "tags": [],
+      "grade": "all",
+      "category": "general"
+    }
+  ],
+  "links": [
+    {
+      "source": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "target": "Sự đồng biến, nghịch biến của hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "target": "Giá trị lớn nhất và giá trị nhỏ nhất của hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đạo hàm.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đạo hàm.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đạo hàm.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đạo hàm.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đạo hàm.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đạo hàm.md",
+      "target": "Sự đồng biến, nghịch biến của hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đạo hàm.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đạo hàm.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "target": "Khối đa diện.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "target": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ.md",
+      "target": "Tích vô hướng của hai vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ.md",
+      "target": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ.md",
+      "target": "Khối đa diện.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ.md",
+      "target": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "target": "Tích vô hướng của hai vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Tổ hợp và Xác suất.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Tổ hợp và Xác suất.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Tổ hợp và Xác suất.md",
+      "target": "Thống kê.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 12.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 12.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 12.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 12.md",
+      "target": "Số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 12.md",
+      "target": "Khối đa diện.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 12.md",
+      "target": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 12.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Tích vô hướng của hai vectơ.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Tích vô hướng của hai vectơ.md",
+      "target": "Cung, góc và công thức lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Tích vô hướng của hai vectơ.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Tích vô hướng của hai vectơ.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Tích vô hướng của hai vectơ.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Tích vô hướng của hai vectơ.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán phổ thông.md",
+      "target": "Toán 10.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán phổ thông.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán phổ thông.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Tổ hợp và Xác suất.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Giá trị lượng giác của một cung.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Cung, góc và công thức lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Sự đồng biến, nghịch biến của hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Khối đa diện.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 11.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Thống kê.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Thống kê.md",
+      "target": "Tổ hợp và Xác suất.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Thống kê.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Cung, góc và công thức lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Tích vô hướng của hai vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Giá trị lượng giác của một cung.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Sự đồng biến, nghịch biến của hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Tổ hợp và Xác suất.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Toán 10.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Sự đồng biến, nghịch biến của hàm số.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Sự đồng biến, nghịch biến của hàm số.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Sự đồng biến, nghịch biến của hàm số.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Sự đồng biến, nghịch biến của hàm số.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Sự đồng biến, nghịch biến của hàm số.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Sự đồng biến, nghịch biến của hàm số.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Sự đồng biến, nghịch biến của hàm số.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Số phức.md",
+      "target": "Khái niệm số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Số phức.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Số phức.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Số phức.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Số phức.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Số phức.md",
+      "target": "Giá trị lượng giác của một cung.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Số phức.md",
+      "target": "Cung, góc và công thức lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Sự đồng biến, nghịch biến của hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương trình, Hệ phương trình.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong mặt phẳng.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong mặt phẳng.md",
+      "target": "Tích vô hướng của hai vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong mặt phẳng.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong mặt phẳng.md",
+      "target": "Số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong mặt phẳng.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong mặt phẳng.md",
+      "target": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong mặt phẳng.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong mặt phẳng.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong mặt phẳng.md",
+      "target": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong không gian.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong không gian.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong không gian.md",
+      "target": "Tích vô hướng của hai vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong không gian.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong không gian.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong không gian.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phương pháp tọa độ trong không gian.md",
+      "target": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "target": "Tích vô hướng của hai vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+      "target": "Số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "target": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Cung, góc và công thức lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Giá trị lượng giác của một cung.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Sự đồng biến, nghịch biến của hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Tổ hợp và Xác suất.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mệnh đề. Tập hợp.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "target": "Tích vô hướng của hai vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Khối đa diện.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Khối đa diện.md",
+      "target": "Vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Khối đa diện.md",
+      "target": "Tích vô hướng của hai vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Khối đa diện.md",
+      "target": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Khối đa diện.md",
+      "target": "Vectơ và quan hệ vuông góc trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Khối đa diện.md",
+      "target": "Mặt nón, Mặt trụ, Mặt cầu.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Khối đa diện.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Giá trị lượng giác của một cung.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Cung, góc và công thức lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lượng giác và phương trình lượng giác.md",
+      "target": "Số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "target": "Toán 12.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số bậc nhất và bậc hai.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số bậc nhất và bậc hai.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số bậc nhất và bậc hai.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số bậc nhất và bậc hai.md",
+      "target": "Sự đồng biến, nghịch biến của hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số bậc nhất và bậc hai.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số bậc nhất và bậc hai.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Hàm số bậc nhất và bậc hai.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giới hạn.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giới hạn.md",
+      "target": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giới hạn.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giới hạn.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giới hạn.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giới hạn.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giới hạn.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giới hạn.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giới hạn.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "target": "Toán 11.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "target": "Bất đẳng thức. Bất phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giá trị lượng giác của một cung.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giá trị lượng giác của một cung.md",
+      "target": "Cung, góc và công thức lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giá trị lượng giác của một cung.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giá trị lượng giác của một cung.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giá trị lượng giác của một cung.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giá trị lượng giác của một cung.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Giá trị lượng giác của một cung.md",
+      "target": "Số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Cung, góc và công thức lượng giác.md",
+      "target": "Giá trị lượng giác của một cung.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Cung, góc và công thức lượng giác.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Cung, góc và công thức lượng giác.md",
+      "target": "Đạo hàm.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Cung, góc và công thức lượng giác.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Cung, góc và công thức lượng giác.md",
+      "target": "Số phức.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Cung, góc và công thức lượng giác.md",
+      "target": "Tích vô hướng của hai vectơ.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Mệnh đề. Tập hợp.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Hàm số bậc nhất và bậc hai.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Phương trình, Hệ phương trình.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Hàm số lượng giác và phương trình lượng giác.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Giới hạn.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Sự đồng biến, nghịch biến của hàm số.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Nguyên hàm, Tích phân và Ứng dụng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Phương pháp tọa độ trong mặt phẳng.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Phương pháp tọa độ trong không gian.md",
+      "direction": "none",
+      "arrow": null
+    },
+    {
+      "source": "Bất đẳng thức. Bất phương trình.md",
+      "target": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+      "direction": "none",
+      "arrow": null
+    }
+  ],
+  "metadata": {
+    "totalNodes": 32,
+    "totalLinks": 256,
+    "arrowLinks": 0,
+    "regularLinks": 256,
+    "generatedAt": "2025-11-05T09:03:11.403Z",
+    "vault": "AI - Skills tree"
+  }
+}
+
+
+        // Color schemes
+        const gradeColors = {
+            '10': '#ff6b6b',
+            '11': '#4ecdc4',
+            '12': '#45b7d1',
+            'all': '#f9ca24'
+        };
+
+        // Initialize
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        const svg = d3.select('#graph-container')
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+
+        const g = svg.append('g');
+
+        // Zoom behavior
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 4])
+            .on('zoom', (event) => {
+                g.attr('transform', event.transform);
+            });
+
+        svg.call(zoom);
+
+        // Simulation
+        const simulation = d3.forceSimulation(graphData.nodes)
+            .force('link', d3.forceLink(graphData.links).id(d => d.id).distance(100))
+            .force('charge', d3.forceManyBody().strength(-300))
+            .force('center', d3.forceCenter(width / 2, height / 2))
+            .force('collision', d3.forceCollide().radius(30));
+
+        // Links
+        const link = g.append('g')
+            .selectAll('line')
+            .data(graphData.links)
+            .join('line')
+            .attr('class', 'link');
+
+        // Nodes
+        const node = g.append('g')
+            .selectAll('g')
+            .data(graphData.nodes)
+            .join('g')
+            .attr('class', 'node')
+            .call(drag(simulation));
+
+        node.append('circle')
+            .attr('r', d => d.category === 'moc' ? 12 : 8)
+            .attr('fill', d => gradeColors[d.grade])
+            .attr('stroke-width', d => d.category === 'moc' ? 3 : 2);
+
+        node.append('text')
+            .attr('dy', -15)
+            .attr('text-anchor', 'middle')
+            .text(d => d.name.length > 30 ? d.name.substring(0, 30) + '...' : d.name);
+
+        // Simulation tick
+        simulation.on('tick', () => {
+            link
+                .attr('x1', d => d.source.x)
+                .attr('y1', d => d.source.y)
+                .attr('x2', d => d.target.x)
+                .attr('y2', d => d.target.y);
+
+            node.attr('transform', d => `translate(${d.x},${d.y})`);
+        });
+
+        // Tooltip
+        const tooltip = d3.select('#tooltip');
+
+        node.on('mouseover', function(event, d) {
+            tooltip.html(`
+                <h4>${d.name}</h4>
+                <p><strong>Khối:</strong> ${d.grade === 'all' ? 'Tất cả' : 'Lớp ' + d.grade}</p>
+                <p><strong>Loại:</strong> ${d.category}</p>
+                ${d.tags.length > 0 ? `
+                    <div class="tooltip-tags">
+                        ${d.tags.map(tag => `<span class="tooltip-tag">#${tag}</span>`).join('')}
+                    </div>
+                ` : ''}
+            `)
+            .style('left', (event.pageX + 10) + 'px')
+            .style('top', (event.pageY - 10) + 'px')
+            .classed('show', true);
+
+            highlightConnections(d);
+        })
+        .on('mouseout', () => {
+            tooltip.classed('show', false);
+            resetHighlight();
+        });
+
+        // Highlight connections
+        function highlightConnections(d) {
+            const connectedNodes = new Set();
+            connectedNodes.add(d.id);
+
+            link.each(function(l) {
+                if (l.source.id === d.id || l.target.id === d.id) {
+                    connectedNodes.add(l.source.id);
+                    connectedNodes.add(l.target.id);
+                    d3.select(this).classed('highlighted', true);
+                }
+            });
+
+            node.classed('dimmed', n => !connectedNodes.has(n.id));
+        }
+
+        function resetHighlight() {
+            link.classed('highlighted', false);
+            node.classed('dimmed', false);
+        }
+
+        // Drag behavior
+        function drag(simulation) {
+            function dragstarted(event) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+            }
+
+            function dragended(event) {
+                if (!event.active) simulation.alphaTarget(0);
+                event.subject.fx = null;
+                event.subject.fy = null;
+            }
+
+            return d3.drag()
+                .on('start', dragstarted)
+                .on('drag', dragged)
+                .on('end', dragended);
+        }
+
+        // Update stats
+        document.getElementById('total-nodes').textContent = graphData.metadata.totalNodes;
+        document.getElementById('total-links').textContent = graphData.metadata.totalLinks;
+        document.getElementById('visible-nodes').textContent = graphData.metadata.totalNodes;
+
+        // Filter functionality
+        let currentGrade = 'all';
+        let currentCategory = 'all';
+
+        document.querySelectorAll('#grade-filters .filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#grade-filters .filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentGrade = this.dataset.grade;
+                applyFilters();
+            });
+        });
+
+        document.querySelectorAll('#category-filters .filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#category-filters .filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentCategory = this.dataset.category;
+                applyFilters();
+            });
+        });
+
+        function applyFilters() {
+            node.style('display', d => {
+                const gradeMatch = currentGrade === 'all' || d.grade === currentGrade || d.grade === 'all';
+                const categoryMatch = currentCategory === 'all' || d.category === currentCategory;
+                return (gradeMatch && categoryMatch) ? 'block' : 'none';
+            });
+
+            const visibleCount = graphData.nodes.filter(d => {
+                const gradeMatch = currentGrade === 'all' || d.grade === currentGrade || d.grade === 'all';
+                const categoryMatch = currentCategory === 'all' || d.category === currentCategory;
+                return gradeMatch && categoryMatch;
+            }).length;
+
+            document.getElementById('visible-nodes').textContent = visibleCount;
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (searchTerm === '') {
+                resetHighlight();
+                return;
+            }
+
+            const matchingNodes = new Set();
+            node.each(function(d) {
+                if (d.name.toLowerCase().includes(searchTerm)) {
+                    matchingNodes.add(d.id);
+                }
+            });
+
+            node.classed('dimmed', d => !matchingNodes.has(d.id));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obsidian Knowledge Graph - Deep View</title>
+    <script src="https://unpkg.com/force-graph"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #1E1E1E;
+            color: #E5E7EB;
+            overflow: hidden;
+        }
+        #graph { width: 100vw; height: 100vh; }
+        .ui-panel {
+            position: fixed;
+            background: rgba(40, 44, 52, 0.95);
+            padding: 18px 22px;
+            border-radius: 12px;
+            border: 1px solid rgba(106, 142, 174, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        .ui-panel:hover { border-color: rgba(106, 142, 174, 0.6); }
+        h3, h4 {
+            color: #D1A15A;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+        h3 { font-size: 14px; margin-bottom: 14px; }
+        h4 { font-size: 13px; margin-bottom: 10px; }
+        #info { top: 20px; left: 20px; max-width: 280px; }
+        #info p {
+            margin: 8px 0; font-size: 13px; color: #B8BEC8;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        #info p strong { color: #6A8EAE; font-weight: 500; }
+        #info p span { background: rgba(106, 142, 174, 0.2); padding: 3px 10px; border-radius: 8px; font-weight: 600; color: #D1A15A; }
+        #search { top: 20px; right: 20px; }
+        #search input {
+            background: rgba(30, 30, 30, 0.8); border: 1px solid rgba(106, 142, 174, 0.2);
+            color: #E5E7EB; padding: 10px 16px; border-radius: 8px; width: 280px; font-size: 13px; transition: all 0.3s;
+        }
+        #search input:focus { outline: none; border-color: #6A8EAE; box-shadow: 0 0 0 3px rgba(106, 142, 174, 0.15); }
+        #controls { bottom: 20px; right: 20px; display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
+        button {
+            background: linear-gradient(135deg, #6A8EAE 0%, #5A7A9A 100%); color: white; border: none; padding: 10px 16px;
+            border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(106, 142, 174, 0.3);
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(106, 142, 174, 0.5); }
+        button.active { background: linear-gradient(135deg, #D1A15A 0%, #B8904A 100%); }
+        #legend { bottom: 20px; left: 20px; }
+        .legend-item { display: flex; align-items: center; margin: 6px 0; font-size: 12px; }
+        .legend-color { width: 16px; height: 16px; border-radius: 50%; margin-right: 10px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 30, 30, 0.95); display: flex; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 1; transition: opacity 0.5s ease;
+        }
+        .loading-overlay.hide { opacity: 0; pointer-events: none; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(106, 142, 174, 0.2); border-top-color: #6A8EAE; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loading"><div class="spinner"></div></div>
+    
+    <div id="graph"></div>
+    
+    <div id="info" class="ui-panel">
+        <h3>THỐNG KÊ</h3>
+        <p><strong>Nodes:</strong> <span id="node-count">0</span></p>
+        <p><strong>Links:</strong> <span id="link-count">0</span></p>
+    </div>
+    
+    <div id="search" class="ui-panel">
+        <input type="text" id="search-input" placeholder="Tìm kiếm...">
+    </div>
+    
+    <div id="controls" class="ui-panel">
+        <button onclick="Graph.zoomToFit(1000, 80)">Reset View</button>
+        <button id="physics-btn" onclick="togglePhysics()" class="active">Physics</button>
+        <button id="labels-btn" onclick="toggleLabels()" class="active">Labels</button>
+    </div>
+    
+    <div id="legend" class="ui-panel">
+        <h4>CHÚ THÍCH</h4>
+        <div class="legend-item"><div class="legend-color" style="background: #D1A15A;"></div><span>Hub (>10)</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #6A8EAE;"></div><span>Quan trọng (6-10)</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #5A9D9A;"></div><span>Trung bình (3-5)</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #7A8A9A;"></div><span>Cơ bản (1-2)</span></div>
+    </div>
+
+    <script>
+        // === DỮ LIỆU GRAPH - ĐÃ TÍCH HỢP TRỰC TIẾP ===
+        const graphData = {
+            nodes: [
+                { id: "A", label: "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số", group: "toan12" },
+                { id: "B", label: "Vectơ và quan hệ vuông góc trong không gian", group: "toan11" },
+                { id: "C", label: "Vectơ", group: "toan10" },
+                { id: "D", label: "Đạo hàm", group: "toan11" },
+                { id: "E", label: "Đường thẳng, mặt phẳng và quan hệ song song trong không gian", group: "toan11" },
+                { id: "F", label: "Thống kê", group: "toan10" },
+                { id: "G", label: "Tổ hợp và Xác suất", group: "toan11" },
+                { id: "H", label: "Toán phổ thông", group: "common" },
+                { id: "I", label: "Sự đồng biến, nghịch biến của hàm số", group: "common" },
+                { id: "J", label: "Tích vô hướng của hai vectơ", group: "toan10" },
+                { id: "K", label: "Toán 12", group: "toan12" },
+                { id: "L", label: "Toán 11", group: "toan11" },
+                { id: "M", label: "Toán 10", group: "toan10" },
+                { id: "N", label: "Phương trình, Hệ phương trình", group: "toan10" },
+                { id: "O", label: "Phương pháp tọa độ trong không gian", group: "toan12" },
+                { id: "P", label: "Số phức", group: "toan12" },
+                { id: "Q", label: "Phép dời hình và phép đồng dạng trong mặt phẳng", group: "toan11" },
+                { id: "R", label: "Phương pháp tọa độ trong mặt phẳng", group: "toan10" },
+                { id: "S", label: "Nguyên hàm, Tích phân và Ứng dụng", group: "toan12" },
+                { id: "T", label: "Mặt nón, Mặt trụ, Mặt cầu", group: "toan12" },
+                { id: "U", label: "Mệnh đề. Tập hợp", group: "toan10" },
+                { id: "V", label: "Khối đa diện", group: "toan12" },
+                { id: "W", label: "Hàm số lũy thừa, hàm số mũ và hàm số logarit", group: "toan12" },
+                { id: "X", label: "Hàm số bậc nhất và bậc hai", group: "toan10" },
+                { id: "Y", label: "Giới hạn", group: "toan11" },
+                { id: "Z", label: "Khái niệm số phức", group: "common" },
+                { id: "AA", label: "Hàm số lượng giác và phương trình lượng giác", group: "toan11" },
+                { id: "AB", label: "Cung, góc và công thức lượng giác", group: "toan10" },
+                { id: "AC", label: "Giá trị lớn nhất và giá trị nhỏ nhất của hàm số", group: "common" },
+                { id: "AD", label: "Giá trị lượng giác của một cung", group: "common" },
+                { id: "AE", label: "Dãy số, Cấp số cộng và Cấp số nhân", group: "toan11" },
+                { id: "AF", label: "Bất đẳng thức. Bất phương trình", group: "toan10" }
+            ],
+            links: [
+                { source: "A", target: "I" }, { source: "A", target: "AC" }, { source: "A", target: "K" },
+                { source: "A", target: "Y" }, { source: "A", target: "D" }, { source: "A", target: "S" },
+                { source: "A", target: "AF" }, { source: "A", target: "N" },
+                { source: "B", target: "L" }, { source: "B", target: "C" }, { source: "B", target: "J" },
+                { source: "B", target: "E" }, { source: "B", target: "O" },
+                { source: "C", target: "J" }, { source: "C", target: "Q" }, { source: "C", target: "R" },
+                { source: "C", target: "B" }, { source: "C", target: "E" }, { source: "C", target: "O" },
+                { source: "C", target: "V" }, { source: "C", target: "T" },
+                { source: "D", target: "L" }, { source: "D", target: "Y" }, { source: "D", target: "X" },
+                { source: "D", target: "W" }, { source: "D", target: "AA" }, { source: "D", target: "I" },
+                { source: "D", target: "S" }, { source: "D", target: "A" },
+                { source: "E", target: "L" }, { source: "E", target: "C" }, { source: "E", target: "B" },
+                { source: "E", target: "V" }, { source: "E", target: "T" }, { source: "E", target: "O" },
+                { source: "F", target: "U" }, { source: "F", target: "G" },
+                { source: "G", target: "L" }, { source: "G", target: "U" }, { source: "G", target: "F" },
+                { source: "H", target: "M" }, { source: "H", target: "L" }, { source: "H", target: "K" },
+                { source: "I", target: "D" }, { source: "I", target: "A" }, { source: "I", target: "U" },
+                { source: "I", target: "X" }, { source: "I", target: "N" }, { source: "I", target: "AF" },
+                { source: "I", target: "Y" },
+                { source: "J", target: "C" }, { source: "J", target: "AB" }, { source: "J", target: "R" },
+                { source: "J", target: "O" }, { source: "J", target: "B" }, { source: "J", target: "E" },
+                { source: "K", target: "A" }, { source: "K", target: "W" }, { source: "K", target: "S" },
+                { source: "K", target: "P" }, { source: "K", target: "V" }, { source: "K", target: "T" },
+                { source: "K", target: "O" },
+                { source: "L", target: "AA" }, { source: "L", target: "G" }, { source: "L", target: "AE" },
+                { source: "L", target: "Y" }, { source: "L", target: "D" }, { source: "L", target: "Q" },
+                { source: "L", target: "E" }, { source: "L", target: "B" }, { source: "L", target: "U" },
+                { source: "L", target: "X" },
+                { source: "M", target: "X" }, { source: "M", target: "U" }, { source: "M", target: "N" },
+                { source: "M", target: "AF" }, { source: "M", target: "F" }, { source: "M", target: "AB" },
+                { source: "M", target: "C" }, { source: "M", target: "J" }, { source: "M", target: "R" },
+                { source: "M", target: "L" },
+                { source: "N", target: "U" }, { source: "N", target: "X" }, { source: "N", target: "AF" },
+                { source: "N", target: "AE" }, { source: "N", target: "W" }, { source: "N", target: "AA" },
+                { source: "N", target: "S" }, { source: "N", target: "O" }, { source: "N", target: "R" },
+                { source: "N", target: "P" },
+                { source: "O", target: "K" }, { source: "O", target: "C" }, { source: "O", target: "J" },
+                { source: "O", target: "R" }, { source: "O", target: "E" }, { source: "O", target: "B" },
+                { source: "O", target: "T" },
+                { source: "P", target: "Z" }, { source: "P", target: "K" }, { source: "P", target: "N" },
+                { source: "P", target: "C" }, { source: "P", target: "R" }, { source: "P", target: "AD" },
+                { source: "P", target: "AB" },
+                { source: "Q", target: "L" }, { source: "Q", target: "C" }, { source: "Q", target: "R" },
+                { source: "Q", target: "J" }, { source: "Q", target: "P" },
+                { source: "R", target: "C" }, { source: "R", target: "J" }, { source: "R", target: "O" },
+                { source: "R", target: "P" }, { source: "R", target: "A" }, { source: "R", target: "Q" },
+                { source: "R", target: "E" }, { source: "R", target: "B" }, { source: "R", target: "T" },
+                { source: "S", target: "K" }, { source: "S", target: "Y" }, { source: "S", target: "D" },
+                { source: "S", target: "W" }, { source: "S", target: "AA" }, { source: "S", target: "A" },
+                { source: "S", target: "N" }, { source: "S", target: "T" },
+                { source: "T", target: "K" }, { source: "T", target: "B" }, { source: "T", target: "E" },
+                { source: "T", target: "J" }, { source: "T", target: "O" }, { source: "T", target: "S" },
+                { source: "U", target: "AF" }, { source: "U", target: "AB" }, { source: "U", target: "AE" },
+                { source: "U", target: "AD" }, { source: "U", target: "Y" }, { source: "U", target: "X" },
+                { source: "U", target: "W" }, { source: "U", target: "AA" }, { source: "U", target: "S" },
+                { source: "U", target: "O" },
+                { source: "V", target: "K" }, { source: "V", target: "C" }, { source: "V", target: "J" },
+                { source: "V", target: "E" }, { source: "V", target: "B" }, { source: "V", target: "T" },
+                { source: "V", target: "O" },
+                { source: "W", target: "K" }, { source: "W", target: "U" }, { source: "W", target: "AF" },
+                { source: "W", target: "X" }, { source: "W", target: "D" }, { source: "W", target: "S" },
+                { source: "W", target: "A" },
+                { source: "X", target: "U" }, { source: "X", target: "N" }, { source: "X", target: "AF" },
+                { source: "X", target: "I" }, { source: "X", target: "D" }, { source: "X", target: "A" },
+                { source: "X", target: "S" },
+                { source: "Y", target: "L" }, { source: "Y", target: "AE" }, { source: "Y", target: "X" },
+                { source: "Y", target: "W" }, { source: "Y", target: "AA" }, { source: "Y", target: "AF" },
+                { source: "Y", target: "N" }, { source: "Y", target: "D" }, { source: "Y", target: "S" },
+                { source: "AA", target: "L" }, { source: "AA", target: "AD" }, { source: "AA", target: "AB" },
+                { source: "AA", target: "X" }, { source: "AA", target: "N" }, { source: "AA", target: "Y" },
+                { source: "AA", target: "D" }, { source: "AA", target: "A" }, { source: "AA", target: "S" },
+                { source: "AA", target: "P" },
+                { source: "AB", target: "AD" }, { source: "AB", target: "AA" }, { source: "AB", target: "D" },
+                { source: "AB", target: "S" }, { source: "AB", target: "P" }, { source: "AB", target: "J" },
+                { source: "AD", target: "R" }, { source: "AD", target: "AB" }, { source: "AD", target: "AA" },
+                { source: "AD", target: "D" }, { source: "AD", target: "S" }, { source: "AD", target: "A" },
+                { source: "AD", target: "P" },
+                { source: "AE", target: "L" }, { source: "AE", target: "U" }, { source: "AE", target: "N" },
+                { source: "AE", target: "AF" }, { source: "AE", target: "X" }, { source: "AE", target: "W" },
+                { source: "AE", target: "Y" },
+                { source: "AF", target: "U" }, { source: "AF", target: "X" }, { source: "AF", target: "N" },
+                { source: "AF", target: "W" }, { source: "AF", target: "AA" }, { source: "AF", target: "Y" },
+                { source: "AF", target: "I" }, { source: "AF", target: "S" }, { source: "AF", target: "R" },
+                { source: "AF", target: "O" }
+            ]
+        };
+
+        // === KHỞI TẠO ĐỒ THỊ ===
+        const Graph = ForceGraph();
+        let showLabels = true;
+        let physicsEnabled = true;
+
+        function initializeGraph() {
+            const loadingEl = document.getElementById('loading');
+
+            if (!graphData.nodes || graphData.nodes.length === 0) {
+                alert("Lỗi: Dữ liệu graphData rỗng.");
+                loadingEl.classList.add('hide');
+                return;
+            }
+
+            // Tính độ kết nối
+            const nodeDegrees = {};
+            graphData.nodes.forEach(n => nodeDegrees[n.id] = 0);
+            graphData.links.forEach(link => {
+                nodeDegrees[link.source]++;
+                nodeDegrees[link.target]++;
+            });
+
+            // Cập nhật thống kê
+            document.getElementById('node-count').textContent = graphData.nodes.length;
+            document.getElementById('link-count').textContent = graphData.links.length;
+
+            // Màu & kích thước
+            const getNodeColor = (node) => {
+                const deg = nodeDegrees[node.id] || 0;
+                if (deg > 10) return '#D1A15A';
+                if (deg > 5) return '#6A8EAE';
+                if (deg > 2) return '#5A9D9A';
+                return '#7A8A9A';
+            };
+
+            const getNodeSize = (node) => Math.max(4, Math.sqrt(nodeDegrees[node.id] || 0) * 3);
+
+            // Khởi tạo đồ thị
+            Graph(document.getElementById('graph'))
+                .graphData(graphData)
+                .nodeId('id')
+                .nodeVal(getNodeSize)
+                .nodeColor(getNodeColor)
+                .nodeLabel('label')
+                .nodeCanvasObject((node, ctx, globalScale) => {
+                    const size = getNodeSize(node);
+                    const color = getNodeColor(node);
+                    const label = node.label;
+
+                    // Vẽ node
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, size, 0, 2 * Math.PI);
+                    ctx.fillStyle = color;
+                    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                    ctx.lineWidth = 1;
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Label
+                    if (showLabels && globalScale > 0.6) {
+                        const fontSize = Math.max(10, 12 / globalScale);
+                        ctx.font = `500 ${fontSize}px Inter`;
+                        ctx.fillStyle = '#E5E7EB';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(label, node.x, node.y + size + fontSize * 0.8);
+                    }
+                })
+                .linkWidth(1.2)
+                .linkColor(() => 'rgba(180, 200, 220, 0.18)')
+                .linkDirectionalParticles(1)
+                .linkDirectionalParticleWidth(1.5)
+                .linkDirectionalParticleSpeed(0.004)
+                .backgroundColor('#1E1E1E')
+                .d3Force('charge', d3.forceManyBody().strength(-180))
+                .d3Force('link', d3.forceLink().distance(70).strength(0.8))
+                .d3Force('center', d3.forceCenter())
+                .onEngineStop(() => {
+                    loadingEl.classList.add('hide');
+                    Graph.zoomToFit(1000, 100);
+                })
+                .onNodeClick(node => {
+                    Graph.centerAt(node.x, node.y, 800);
+                    Graph.zoom(4, 800);
+                });
+
+            // Tìm kiếm
+            document.getElementById('search-input').addEventListener('input', e => {
+                const term = e.target.value.toLowerCase().trim();
+                if (!term) return;
+                const matched = graphData.nodes.find(n =>
+                    n.label.toLowerCase().includes(term)
+                );
+                if (matched) {
+                    Graph.centerAt(matched.x, matched.y, 800);
+                    Graph.zoom(4, 800);
+                }
+            });
+        }
+
+        // Controls
+        function togglePhysics() {
+            physicsEnabled = !physicsEnabled;
+            document.getElementById('physics-btn').classList.toggle('active');
+            physicsEnabled ? Graph.resumeAnimation() : Graph.pauseAnimation();
+        }
+
+        function toggleLabels() {
+            showLabels = !showLabels;
+            document.getElementById('labels-btn').classList.toggle('active');
+            Graph.refresh();
+        }
+
+        window.onload = initializeGraph;
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "type": "graph",
+      "ctime": 1762326702149,
+      "title": "Knowledge Graph",
+      "options": {
+        "collapse-filter": true,
+        "search": "",
+        "showTags": false,
+        "showAttachments": false,
+        "hideUnresolved": false,
+        "showOrphans": true,
+        "collapse-color-groups": false,
+        "colorGroups": [],
+        "collapse-display": false,
+        "showArrow": true,
+        "textFadeMultiplier": -0.6,
+        "nodeSizeMultiplier": 1.59020618556701,
+        "lineSizeMultiplier": 1.28711340206186,
+        "collapse-forces": false,
+        "centerStrength": 0.120274914089347,
+        "repelStrength": 7.7319587628866,
+        "linkStrength": 0.584192439862543,
+        "linkDistance": 234,
+        "scale": 0.5087618855792441,
+        "close": true
+      }
+    }
+  ]
+}

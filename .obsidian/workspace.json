@@ -1,0 +1,273 @@
+{
+  "main": {
+    "id": "d99ce9fb0ea73dc5",
+    "type": "split",
+    "children": [
+      {
+        "id": "83de0e141788a620",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "216392bf9b3473f4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Sự đồng biến, nghịch biến của hàm số.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Sự đồng biến, nghịch biến của hàm số"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "b15bb719dc97b7f3",
+    "type": "split",
+    "children": [
+      {
+        "id": "6ecb3c6fc1118e28",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ceaa5982a720f9d7",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "b48ec4c4c91840d5",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "c4371e9226f81f6c",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 433
+  },
+  "right": {
+    "id": "c2d56518593e791f",
+    "type": "split",
+    "children": [
+      {
+        "id": "622d1412c6642fc2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3193438c502bf9f8",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "f01b7f5c97de02eb",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "b858575509b74c92",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "f935d5aa03a1d8f7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          },
+          {
+            "id": "1a347f5835843200",
+            "type": "leaf",
+            "state": {
+              "type": "juggl_nodes",
+              "state": {},
+              "icon": "ag-node-list",
+              "title": "Juggl nodes"
+            }
+          },
+          {
+            "id": "e4df85ebe4aa06ce",
+            "type": "leaf",
+            "state": {
+              "type": "juggl_style",
+              "state": {},
+              "icon": "ag-style",
+              "title": "Juggl style"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "webpage-html-export:Export as HTML": false,
+      "export-graph-view:Export graph view": false,
+      "juggl:Juggl global graph": false,
+      "3d-graph:3D Graph": false,
+      "3d-graph-new:Global 3D Graph": false
+    }
+  },
+  "floating": {
+    "id": "0ae8bc32bea778ad",
+    "type": "floating",
+    "children": [
+      {
+        "id": "c5cfb107a65f7960",
+        "type": "window",
+        "children": [
+          {
+            "id": "1688284dba88e1bf",
+            "type": "tabs",
+            "children": [
+              {
+                "id": "0a40a99e0ae86ccc",
+                "type": "leaf",
+                "state": {
+                  "type": "graph",
+                  "state": {},
+                  "icon": "lucide-git-fork",
+                  "title": "Graph view"
+                }
+              }
+            ]
+          }
+        ],
+        "direction": "vertical",
+        "x": 131,
+        "y": 21,
+        "width": 1444,
+        "height": 976,
+        "maximize": true,
+        "zoom": 0
+      }
+    ]
+  },
+  "active": "216392bf9b3473f4",
+  "lastOpenFiles": [
+    "Thống kê.md",
+    "Số phức.md",
+    "Phương trình, Hệ phương trình.md",
+    "Phương pháp tọa độ trong không gian.md",
+    "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+    "Toán 10.md",
+    "Mặt nón, Mặt trụ, Mặt cầu.md",
+    "Mệnh đề. Tập hợp.md",
+    "Nguyên hàm, Tích phân và Ứng dụng.md",
+    "Phương pháp tọa độ trong mặt phẳng.md",
+    "Sự đồng biến, nghịch biến của hàm số.md",
+    "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+    "Tích vô hướng của hai vectơ.md",
+    "Toán 12.md",
+    "Vectơ và quan hệ vuông góc trong không gian.md",
+    "Tổ hợp và Xác suất.md",
+    "Toán 11.md",
+    "Toán phổ thông.md",
+    "Vectơ.md",
+    "Bất đẳng thức. Bất phương trình.md",
+    "generate_graph_data.py",
+    "Cung, góc và công thức lượng giác.md",
+    "Đạo hàm.md",
+    "Dãy số, Cấp số cộng và Cấp số nhân.md",
+    "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+    "Giá trị lượng giác của một cung.md",
+    "Giới hạn.md",
+    "obsidian_graph_v3.html",
+    "toan_hoc_graph.mmd",
+    "Data2.txt",
+    "obsidian_graph_v2.html",
+    "Data.txt",
+    "Data.py",
+    "obsidian_graph.html",
+    "Knowledge Graph.mmd",
+    "AI - Skills tree.html",
+    "Untitled.canvas",
+    "Untitled 3.canvas",
+    "Untitled 2.canvas",
+    "Untitled 1.canvas"
+  ]
+}
