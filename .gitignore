@@ -1,0 +1,13 @@
+# .gitignore
+
+# Ẩn file .env
+.env
+
+# Ẩn file Python cache
+__pycache__/
+*.pyc
+
+# Ẩn file tạm
+*.log
+data.js
+*.tmp

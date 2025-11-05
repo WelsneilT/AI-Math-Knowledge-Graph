@@ -1,7 +1,122 @@
-const graphData = 
-{
-  "nodes": [
-    
-  ],
-  "links": []
-}
+        const rawFiles = [
+    {
+        "name": "Bất đẳng thức. Bất phương trình.md",
+        "content": "- [[Bất đẳng thức]]\n- [[Bất phương trình]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Phương trình, Hệ phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Giới hạn]]\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Phương pháp tọa độ trong không gian]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]"
+    },
+    {
+        "name": "Cung, góc và công thức lượng giác.md",
+        "content": "- [[Cung và góc lượng giác]]\n- [[Giá trị lượng giác của một cung]]\n- [[Công thức lượng giác]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Giá trị lượng giác của một cung]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Đạo hàm]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Số phức]]\n- [[Tích vô hướng của hai vectơ]]"
+    },
+    {
+        "name": "Dãy số, Cấp số cộng và Cấp số nhân.md",
+        "content": "```\n---\ntags:\n  - MOC\n  - Đại_số_11\n---\n\n# Chương 3: Dãy số - Cấp số cộng - Cấp số nhân\n\n## Các đơn vị kiến thức\n\n- [[Phương pháp quy nạp toán học]]\n- [[Dãy số]]\n- [[Cấp số cộng]]\n- [[Cấp số nhân]]\n\n---\n\nQuay về: [[Toán 11]]\n\n---\n\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Phương trình, Hệ phương trình]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Giới hạn]]\n```"
+    },
+    {
+        "name": "Giá trị lượng giác của một cung.md",
+        "content": "---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Phương pháp tọa độ trong mặt phẳng]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Cung, góc và công thức lượng giác]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Tích vô hướng của hai vec tơ]]\n- [[Đạo hàm]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Số phức]]"
+    },
+    {
+        "name": "Giới hạn.md",
+        "content": "```markdown\n---\ntags:\n  - MOC\n  - Giải_tích_11\n---\n\n# Chương 4: Giới hạn\n\n## Các đơn vị kiến thức\n\n- [[Giới hạn của dãy số]]\n- [[Giới hạn của hàm số]]\n- [[Hàm số liên tục]]\n\n---\n\nQuay về: [[Toán 11]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Dãy số, Cấp số cộng và Cấp số nhân]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Phương trình, Hệ phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Đạo hàm]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n```"
+    },
+    {
+        "name": "Hàm số bậc nhất và bậc hai.md",
+        "content": "```markdown\n## Các đơn vị kiến thức\n- [[Đại cương về hàm số]]\n- [[Hàm số bậc nhất y = ax + b]]\n- [[Hàm số bậc hai y = ax^2 + bx + c]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Phương trình, Hệ phương trình]]\n- [[Bất đẳng thức. Bất phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Đạo hàm]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n```"
+    },
+    {
+        "name": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+        "content": "```markdown\n---\ntags:\n  - MOC\n  - Giải_tích_12\n---\n# Chương 2: Hàm số lũy thừa, hàm số mũ và hàm số logarit\n\n## Các đơn vị kiến thức\n- [[Lũy thừa và Hàm số lũy thừa]]\n- [[Logarit và Hàm số mũ, Hàm số logarit]]\n- [[Phương trình mũ và phương trình logarit]]\n- [[Bất phương trình mũ và bất phương trình logarit]]\n\n---\nQuay về: [[Toán 12]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Đạo hàm]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n```"
+    },
+    {
+        "name": "Hàm số lượng giác và phương trình lượng giác.md",
+        "content": "---\ntags:\n  - MOC\n  - Giải_tích_11\n---\n\n# Chương 1: Hàm số lượng giác và Phương trình lượng giác\n\n## Các đơn vị kiến thức\n- [[Hàm số lượng giác]]\n- [[Phương trình lượng giác cơ bản]]\n- [[Một số phương trình lượng giác thường gặp]]\n\n---\n\nQuay về: [[Toán 11]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Giá trị lượng giác của một cung]]\n- [[Cung, góc và công thức lượng giác]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Phương trình, Hệ phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Giới hạn]]\n- [[Đạo hàm]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Số phức]]"
+    },
+    {
+        "name": "Khối đa diện.md",
+        "content": "---\ntags:\n  - MOC\n  - Hình_học_12\n---\n# Chương 5: Khối đa diện\n\n## Các đơn vị kiến thức\n- [[Khái niệm về khối đa diện, khối đa diện lồi và khối đa diện đều]]\n- [[Thể tích của khối đa diện]]\n\n---\nQuay về: [[Toán 12]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Tích vô hướng của hai vectơ]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Mặt nón, Mặt trụ, Mặt cầu]]\n- [[Phương pháp tọa độ trong không gian]]"
+    },
+    {
+        "name": "Mặt nón, Mặt trụ, Mặt cầu.md",
+        "content": "---\ntags:\n  - MOC\n  - Hình_học_12\n---\n# Chương 6: Mặt nón, Mặt trụ, Mặt cầu\n\n## Các đơn vị kiến thức\n- [[Khái niệm về mặt nón, mặt trụ, mặt cầu]]\n- [[Diện tích và thể tích của mặt nón, mặt trụ, mặt cầu]]\n\n---\nQuay về: [[Toán 12]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Tích vô hướng của hai vectơ]]\n- [[Phương pháp tọa độ trong không gian]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Nguyên hàm, Tích phân và Ứng dụng]]"
+    },
+    {
+        "name": "Mệnh đề. Tập hợp.md",
+        "content": "```markdown\n## Các đơn vị kiến thức\n- [[Mệnh đề]]\n- [[Tập hợp]]\n---\n## Liên kết kiến thức\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Cung, góc và công thức lượng giác]]\n- [[Dãy số, Cấp số cộng và Cấp số nhân]]\n- [[Giá trị lượng giác của một cung]]\n- [[Giới hạn]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Phương pháp tọa độ trong không gian]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Phương trình, Hệ phương trình]]\n- [[Số phức]]\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Tổ hợp và Xác suất]]\n- [[Đạo hàm]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n```"
+    },
+    {
+        "name": "Nguyên hàm, Tích phân và Ứng dụng.md",
+        "content": "---\ntags:\n  - MOC\n  - Giải_tích_12\n---\n# Chương 3: Nguyên hàm - Tích phân và Ứng dụng\n\n## Các đơn vị kiến thức\n- [[Nguyên hàm]]\n- [[Tích phân]]\n- [[Ứng dụng của tích phân trong hình học]]\n\n---\nQuay về: [[Toán 12]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Giới hạn]]\n- [[Đạo hàm]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Phương trình, Hệ phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Mặt nón, Mặt trụ, Mặt cầu]]"
+    },
+    {
+        "name": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
+        "content": "---\ntags:\n  - MOC\n  - Hình_học_11\n---\n\n# Chương 6: Phép dời hình và phép đồng dạng trong mặt phẳng\n\n## Các đơn vị kiến thức\n\n- [[Phép biến hình và phép tịnh tiến]]\n- [[Phép đối xứng trục]]\n- [[Phép đối xứng tâm]]\n- [[Phép quay]]\n- [[Khái niệm về phép dời hình và hai hình bằng nhau]]\n- [[Phép vị tự và phép đồng dạng]]\n\n---\n\nQuay về: [[Toán 11]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Tích vô hướng của hai vectơ]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Số phức]]"
+    },
+    {
+        "name": "Phương pháp tọa độ trong không gian.md",
+        "content": "---\ntags:\n  - MOC\n  - Hình_học_12\n---\n# Chương 7: Phương pháp tọa độ trong không gian\n\n## Các đơn vị kiến thức\n- [[Hệ tọa độ trong không gian]]\n- [[Phương trình mặt phẳng]]\n- [[Phương trình đường thẳng]]\n\n---\nQuay về: [[Toán 12]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Tích vô hướng của hai vectơ]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Mặt nón, Mặt trụ, Mặt cầu]]"
+    },
+    {
+        "name": "Phương pháp tọa độ trong mặt phẳng.md",
+        "content": "- [[Phương trình đường thẳng]]\n- [[Phương trình đường tròn]]\n- [[Phương trình đường elip]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Tích vô hướng của hai vectơ]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Phương pháp tọa độ trong không gian]]\n- [[Số phức]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Phép dời hình và phép đồng dạng trong mặt phẳng]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Mặt nón, Mặt trụ, Mặt cầu]]"
+    },
+    {
+        "name": "Phương trình, Hệ phương trình.md",
+        "content": "---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Hàm số bậc nhất và bậc hai]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Dãy số, Cấp số cộng và Cấp số nhân]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Phương pháp tọa độ trong không gian]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Số phức]]\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]"
+    },
+    {
+        "name": "Số phức.md",
+        "content": "---\ntags:\n  - MOC\n  - Giải_tích_12\n---\n# Chương 4: Số phức\n\n## Các đơn vị kiến thức\n- [[Khái niệm số phức]]\n- [[Phép cộng, trừ và nhân số phức]]\n- [[Phép chia số phức]]\n- [[Phương trình bậc hai với hệ số thực]]\n\n---\nQuay về: [[Toán 12]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Phương trình, Hệ phương trình]]\n- [[Vectơ]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Giá trị lượng giác của một cung]]\n- [[Cung, góc và công thức lượng giác]]"
+    },
+    {
+        "name": "Sự đồng biến, nghịch biến của hàm số.md",
+        "content": "```markdown\n---\n\ntags:\n  - Khảo_sát_hàm_số\n  - Giải_tích_12\n\n---\n\n# Sự đồng biến, nghịch biến của hàm số\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Phương trình, Hệ phương trình]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Giới hạn]]\n- [[Đạo hàm]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n```"
+    },
+    {
+        "name": "Thống kê.md",
+        "content": "```markdown\n- [[Khái niệm cơ bản về thống kê]]\n- [[Phương sai và độ lệch chuẩn]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Tổ hợp và Xác suất]]\n```"
+    },
+    {
+        "name": "Toán 10.md",
+        "content": "- [[Hàm số bậc nhất và bậc hai]]\n- [[Mệnh đề. Tập hợp]]\n- [[Phương trình, Hệ phương trình]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Thống kê]]\n- [[Cung, góc và công thức lượng giác]]\n- [[Vectơ]]\n- [[Tích vô hướng của hai vectơ]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n---\n## Liên kết kiến thức\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Toán 11]]\n- [[Toán 12]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Cung, góc và công thức lượng giác]]\n- [[Dãy số, Cấp số cộng và Cấp số nhân]]\n- [[Giá trị lượng giác của một cung]]\n- [[Giới hạn]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Phương pháp tọa độ trong không gian]]\n- [[Phương trình, Hệ phương trình]]\n- [[Số phức]]\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Tổ hợp và Xác suất]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Đạo hàm]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]"
+    },
+    {
+        "name": "Toán 11.md",
+        "content": "```markdown\n## Phần 1: Đại số và Giải tích 11\n\n- **Chương 1:** [[Hàm số lượng giác và phương trình lượng giác]]\n- **Chương 2:** [[Tổ hợp và Xác suất]]\n- **Chương 3:** [[Dãy số, Cấp số cộng và Cấp số nhân]]\n- **Chương 4:** [[Giới hạn]]\n- **Chương 5:** [[Đạo hàm]]\n\n## Phần 2: Hình học 11\n\n- **Chương 6:** [[Phép dời hình và phép đồng dạng trong mặt phẳng]]\n- **Chương 7:** [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- **Chương 8:** [[Vectơ và quan hệ vuông góc trong không gian]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Phương trình, Hệ phương trình]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Vectơ]]\n- [[Tích vô hướng của hai vec tơ]]\n- [[Giá trị lượng giác của một cung]]\n- [[Cung, góc và công thức lượng giác]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Toán 12]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Khối đa diện]]\n- [[Mặt nón, Mặt trụ, Mặt cầu]]\n- [[Phương pháp tọa độ trong không gian]]\n```"
+    },
+    {
+        "name": "Toán 12.md",
+        "content": "```markdown\ntags:\n\n- MOC\n  - Toán_học\n\n---\n\n# Sơ đồ nội dung Toán 12\n\nĐây là nơi tổng hợp toàn bộ kiến thức và các chương của môn Toán lớp 12, bao gồm Giải tích và Hình học.\n\n## Phần 1: Giải tích 12\n\n- **Chương 1:** [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- **Chương 2:** [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- **Chương 3:** [[Nguyên hàm, Tích phân và Ứng dụng]]\n- **Chương 4:** [[Số phức]]\n\n## Phần 2: Hình học 12\n\n- **Chương 5:** [[Khối đa diện]]\n- **Chương 6:** [[Mặt nón, Mặt trụ, Mặt cầu]]\n- **Chương 7:** [[Phương pháp tọa độ trong không gian]]\n```"
+    },
+    {
+        "name": "Toán phổ thông.md",
+        "content": "[[Toán 10]]\n[[Toán 11]]\n[[Toán 12]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Toán 10]]\n- [[Toán 11]]\n- [[Toán 12]]"
+    },
+    {
+        "name": "Tích vô hướng của hai vectơ.md",
+        "content": "- [[Giá trị lượng giác của một góc bất kỳ từ 0° đến 180°]]\n- [[Tích vô hướng của hai vec tơ]]]\n- [[Các hệ thức lượng trong tam giác]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Cung, góc và công thức lượng giác]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Phương pháp tọa độ trong không gian]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]"
+    },
+    {
+        "name": "Tổ hợp và Xác suất.md",
+        "content": "---\ntags:\n  - MOC\n  - Đại_số_11\n---\n\n# Chương 2: Tổ hợp và Xác suất\n\n## Các đơn vị kiến thức\n- [[Quy tắc đếm]]\n- [[Hoán vị, Chỉnh hợp, Tổ hợp]]\n- [[Nhị thức Niu-tơn]]\n- [[Phép thử và biến cố]]\n- [[Xác suất của biến cố]]\n\n---\n\nQuay về: [[Toán 11]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Thống kê]]"
+    },
+    {
+        "name": "Vectơ và quan hệ vuông góc trong không gian.md",
+        "content": "```markdown\n---\ntags:\n---\n# Chương 8: Vectơ và quan hệ vuông góc trong không gian\n\n## Các đơn vị kiến thức\n- [[Vectơ trong không gian]]\n- [[Hai đường thẳng vuông góc]]\n- [[Đường thẳng vuông góc với mặt phẳng]]\n- [[Hai mặt phẳng vuông góc]]\n- [[Khoảng cách]]\n\n---\nQuay về: [[Toán 11]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Tích vô hướng của hai vectơ]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Phương pháp tọa độ trong không gian]]\n```"
+    },
+    {
+        "name": "Vectơ.md",
+        "content": "- [[Vectơ và các phép toán cộng, trừ, nhân với một số]]\n- [[Hệ trục tọa độ]]\n---\n## Liên kết kiến thức\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Tích vô hướng của hai vectơ]]\n- [[Phép dời hình và phép đồng dạng trong mặt phẳng]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Phương pháp tọa độ trong không gian]]\n- [[Khối đa diện]]\n- [[Mặt nón, Mặt trụ, Mặt cầu]]"
+    },
+    {
+        "name": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
+        "content": "```markdown\n---\ntags:\n- MOC\n- Hình_học_11\n---\n\n# Chương 7: Đường thẳng, mặt phẳng và quan hệ song song trong không gian\n\n## Các đơn vị kiến thức\n\n- [[Đại cương về đường thẳng và mặt phẳng]]\n- [[Hai đường thẳng chéo nhau và hai đường thẳng song song]]\n- [[Đường thẳng và mặt phẳng song song]]\n- [[Hai mặt phẳng song song]]\n\n---\n\nQuay về: [[Toán 11]]\n\n---\n\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n\n- [[Vectơ]]\n- [[Tích vô hướng của hai vec tơ]]\n\n### Kiến thức kế thừa (Ứng dụng)\n\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Khối đa diện]]\n- [[Mặt nón, Mặt trụ, Mặt cầu]]\n- [[Phương pháp tọa độ trong không gian]]\n```"
+    },
+    {
+        "name": "Đạo hàm.md",
+        "content": "---\ntags:\n  - MOC\n  - Giải_tích_11\n---\n\n# Chương 5: Đạo hàm\n\n## Các đơn vị kiến thức\n\n- [[Định nghĩa và ý nghĩa của đạo hàm]]\n- [[Quy tắc tính đạo hàm]]\n- [[Đạo hàm của hàm số lượng giác]]\n- [[Đạo hàm cấp hai]]\n\n---\n\nQuay về: [[Toán 11]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Giới hạn]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]"
+    },
+    {
+        "name": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+        "content": "---\ntags:\n  - MOC\n  - Giải_tích_12\n---\n# Chương 1: Ứng dụng đạo hàm để khảo sát và vẽ đồ thị của hàm số\n\n## Các đơn vị kiến thức\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Cực trị của hàm số]]\n- [[Giá trị lớn nhất và giá trị nhỏ nhất của hàm số]]\n- [[Bảng biến thiên và đồ thị của hàm số]]\n- [[Đường tiệm cận]]\n\n---\nQuay về: [[Toán 12]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Giới hạn]]\n- [[Đạo hàm]]\n- [[Sự đồng biến, nghịch biến của hàm số]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Phương trình, Hệ phương trình]]"
+    }
+];

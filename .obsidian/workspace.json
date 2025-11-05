@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Sự đồng biến, nghịch biến của hàm số.md",
+                "file": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Sự đồng biến, nghịch biến của hàm số"
+              "title": "Hàm số lũy thừa, hàm số mũ và hàm số logarit"
             }
           }
         ]
@@ -227,10 +227,14 @@
       }
     ]
   },
-  "active": "216392bf9b3473f4",
+  "active": "0a40a99e0ae86ccc",
   "lastOpenFiles": [
-    "Thống kê.md",
+    "vercel.json",
     "Số phức.md",
+    "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
+    "data.js",
+    "Sự đồng biến, nghịch biến của hàm số.md",
+    "Thống kê.md",
     "Phương trình, Hệ phương trình.md",
     "Phương pháp tọa độ trong không gian.md",
     "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
@@ -239,7 +243,6 @@
     "Mệnh đề. Tập hợp.md",
     "Nguyên hàm, Tích phân và Ứng dụng.md",
     "Phương pháp tọa độ trong mặt phẳng.md",
-    "Sự đồng biến, nghịch biến của hàm số.md",
     "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
     "Tích vô hướng của hai vectơ.md",
     "Toán 12.md",
@@ -254,8 +257,6 @@
     "Đạo hàm.md",
     "Dãy số, Cấp số cộng và Cấp số nhân.md",
     "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
-    "Giá trị lượng giác của một cung.md",
-    "Giới hạn.md",
     "obsidian_graph_v3.html",
     "toan_hoc_graph.mmd",
     "Data2.txt",
@@ -264,7 +265,6 @@
     "Data.py",
     "obsidian_graph.html",
     "Knowledge Graph.mmd",
-    "AI - Skills tree.html",
     "Untitled.canvas",
     "Untitled 3.canvas",
     "Untitled 2.canvas",
