@@ -1,9 +1,4 @@
----
-tags:
-  - MOC
-  - Giải_tích_12
----
-# Chương 4: Số phức
+# Số phức
 
 ## Các đơn vị kiến thức
 - [[Khái niệm số phức]]
@@ -12,13 +7,11 @@ tags:
 - [[Phương trình bậc hai với hệ số thực]]
 
 ---
-Quay về: [[Toán 12]]
----
 ## Liên kết kiến thức
 
 ### Kiến thức tiên quyết (Nền tảng)
-- [[Phương trình, Hệ phương trình]]
 - [[Vectơ]]
 - [[Phương pháp tọa độ trong mặt phẳng]]
-- [[Giá trị lượng giác của một cung]]
 - [[Cung, góc và công thức lượng giác]]
+- [[Hàm số lượng giác và phương trình lượng giác]]
+- [[Phương trình, Hệ phương trình]]

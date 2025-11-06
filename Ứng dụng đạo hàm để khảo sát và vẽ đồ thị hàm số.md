@@ -1,17 +1,4 @@
----
-
-### **Cấp 2: Sơ đồ nội dung các chương (File chi tiết)**
-
-Bây giờ, bạn hãy tạo các file tương ứng với tên trong dấu `[[...]]` ở trên và điền nội dung sau vào.
-
-**File: `Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md`**
-```markdown
----
-tags:
-  - MOC
-  - Giải_tích_12
----
-# Chương 1: Ứng dụng đạo hàm để khảo sát và vẽ đồ thị của hàm số
+# Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số
 
 ## Các đơn vị kiến thức
 - [[Sự đồng biến, nghịch biến của hàm số]]
@@ -21,16 +8,16 @@ tags:
 - [[Đường tiệm cận]]
 
 ---
-Quay về: [[Toán 12]]
----
 ## Liên kết kiến thức
 
 ### Kiến thức tiên quyết (Nền tảng)
-- [[Giới hạn]]
 - [[Đạo hàm]]
-- [[Sự đồng biến, nghịch biến của hàm số]]
-
-### Kiến thức kế thừa (Ứng dụng)
-- [[Nguyên hàm, Tích phân và Ứng dụng]]
+- [[Giới hạn]]
 - [[Bất đẳng thức. Bất phương trình]]
 - [[Phương trình, Hệ phương trình]]
+- [[Hàm số bậc nhất và bậc hai]]
+
+### Kiến thức kế thừa (Ứng dụng)
+- [[Phương trình, Hệ phương trình]]
+- [[Bất đẳng thức. Bất phương trình]]
+- [[Nguyên hàm, Tích phân và Ứng dụng]]

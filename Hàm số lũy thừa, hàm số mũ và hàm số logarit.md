@@ -1,9 +1,4 @@
----
-tags:
-  - MOC
-  - Giải_tích_12
----
-# Chương 2: Hàm số lũy thừa, hàm số mũ và hàm số logarit
+# Hàm số lũy thừa, hàm số mũ và hàm số logarit
 
 ## Các đơn vị kiến thức
 - [[Lũy thừa và Hàm số lũy thừa]]
@@ -12,14 +7,11 @@ tags:
 - [[Bất phương trình mũ và bất phương trình logarit]]
 
 ---
-Quay về: [[Toán 12]]
----
 ## Liên kết kiến thức
 
 ### Kiến thức tiên quyết (Nền tảng)
-- [[Mệnh đề. Tập hợp]]
+- [[Phương trình, Hệ phương trình]]
 - [[Bất đẳng thức. Bất phương trình]]
-- [[Hàm số bậc nhất và bậc hai]]
 - [[Đạo hàm]]
 
 ### Kiến thức kế thừa (Ứng dụng)

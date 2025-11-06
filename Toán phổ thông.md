@@ -1,10 +1,10 @@
-[[Toán 10]]
-[[Toán 11]]
-[[Toán 12]]
+# Toán phổ thông
+
 ---
 ## Liên kết kiến thức
 
 ### Kiến thức tiên quyết (Nền tảng)
-- [[Toán 10]]
-- [[Toán 11]]
-- [[Toán 12]]
+- [[Mệnh đề. Tập hợp]]
+- [[Phương trình, Hệ phương trình]]
+- [[Hàm số bậc nhất và bậc hai]]
+- [[Vectơ]]

@@ -1,7 +1,4 @@
----
-tags:
----
-# Chương 8: Vectơ và quan hệ vuông góc trong không gian
+# Vectơ và quan hệ vuông góc trong không gian
 
 ## Các đơn vị kiến thức
 - [[Vectơ trong không gian]]
@@ -11,14 +8,12 @@ tags:
 - [[Khoảng cách]]
 
 ---
-Quay về: [[Toán 11]]
----
 ## Liên kết kiến thức
 
 ### Kiến thức tiên quyết (Nền tảng)
 - [[Vectơ]]
-- [[Tích vô hướng của hai vectơ]]
 - [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]
+- [[Tích vô hướng của hai vectơ]]
 
 ### Kiến thức kế thừa (Ứng dụng)
 - [[Phương pháp tọa độ trong không gian]]

@@ -1,5 +1,8 @@
+# Thống kê
+## Các đơn vị kiến thức
 - [[Khái niệm cơ bản về thống kê]] 
 - [[Phương sai và độ lệch chuẩn]]
+
 ---
 ## Liên kết kiến thức
 
