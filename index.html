@@ -32,7 +32,7 @@
             box-shadow: 0 6px 32px rgba(0, 0, 0, 0.6);
         }
         
-        h3, h4 { 
+        h3 { 
             color: #9BA8BC; 
             font-weight: 600; 
             text-transform: uppercase; 
@@ -60,24 +60,136 @@
             font-size: 13px;
         }
         
-        #search { top: 20px; right: 20px; }
-        #search input { 
-            background: rgba(15, 20, 30, 0.95); 
-            border: 1px solid rgba(80, 100, 130, 0.3); 
-            color: #E5E7EB; 
-            padding: 10px 16px; 
-            border-radius: 8px; 
-            width: 280px; 
-            font-size: 12px;
-            transition: all 0.25s;
+        /* ⭐ SEARCH - CLEAN & POWERFUL */
+        #search-container { 
+            position: fixed;
+            top: 20px; 
+            right: 20px; 
+            width: 320px;
+            z-index: 200;
         }
-        #search input:focus { 
-            outline: none; 
+        
+        #search-box {
+            position: relative;
+            background: rgba(15, 20, 28, 0.92); 
+            border-radius: 10px; 
+            border: 1px solid rgba(80, 100, 130, 0.25); 
+            backdrop-filter: blur(12px); 
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5); 
+            transition: all 0.25s ease;
+        }
+        
+        #search-box:focus-within {
             border-color: #7A90B0; 
-            box-shadow: 0 0 0 3px rgba(122, 144, 176, 0.12);
-            background: rgba(20, 28, 40, 0.98);
+            box-shadow: 0 6px 32px rgba(122, 144, 176, 0.3);
         }
-        #search input::placeholder { color: rgba(184, 190, 200, 0.4); }
+        
+        #search-input { 
+            background: transparent;
+            border: none;
+            color: #E5E7EB; 
+            padding: 12px 16px; 
+            width: 100%;
+            font-size: 13px;
+            outline: none;
+        }
+        #search-input::placeholder { 
+            color: rgba(184, 190, 200, 0.4); 
+        }
+        
+        /* ⭐ DROPDOWN RESULTS */
+        #search-results {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: rgba(15, 20, 28, 0.98);
+            border: 1px solid rgba(100, 130, 170, 0.35);
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(16px);
+        }
+        
+        #search-results.show { display: block; }
+        
+        .result-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(80, 100, 130, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .result-item:last-child { border-bottom: none; }
+        
+        .result-item:hover {
+            background: rgba(100, 140, 190, 0.15);
+        }
+        
+        .result-item.selected {
+            background: rgba(122, 144, 176, 0.25);
+        }
+        
+        .result-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .result-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .result-name {
+            font-size: 12px;
+            color: #E5E7EB;
+            font-weight: 500;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .result-meta {
+            font-size: 10px;
+            color: #8A9AB0;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .result-badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .result-badge.file {
+            background: rgba(139, 196, 184, 0.2);
+            color: #9BCFC4;
+        }
+        
+        .result-badge.missing {
+            background: rgba(217, 119, 144, 0.2);
+            color: #D97790;
+        }
+        
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #7A8A9A;
+            font-size: 11px;
+        }
+        
+        /* Scrollbar */
+        #search-results::-webkit-scrollbar { width: 6px; }
+        #search-results::-webkit-scrollbar-track { background: rgba(20, 25, 35, 0.5); border-radius: 3px; }
+        #search-results::-webkit-scrollbar-thumb { background: rgba(80, 110, 150, 0.5); border-radius: 3px; }
         
         #controls { 
             bottom: 20px; 
@@ -163,8 +275,6 @@
             50% { opacity: 1; }
         }
         
-        .missing { color: #D97790 !important; font-style: italic; }
-        
         #node-info {
             position: absolute;
             background: rgba(12, 16, 24, 0.96);
@@ -197,44 +307,6 @@
             padding-top: 6px;
             border-top: 1px solid rgba(100, 130, 170, 0.2);
         }
-        
-        /* Query Panel */
-        #query-panel {
-            top: 80px;
-            right: 20px;
-            width: 280px;
-            max-height: 70vh;
-            overflow-y: auto;
-            display: none;
-        }
-        #query-panel.show { display: block; }
-        #query-panel h4 { margin-bottom: 8px; }
-        .query-item {
-            padding: 8px 12px;
-            margin: 4px 0;
-            background: rgba(80, 110, 150, 0.1);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 11px;
-            border: 1px solid transparent;
-        }
-        .query-item:hover {
-            background: rgba(100, 140, 190, 0.2);
-            border-color: rgba(100, 140, 190, 0.4);
-            transform: translateX(-3px);
-        }
-        .query-item .count {
-            float: right;
-            color: #7A90B0;
-            font-weight: 600;
-        }
-        
-        /* Scrollbar */
-        #query-panel::-webkit-scrollbar { width: 6px; }
-        #query-panel::-webkit-scrollbar-track { background: rgba(20, 25, 35, 0.5); border-radius: 3px; }
-        #query-panel::-webkit-scrollbar-thumb { background: rgba(80, 110, 150, 0.5); border-radius: 3px; }
-        #query-panel::-webkit-scrollbar-thumb:hover { background: rgba(100, 130, 170, 0.7); }
     </style>
 </head>
 <body>
@@ -252,19 +324,26 @@
         <p><strong>Links:</strong> <span id="link-count">0</span></p>
     </div>
 
-    <div id="search" class="ui-panel">
-        <input type="text" id="search-input" placeholder="🔍 Tìm kiếm chủ đề...">
+    <div id="search-container">
+        <div id="search-box">
+            <input 
+                type="text" 
+                id="search-input" 
+                placeholder="🔍 Tìm kiếm chủ đề... (Enter để focus)"
+                autocomplete="off"
+            >
+        </div>
+        <div id="search-results"></div>
     </div>
 
     <div id="controls" class="ui-panel">
         <button onclick="Graph.zoomToFit(1000, 80)">Reset View</button>
         <button id="physics-btn" onclick="togglePhysics()" class="active">Physics</button>
         <button id="labels-btn" onclick="toggleLabels()" class="active">Labels</button>
-        <button id="query-btn" onclick="toggleQuery()">Truy vấn</button>
     </div>
 
     <div id="legend" class="ui-panel">
-        <h4>📌 CHÚ THÍCH</h4>
+        <h3>📌 CHÚ THÍCH</h3>
         <div class="legend-item">
             <div class="legend-color" style="background: #E8B86D;"></div>
             <span>Hub (>10 kết nối)</span>
@@ -282,14 +361,9 @@
             <span>Cơ bản (≤2)</span>
         </div>
     </div>
-    
-    <div id="query-panel" class="ui-panel">
-        <h4>🔍 TRUY VẤN NHANH</h4>
-        <div id="query-list"></div>
-    </div>
 
     <script>
-        // === DỮ LIỆU - BẠN SẼ THAY THẾ PHẦN NÀY ===
+        // === DỮ LIỆU ===
         const rawFiles = [
     {
         "name": "Bất đẳng thức. Bất phương trình.md",
@@ -444,12 +518,6 @@
             })
         };
 
-        graphData.nodes.forEach(node => {
-            node.content = node.isFile 
-                ? fileContentMap.get(node.id) 
-                : `<span class="missing">⚠️ Chưa có file: ${node.id}.md</span>`;
-        });
-
         // === GRAPH SETUP ===
         const Graph = ForceGraph();
         let showLabels = true;
@@ -461,9 +529,12 @@
         let hoverNode = null;
         let clickedNode = null;
         let isDragging = false;
+        
+        let nodeDegrees = {};
+        let selectedResultIndex = -1;
+        let searchResults = [];
 
         function initializeGraph() {
-            const nodeDegrees = {};
             graphData.nodes.forEach(n => nodeDegrees[n.id] = 0);
             graphData.links.forEach(l => { 
                 nodeDegrees[l.source]++; 
@@ -473,13 +544,12 @@
             document.getElementById('node-count').textContent = graphData.nodes.length;
             document.getElementById('link-count').textContent = graphData.links.length;
 
-            // ⭐ MÀU SẮC TINH TẾ HƠN
             const getNodeColor = n => {
                 const deg = nodeDegrees[n.id] || 0;
-                if (deg > 10) return '#E8B86D'; // Vàng nhạt
-                if (deg > 5) return '#D4A574';  // Cam nhạt
-                if (deg > 2) return '#6B9BD1';  // Xanh dương nhạt
-                return '#7A8A9A';               // Xám
+                if (deg > 10) return '#E8B86D';
+                if (deg > 5) return '#D4A574';
+                if (deg > 2) return '#6B9BD1';
+                return '#7A8A9A';
             };
             
             const getNodeSize = n => {
@@ -509,7 +579,6 @@
                     
                     if (isHighlighted) {
                         if (isActive) {
-                            // ⭐ MÀU HIGHLIGHT TINH TẾ - XANH MINT NHẠT
                             fillColor = '#8BC4B8';
                             strokeColor = '#8BC4B8';
                             lineWidth = 4;
@@ -530,7 +599,6 @@
                     ctx.fill(); 
                     ctx.stroke();
 
-                    // ⭐ VẼ CHỮ TINH TẾ
                     if (showLabels && scale > 0.4) {
                         const baseFontSize = 12;
                         const fontSize = isHighlighted ? baseFontSize * 1.2 : baseFontSize;
@@ -549,7 +617,6 @@
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         
-                        // Glow nhẹ cho chữ highlight
                         if (isHighlighted) {
                             ctx.shadowColor = 'rgba(139, 196, 184, 0.4)';
                             ctx.shadowBlur = 8;
@@ -561,8 +628,6 @@
                 })
                 .linkCanvasObject((link, ctx) => {
                     const isHighlighted = highlightLinks.has(link);
-                    
-                    // ⭐ ĐƯỜNG NỐI TINH TẾ
                     const color = isHighlighted ? 'rgba(155, 207, 196, 0.6)' : 'rgba(100, 120, 140, 0.12)';
                     const width = isHighlighted ? 2 : 0.8;
 
@@ -609,12 +674,15 @@
                 })
                 .onNodeHover(node => {
                     if (isDragging || clickedNode) return;
+                    
                     highlightNodes.clear();
                     highlightLinks.clear();
                     hoverNode = node || null;
+                    
                     if (node) {
-                        updateNodeInfo(node, nodeDegrees);
+                        updateNodeInfo(node);
                         highlightNodes.add(node.id);
+                        
                         graphData.links.forEach(link => {
                             if (link.source.id === node.id || link.target.id === node.id) {
                                 highlightLinks.add(link);
@@ -622,9 +690,13 @@
                                 highlightNodes.add(link.target.id);
                             }
                         });
+                        
+                        freezeUnrelatedNodes();
                     } else {
                         nodeInfo.classList.remove('show');
+                        unfreezeAllNodes();
                     }
+                    
                     Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
                 })
                 .onNodeClick(node => {
@@ -633,11 +705,13 @@
                         highlightNodes.clear();
                         highlightLinks.clear();
                         nodeInfo.classList.remove('show');
+                        unfreezeAllNodes();
                     } else {
                         clickedNode = node;
                         highlightNodes.clear();
                         highlightLinks.clear();
                         highlightNodes.add(node.id);
+                        
                         graphData.links.forEach(link => {
                             if (link.source.id === node.id || link.target.id === node.id) {
                                 highlightLinks.add(link);
@@ -645,8 +719,11 @@
                                 highlightNodes.add(link.target.id);
                             }
                         });
-                        updateNodeInfo(node, nodeDegrees);
+                        
+                        updateNodeInfo(node);
+                        freezeUnrelatedNodes();
                     }
+                    
                     Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
                 })
                 .onNodeDragStart(node => {
@@ -655,6 +732,7 @@
                     highlightNodes.clear();
                     highlightLinks.clear();
                     hoverNode = node;
+                    
                     highlightNodes.add(node.id);
                     graphData.links.forEach(link => {
                         if (link.source.id === node.id || link.target.id === node.id) {
@@ -663,7 +741,9 @@
                             highlightNodes.add(link.target.id);
                         }
                     });
-                    updateNodeInfo(node, nodeDegrees);
+                    
+                    updateNodeInfo(node);
+                    freezeUnrelatedNodes();
                     Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
                 })
                 .onNodeDrag(node => {
@@ -677,6 +757,7 @@
                             highlightNodes.clear();
                             highlightLinks.clear();
                             nodeInfo.classList.remove('show');
+                            unfreezeAllNodes();
                             Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
                         }
                     }, 300);
@@ -687,9 +768,26 @@
                         highlightNodes.clear();
                         highlightLinks.clear();
                         nodeInfo.classList.remove('show');
+                        unfreezeAllNodes();
                         Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
                     }
                 });
+
+            function freezeUnrelatedNodes() {
+                graphData.nodes.forEach(n => {
+                    if (!highlightNodes.has(n.id)) {
+                        n.fx = n.x;
+                        n.fy = n.y;
+                    }
+                });
+            }
+
+            function unfreezeAllNodes() {
+                graphData.nodes.forEach(n => {
+                    n.fx = undefined;
+                    n.fy = undefined;
+                });
+            }
 
             document.getElementById('graph').addEventListener('mousemove', e => {
                 if (nodeInfo.classList.contains('show')) {
@@ -708,43 +806,163 @@
                 }
             });
 
-            document.getElementById('search-input').addEventListener('input', e => {
-                const term = e.target.value.toLowerCase().trim();
-                if (!term) {
-                    if (!clickedNode) {
-                        highlightNodes.clear();
-                        highlightLinks.clear();
-                        Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-                    }
-                    return;
-                }
-                const matched = graphData.nodes.find(n => n.label.toLowerCase().includes(term));
-                if (matched) {
-                    Graph.centerAt(matched.x, matched.y, 1000);
-                    Graph.zoom(3, 1000);
-                    setTimeout(() => {
-                        clickedNode = matched;
-                        highlightNodes.clear();
-                        highlightLinks.clear();
-                        highlightNodes.add(matched.id);
-                        graphData.links.forEach(link => {
-                            if (link.source.id === matched.id || link.target.id === matched.id) {
-                                highlightLinks.add(link);
-                                highlightNodes.add(link.source.id);
-                                highlightNodes.add(link.target.id);
-                            }
-                        });
-                        updateNodeInfo(matched, nodeDegrees);
-                        Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-                    }, 500);
-                }
-            });
-
-            // ⭐ TẠO PANEL TRUY VẤN
-            buildQueryPanel(nodeDegrees);
+            setupSearch();
         }
 
-        function updateNodeInfo(node, nodeDegrees) {
+        // ⭐ SEARCH FUNCTIONALITY
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            const searchResultsDiv = document.getElementById('search-results');
+            
+            // Focus on Enter key press
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && document.activeElement !== searchInput) {
+                    searchInput.focus();
+                    e.preventDefault();
+                }
+            });
+            
+            // Input event - realtime search
+            searchInput.addEventListener('input', e => {
+                const term = e.target.value.toLowerCase().trim();
+                selectedResultIndex = -1;
+                
+                if (!term) {
+                    searchResultsDiv.classList.remove('show');
+                    searchResults = [];
+                    return;
+                }
+                
+                // Find matching nodes
+                searchResults = graphData.nodes
+                    .filter(n => n.label.toLowerCase().includes(term))
+                    .sort((a, b) => {
+                        const degA = nodeDegrees[a.id] || 0;
+                        const degB = nodeDegrees[b.id] || 0;
+                        return degB - degA;
+                    })
+                    .slice(0, 10);
+                
+                renderSearchResults();
+            });
+            
+            // Keyboard navigation
+            searchInput.addEventListener('keydown', e => {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (!searchResults.length) return;
+                    selectedResultIndex = Math.min(selectedResultIndex + 1, searchResults.length - 1);
+                    renderSearchResults();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (!searchResults.length) return;
+                    selectedResultIndex = Math.max(selectedResultIndex - 1, -1);
+                    renderSearchResults();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (searchResults.length === 0) return;
+                    
+                    const targetNode = selectedResultIndex >= 0 
+                        ? searchResults[selectedResultIndex] 
+                        : searchResults[0];
+                    
+                    if (targetNode) {
+                        window.selectNode(targetNode.id);
+                    }
+                } else if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    searchResultsDiv.classList.remove('show');
+                    searchResults = [];
+                    searchInput.blur();
+                }
+            });
+            
+            // Click outside to close
+            document.addEventListener('click', e => {
+                if (!e.target.closest('#search-container')) {
+                    searchResultsDiv.classList.remove('show');
+                }
+            });
+        }
+
+
+        function renderSearchResults() {
+            const searchResultsDiv = document.getElementById('search-results');
+            
+            if (searchResults.length === 0) {
+                searchResultsDiv.innerHTML = '<div class="no-results">Không tìm thấy kết quả</div>';
+                searchResultsDiv.classList.add('show');
+                return;
+            }
+            
+            let html = '';
+            searchResults.forEach((node, index) => {
+                const deg = nodeDegrees[node.id] || 0;
+                const icon = node.isFile ? '📄' : '⚠️';
+                const badge = node.isFile 
+                    ? '<span class="result-badge file">File</span>' 
+                    : '<span class="result-badge missing">Missing</span>';
+                const selectedClass = index === selectedResultIndex ? 'selected' : '';
+                
+                html += `
+                    <div class="result-item ${selectedClass}" onclick="selectNode('${node.id}')">
+                        <div class="result-icon">${icon}</div>
+                        <div class="result-content">
+                            <div class="result-name">${node.label}</div>
+                            <div class="result-meta">
+                                ${badge}
+                                <span>${deg} kết nối</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            searchResultsDiv.innerHTML = html;
+            searchResultsDiv.classList.add('show');
+        }
+
+        window.selectNode = function(nodeId) {
+            const node = graphData.nodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            // Clear search
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').classList.remove('show');
+            searchResults = [];
+            
+            // Focus node
+            Graph.centerAt(node.x, node.y, 1000);
+            Graph.zoom(3, 1000);
+            
+            setTimeout(() => {
+                clickedNode = node;
+                highlightNodes.clear();
+                highlightLinks.clear();
+                highlightNodes.add(node.id);
+                
+                graphData.links.forEach(link => {
+                    if (link.source.id === node.id || link.target.id === node.id) {
+                        highlightLinks.add(link);
+                        highlightNodes.add(link.source.id);
+                        highlightNodes.add(link.target.id);
+                    }
+                });
+                
+                updateNodeInfo(node);
+                
+                graphData.nodes.forEach(n => {
+                    if (!highlightNodes.has(n.id)) {
+                        n.fx = n.x;
+                        n.fy = n.y;
+                    }
+                });
+                
+                Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
+            }, 500);
+        };
+
+        function updateNodeInfo(node) {
             const deg = nodeDegrees[node.id] || 0;
             const titleColor = node.isFile ? '#9BCFC4' : '#D97790';
             const statusIcon = node.isFile ? '✅' : '⚠️';
@@ -769,74 +987,6 @@
             nodeInfo.classList.add('show');
         }
 
-        // ⭐ PANEL TRUY VẤN NHANH
-        function buildQueryPanel(nodeDegrees) {
-            const queryList = document.getElementById('query-list');
-            
-            // Top hubs
-            const hubs = graphData.nodes
-                .filter(n => (nodeDegrees[n.id] || 0) > 10)
-                .sort((a, b) => (nodeDegrees[b.id] || 0) - (nodeDegrees[a.id] || 0));
-            
-            // Missing files
-            const missing = graphData.nodes.filter(n => !n.isFile);
-            
-            // Isolated nodes
-            const isolated = graphData.nodes.filter(n => (nodeDegrees[n.id] || 0) === 0);
-            
-            let html = '<h4 style="margin-top:12px; color:#9BA8BC;">🌟 Top Hubs</h4>';
-            hubs.slice(0, 5).forEach(n => {
-                html += `<div class="query-item" onclick="focusNode('${n.id}')">
-                    ${n.label} <span class="count">${nodeDegrees[n.id]}</span>
-                </div>`;
-            });
-            
-            html += '<h4 style="margin-top:12px; color:#9BA8BC;">⚠️ Chưa có file</h4>';
-            missing.slice(0, 5).forEach(n => {
-                html += `<div class="query-item" onclick="focusNode('${n.id}')">
-                    ${n.label} <span class="count">${nodeDegrees[n.id] || 0}</span>
-                </div>`;
-            });
-            
-            if (isolated.length > 0) {
-                html += '<h4 style="margin-top:12px; color:#9BA8BC;">🔗 Không có liên kết</h4>';
-                isolated.slice(0, 5).forEach(n => {
-                    html += `<div class="query-item" onclick="focusNode('${n.id}')">${n.label}</div>`;
-                });
-            }
-            
-            queryList.innerHTML = html;
-        }
-
-        window.focusNode = function(nodeId) {
-            const node = graphData.nodes.find(n => n.id === nodeId);
-            if (node) {
-                Graph.centerAt(node.x, node.y, 1000);
-                Graph.zoom(3, 1000);
-                setTimeout(() => {
-                    clickedNode = node;
-                    highlightNodes.clear();
-                    highlightLinks.clear();
-                    highlightNodes.add(node.id);
-                    graphData.links.forEach(link => {
-                        if (link.source.id === node.id || link.target.id === node.id) {
-                            highlightLinks.add(link);
-                            highlightNodes.add(link.source.id);
-                            highlightNodes.add(link.target.id);
-                        }
-                    });
-                    const nodeDegrees = {};
-                    graphData.nodes.forEach(n => nodeDegrees[n.id] = 0);
-                    graphData.links.forEach(l => { 
-                        nodeDegrees[l.source.id || l.source]++; 
-                        nodeDegrees[l.target.id || l.target]++; 
-                    });
-                    updateNodeInfo(node, nodeDegrees);
-                    Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-                }, 500);
-            }
-        };
-
         function togglePhysics() { 
             physicsEnabled = !physicsEnabled; 
             document.getElementById('physics-btn').classList.toggle('active'); 
@@ -847,12 +997,6 @@
             showLabels = !showLabels; 
             document.getElementById('labels-btn').classList.toggle('active'); 
             Graph.refresh(); 
-        }
-        
-        function toggleQuery() {
-            const panel = document.getElementById('query-panel');
-            panel.classList.toggle('show');
-            document.getElementById('query-btn').classList.toggle('active');
         }
 
         window.onload = initializeGraph;
