@@ -1,1005 +1,927 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Toán Học - Knowledge Graph</title>
-    <script src="https://unpkg.com/force-graph"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
-            background: #0a0e14; 
-            color: #E5E7EB; 
-            overflow: hidden; 
-        }
-        #graph { width: 100vw; height: 100vh; }
-        
-        .ui-panel { 
-            position: fixed; 
-            background: rgba(15, 20, 28, 0.92); 
-            padding: 16px 20px; 
-            border-radius: 10px; 
-            border: 1px solid rgba(80, 100, 130, 0.25); 
-            backdrop-filter: blur(12px); 
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5); 
-            transition: all 0.25s ease; 
-            z-index: 100; 
-        }
-        .ui-panel:hover { 
-            border-color: rgba(100, 130, 170, 0.4); 
-            box-shadow: 0 6px 32px rgba(0, 0, 0, 0.6);
-        }
-        
-        h3 { 
-            color: #9BA8BC; 
-            font-weight: 600; 
-            text-transform: uppercase; 
-            letter-spacing: 1.2px; 
-            margin-bottom: 12px;
-            font-size: 11px;
-        }
-        
-        #info { top: 20px; left: 20px; max-width: 240px; }
-        #info p { 
-            margin: 8px 0; 
-            font-size: 12px; 
-            color: #B8BEC8; 
-            display: flex; 
-            justify-content: space-between;
-            align-items: center;
-        }
-        #info p strong { color: #7A90B0; font-weight: 500; }
-        #info p span { 
-            background: rgba(80, 110, 150, 0.15); 
-            padding: 3px 10px; 
-            border-radius: 8px; 
-            color: #A8C0E0; 
-            font-weight: 600;
-            font-size: 13px;
-        }
-        
-        /* ⭐ SEARCH - CLEAN & POWERFUL */
-        #search-container { 
-            position: fixed;
-            top: 20px; 
-            right: 20px; 
-            width: 320px;
-            z-index: 200;
-        }
-        
-        #search-box {
-            position: relative;
-            background: rgba(15, 20, 28, 0.92); 
-            border-radius: 10px; 
-            border: 1px solid rgba(80, 100, 130, 0.25); 
-            backdrop-filter: blur(12px); 
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5); 
-            transition: all 0.25s ease;
-        }
-        
-        #search-box:focus-within {
-            border-color: #7A90B0; 
-            box-shadow: 0 6px 32px rgba(122, 144, 176, 0.3);
-        }
-        
-        #search-input { 
-            background: transparent;
-            border: none;
-            color: #E5E7EB; 
-            padding: 12px 16px; 
-            width: 100%;
-            font-size: 13px;
-            outline: none;
-        }
-        #search-input::placeholder { 
-            color: rgba(184, 190, 200, 0.4); 
-        }
-        
-        /* ⭐ DROPDOWN RESULTS */
-        #search-results {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: rgba(15, 20, 28, 0.98);
-            border: 1px solid rgba(100, 130, 170, 0.35);
-            border-radius: 10px;
-            max-height: 400px;
-            overflow-y: auto;
-            display: none;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(16px);
-        }
-        
-        #search-results.show { display: block; }
-        
-        .result-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 1px solid rgba(80, 100, 130, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .result-item:last-child { border-bottom: none; }
-        
-        .result-item:hover {
-            background: rgba(100, 140, 190, 0.15);
-        }
-        
-        .result-item.selected {
-            background: rgba(122, 144, 176, 0.25);
-        }
-        
-        .result-icon {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .result-content {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .result-name {
-            font-size: 12px;
-            color: #E5E7EB;
-            font-weight: 500;
-            margin-bottom: 2px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .result-meta {
-            font-size: 10px;
-            color: #8A9AB0;
-            display: flex;
-            gap: 8px;
-        }
-        
-        .result-badge {
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-        
-        .result-badge.file {
-            background: rgba(139, 196, 184, 0.2);
-            color: #9BCFC4;
-        }
-        
-        .result-badge.missing {
-            background: rgba(217, 119, 144, 0.2);
-            color: #D97790;
-        }
-        
-        .no-results {
-            padding: 20px;
-            text-align: center;
-            color: #7A8A9A;
-            font-size: 11px;
-        }
-        
-        /* Scrollbar */
-        #search-results::-webkit-scrollbar { width: 6px; }
-        #search-results::-webkit-scrollbar-track { background: rgba(20, 25, 35, 0.5); border-radius: 3px; }
-        #search-results::-webkit-scrollbar-thumb { background: rgba(80, 110, 150, 0.5); border-radius: 3px; }
-        
-        #controls { 
-            bottom: 20px; 
-            right: 20px; 
-            display: flex; 
-            gap: 8px; 
-            padding: 12px 16px; 
-        }
-        button { 
-            background: linear-gradient(135deg, rgba(80, 110, 150, 0.8), rgba(60, 90, 130, 0.8)); 
-            color: #E8EEF5; 
-            border: none; 
-            padding: 9px 16px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 11px; 
-            font-weight: 600; 
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            transition: all 0.25s ease;
-            letter-spacing: 0.3px;
-        }
-        button:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 16px rgba(80, 110, 150, 0.4); 
-        }
-        button.active { 
-            background: linear-gradient(135deg, rgba(100, 140, 190, 0.9), rgba(80, 120, 170, 0.9)); 
-            box-shadow: 0 2px 12px rgba(100, 140, 190, 0.3);
-        }
-        
-        #legend { bottom: 20px; left: 20px; }
-        .legend-item { 
-            display: flex; 
-            align-items: center; 
-            margin: 6px 0; 
-            font-size: 11px;
-            transition: all 0.2s;
-            color: #B8BEC8;
-        }
-        .legend-item:hover { transform: translateX(3px); }
-        .legend-color { 
-            width: 16px; 
-            height: 16px; 
-            border-radius: 50%; 
-            margin-right: 10px; 
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-        
-        .loading-overlay { 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: linear-gradient(135deg, rgba(10, 14, 20, 0.98), rgba(15, 20, 30, 0.98)); 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-            justify-content: center; 
-            z-index: 9999; 
-            opacity: 1; 
-            transition: opacity 0.5s ease; 
-        }
-        .loading-overlay.hide { opacity: 0; pointer-events: none; }
-        
-        .spinner { 
-            width: 50px; height: 50px; 
-            border: 4px solid rgba(80, 110, 150, 0.2); 
-            border-top-color: #7A90B0; 
-            border-radius: 50%; 
-            animation: spin 1s ease-in-out infinite; 
-        }
-        .loading-text {
-            margin-top: 16px;
-            color: #7A90B0;
-            font-size: 12px;
-            letter-spacing: 1.5px;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
-        
-        #node-info {
-            position: absolute;
-            background: rgba(12, 16, 24, 0.96);
-            color: #E5E7EB;
-            padding: 14px 18px;
-            border-radius: 10px;
-            border: 1px solid rgba(100, 130, 170, 0.35);
-            font-size: 11px;
-            pointer-events: none;
-            max-width: 320px;
-            box-shadow: 0 6px 28px rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(16px);
-            opacity: 0;
-            transition: opacity 0.2s;
-            z-index: 1000;
-            line-height: 1.5;
-        }
-        #node-info.show { opacity: 1; }
-        #node-info .title {
-            font-weight: 700;
-            font-size: 13px;
-            margin-bottom: 6px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid rgba(100, 130, 170, 0.25);
-        }
-        #node-info .connections {
-            font-size: 10px;
-            color: #8A9AB0;
-            margin-top: 6px;
-            padding-top: 6px;
-            border-top: 1px solid rgba(100, 130, 170, 0.2);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đồ thị Kiến thức Toán THPT 3D - Trải nghiệm Trung tính & Gợi mở</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0a0e27;
+      color: #fff;
+      overflow: hidden; 
+    }
+    
+    #graph-container {
+      width: 100vw;
+      height: 100vh;
+    }
+    
+    .panel {
+      position: absolute;
+      background-color: rgba(20, 25, 45, 0.95);
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(100, 150, 255, 0.4);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+    }
+    
+    .info {
+      top: 10px;
+      left: 10px;
+      max-width: 160px;
+    }
+    
+    .info h3 { 
+      margin: 0 0 8px 0;
+      font-size: 12px;
+      color: #6ca0dc;
+      border-bottom: 2px solid rgba(108, 160, 220, 0.3);
+      padding-bottom: 4px;
+    }
+    
+    .legend-item { 
+      display: flex; 
+      align-items: center; 
+      margin-bottom: 6px;
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+    
+    .legend-item:hover {
+      transform: translateX(3px);
+    }
+    
+    .legend-color { 
+      width: 25px; 
+      height: 3px; 
+      margin-right: 8px;
+      border-radius: 2px;
+      box-shadow: 0 0 8px currentColor;
+    }
+    
+    .legend-note {
+      font-size: 9px;
+      color: #888;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(100, 150, 255, 0.2);
+      font-style: italic;
+    }
+    
+    /* SEARCH BOX - Phải trên cùng */
+    .search-box {
+      top: 10px;
+      right: 10px;
+      min-width: 320px;
+      max-width: 320px;
+      padding: 10px 12px;
+    }
+    
+    .search-box h3 {
+      margin: 0 0 8px 0;
+      font-size: 12px;
+      color: #6ca0dc;
+      border-bottom: 2px solid rgba(108, 160, 220, 0.3);
+      padding-bottom: 4px;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid rgba(100, 150, 255, 0.4);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 12px;
+    }
+    
+    .search-box input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* CONTROLS - Góc phải dưới, 5 nút 1 hàng ngang */
+    .controls {
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+    }
+    
+    .controls button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.3s;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    
+    .controls button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .controls button:active {
+      transform: translateY(0);
+    }
+    
+    .instructions {
+      bottom: 10px;
+      left: 10px;
+      font-size: 10px;
+      color: #aaa;
+      max-width: 350px;
+      line-height: 1.5;
+    }
+    
+    .instructions strong {
+      color: #6ca0dc;
+    }
+    
+    .node-detail {
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      max-width: 320px;
+      min-width: 320px;
+      max-height: 70vh;
+      overflow-y: auto;
+      display: none;
+    }
+    
+    .node-detail.active {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
+    }
+    
+    .node-detail h2 {
+      font-size: 15px;
+      margin-bottom: 10px;
+      color: #ffd700;
+      border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+      padding-bottom: 5px;
+    }
+    
+    .node-detail h3 {
+      font-size: 13px;
+      margin: 12px 0 6px 0;
+      color: #6ca0dc;
+    }
+    
+    .node-detail ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    
+    .node-detail li {
+      margin: 6px 0;
+      padding-left: 15px;
+      position: relative;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    
+    .node-detail li:before {
+      content: "▸";
+      position: absolute;
+      left: 3px;
+      color: #6ca0dc;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      transition: all 0.3s;
+    }
+    
+    .close-btn:hover {
+      background: rgba(255, 100, 100, 0.8);
+      transform: rotate(90deg);
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: bold;
+      margin-right: 3px;
+    }
+    
+    .badge-10 { background: #9999ff; }
+    .badge-11 { background: #f5d442; color: #000; }
+    .badge-12 { background: #ff8c42; }
+    
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(108, 160, 220, 0.5);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(108, 160, 220, 0.8);
+    }
+
+    .stats {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(100, 150, 255, 0.3);
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    .stat-item {
+      margin: 3px 0;
+    }
+
+    .stat-number {
+      color: #6ca0dc;
+      font-weight: bold;
+      font-size: 11px;
+    }
+  </style>
 </head>
 <body>
-    <div class="loading-overlay" id="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">ĐANG TẢI DỮ LIỆU...</div>
+  <div id="graph-container"></div>
+
+  <div class="panel info">
+    <h3>📚 Chú thích</h3>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #ff6961;"></div>
+      <span>Kiến thức tiên quyết</span>
     </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #6CA0DC;"></div>
+      <span>Phân rã kiến thức</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #77dd77;"></div>
+      <span>Kiến thức ứng dụng</span>
+    </div>
+    <div class="legend-note">
+      💡 <strong>Hover</strong> để xem trước<br>
+      🖱️ <strong>Click</strong> để cố định
+    </div>
+    <div class="stats">
+      <div class="stat-item">📊 Chương: <span class="stat-number" id="total-chapters">0</span></div>
+      <div class="stat-item">🔗 Liên kết: <span class="stat-number" id="total-links">0</span></div>
+    </div>
+  </div>
+
+  <div class="panel search-box">
+    <h3>🔍 Tìm kiếm</h3>
+    <input type="text" id="search-input" placeholder="Nhập tên chương để tìm kiếm..." oninput="searchNode(this.value)">
+  </div>
+
+  <div class="panel controls">
+    <button onclick="viewAngle()">Góc nghiêng</button>
+    <button onclick="viewTop()">Từ trên xuống</button>
+    <button onclick="viewSide()">Góc ngang</button>
+    <button onclick="resetView()">Đặt lại</button>
+    <button onclick="togglePhysics()">Vật lý</button>
+</div>
+
+  <div class="panel instructions">
+    🖱️ <strong>Kéo:</strong> Xoay | <strong>Scroll:</strong> Zoom | <strong>Phải:</strong> Di chuyển<br>
+    💡 <strong>Hover node:</strong> Xem trước liên kết | <strong>Click:</strong> Xem chi tiết & cố định màu
+  </div>
+
+  <div class="panel node-detail" id="node-detail">
+    <button class="close-btn" onclick="closeDetail()">×</button>
+    <div id="detail-content"></div>
+  </div>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three-spritetext@1.8.2/dist/three-spritetext.min.js"></script>
+  <script src="https://unpkg.com/3d-force-graph@1.73.3/dist/3d-force-graph.min.js"></script>
+
+  <script>
+    const fullKnowledgeData = {
+  nodes: [
+    // LỚP 10
+    { id: "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Nền tảng logic và ngôn ngữ toán học", lessons: ["Mệnh đề", "Tập hợp và các phép toán trên tập hợp"], prerequisites: [], applications: ["CHƯƠNG II. BẤT PHƯƠNG TRÌNH VÀ HỆ BẤT PHƯƠNG TRÌNH BẬC NHẤT HAI ẨN", "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG", "CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN", "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN"] },
+    { id: "CHƯƠNG II. BẤT PHƯƠNG TRÌNH VÀ HỆ BẤT PHƯƠNG TRÌNH BẬC NHẤT HAI ẨN", group: 10, color: '#9999ff', val: 8, type: 'chapter', description: "Giải bất phương trình và hệ bất phương trình trong không gian 2D", lessons: ["Bất phương trình bậc nhất hai ẩn", "Hệ bất phương trình bậc nhất hai ẩn"], prerequisites: ["CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"], applications: ["CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ"] },
+    { id: "CHƯƠNG III. HỆ THỨC LƯỢNG TRONG TAM GIÁC", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Định lý sin, cosin và các hệ thức lượng giác cơ bản", lessons: ["Giá trị lượng giác của góc 0°-180°", "Hệ thức lượng trong tam giác"], prerequisites: [], applications: ["CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC"] },
+    { id: "CHƯƠNG IV. VECTO", group: 10, color: '#9999ff', val: 10, type: 'chapter', description: "Khái niệm vectơ, các phép toán và tích vô hướng", lessons: ["Các khái niệm mở đầu", "Tổng và hiệu vectơ", "Tích vectơ với số", "Vectơ trong mặt phẳng toạ độ", "Tích vô hướng"], prerequisites: [], applications: ["CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG", "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN"] },
+    { id: "CHƯƠNG V. CÁC SỐ ĐẶC TRƯNG CỦA MẪU SỐ LIỆU KHÔNG GHÉP NHÓM", group: 10, color: '#9999ff', val: 7, type: 'chapter', description: "Các số đặc trưng đo xu thế trung tâm và độ phân tán", lessons: ["Số gần đúng và sai số", "Số đặc trưng đo xu thế trung tâm", "Số đặc trưng đo độ phân tán"], prerequisites: [], applications: ["CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM"] },
+    { id: "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG", group: 10, color: '#9999ff', val: 11, type: 'chapter', description: "Khái niệm hàm số, tính chất và đồ thị - Nền tảng của Giải tích", lessons: ["Hàm số", "Hàm số bậc hai", "Dấu tam thức bậc hai", "Phương trình quy về bậc hai"], prerequisites: ["CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"], applications: ["CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN", "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC", "CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC", "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT"] },
+    { id: "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG", group: 10, color: '#9999ff', val: 10, type: 'chapter', description: "Đại số hóa hình học phẳng bằng hệ toạ độ", lessons: ["Phương trình đường thẳng", "Đường thẳng trong Oxy", "Đường tròn trong Oxy", "Ba đường conic"], prerequisites: ["CHƯƠNG IV. VECTO"], applications: ["CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"] },
+    { id: "CHƯƠNH VIII. ĐẠI SỐ TỔ HỢP", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Nghệ thuật đếm: Hoán vị, Chỉnh hợp, Tổ hợp", lessons: ["Quy tắc đếm", "Hoán vị, chỉnh hợp, tổ hợp", "Nhị thức Newton"], prerequisites: [], applications: ["CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN", "CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT", "CHƯƠNG VI. XÁC SUẤT CÓ ĐIỀU KIỆN"] },
+    { id: "CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Định nghĩa xác suất: P(A) = |A| / |Ω|", lessons: ["Biến cố và định nghĩa cổ điển", "Thực hành tính xác suất"], prerequisites: ["CHƯƠNH VIII. ĐẠI SỐ TỔ HỢP", "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"], applications: ["CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT"] },
     
-    <div id="graph"></div>
-    <div id="node-info"></div>
-
-    <div id="info" class="ui-panel">
-        <h3>📊 THỐNG KÊ</h3>
-        <p><strong>Nodes:</strong> <span id="node-count">0</span></p>
-        <p><strong>Links:</strong> <span id="link-count">0</span></p>
-    </div>
-
-    <div id="search-container">
-        <div id="search-box">
-            <input 
-                type="text" 
-                id="search-input" 
-                placeholder="🔍 Tìm kiếm chủ đề... (Enter để focus)"
-                autocomplete="off"
-            >
-        </div>
-        <div id="search-results"></div>
-    </div>
-
-    <div id="controls" class="ui-panel">
-        <button onclick="Graph.zoomToFit(1000, 80)">Reset View</button>
-        <button id="physics-btn" onclick="togglePhysics()" class="active">Physics</button>
-        <button id="labels-btn" onclick="toggleLabels()" class="active">Labels</button>
-    </div>
-
-    <div id="legend" class="ui-panel">
-        <h3>📌 CHÚ THÍCH</h3>
-        <div class="legend-item">
-            <div class="legend-color" style="background: #E8B86D;"></div>
-            <span>Hub (>10 kết nối)</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background: #D4A574;"></div>
-            <span>Quan trọng (6-10)</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background: #6B9BD1;"></div>
-            <span>Liên quan (3-5)</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background: #7A8A9A;"></div>
-            <span>Cơ bản (≤2)</span>
-        </div>
-    </div>
-
-    <script>
-        // === DỮ LIỆU ===
-        const rawFiles = [
-    {
-        "name": "Bất đẳng thức. Bất phương trình.md",
-        "content": "```markdown\n# Bất đẳng thức. Bất phương trình\n## Đơn vị kiến thức\n- [[Bất đẳng thức]]\n- [[Bất phương trình]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Phương trình, Hệ phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Giới hạn]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n```"
-    },
-    {
-        "name": "Cung, góc và công thức lượng giác.md",
-        "content": "# Cung, góc và công thức lượng giác\n\n## Đơn vị kiến thức\n- [[Cung và góc lượng giác]]\n- [[Giá trị lượng giác của một cung]]\n- [[Công thức lượng giác]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Phương pháp tọa độ trong mặt phẳng]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Số phức]]\n- [[Tích vô hướng của hai vectơ]]"
-    },
-    {
-        "name": "Dãy số, Cấp số cộng và Cấp số nhân.md",
-        "content": "```markdown\n# Dãy số, Cấp số cộng và Cấp số nhân\n\n## Các đơn vị kiến thức\n- [[Phương pháp quy nạp toán học]]\n- [[Dãy số]]\n- [[Cấp số cộng]]\n- [[Cấp số nhân]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Phương trình, Hệ phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Giới hạn]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n```"
-    },
-    {
-        "name": "Giá trị lượng giác của một cung.md",
-        "content": "# Giá trị lượng giác của một cung\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Cung, góc và công thức lượng giác]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Cung, góc và công thức lượng giác]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Đạo hàm]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Tích vô hướng của hai vectơ]]\n- [[Số phức]]"
-    },
-    {
-        "name": "Giới hạn.md",
-        "content": "# Giới hạn\n\n## Các đơn vị kiến thức\n- [[Giới hạn của dãy số]]\n- [[Giới hạn của hàm số]]\n- [[Hàm số liên tục]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Dãy số, Cấp số cộng và Cấp số nhân]]\n- [[Bất đẳng thức. Bất phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Đạo hàm]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]"
-    },
-    {
-        "name": "Hàm số bậc nhất và bậc hai.md",
-        "content": "# Hàm số bậc nhất và bậc hai\n\n## Các đơn vị kiến thức\n- [[Đại cương về hàm số]]\n- [[Hàm số bậc nhất y = ax + b]]\n- [[Hàm số bậc hai y = ax^2 + bx + c]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Phương trình, Hệ phương trình]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Đạo hàm]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]"
-    },
-    {
-        "name": "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
-        "content": "```markdown\n# Hàm số lũy thừa, hàm số mũ và hàm số logarit\n\n## Các đơn vị kiến thức\n- [[Lũy thừa và Hàm số lũy thừa]]\n- [[Logarit và Hàm số mũ, Hàm số logarit]]\n- [[Phương trình mũ và phương trình logarit]]\n- [[Bất phương trình mũ và bất phương trình logarit]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Phương trình, Hệ phương trình]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Đạo hàm]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n```"
-    },
-    {
-        "name": "Hàm số lượng giác và phương trình lượng giác.md",
-        "content": "# Hàm số lượng giác và phương trình lượng giác\n\n## Các đơn vị kiến thức\n- [[Hàm số lượng giác]]\n- [[Phương trình lượng giác cơ bản]]\n- [[Một số phương trình lượng giác thường gặp]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Cung, góc và công thức lượng giác]]\n- [[Giá trị lượng giác của một cung]]\n- [[Phương trình, Hệ phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Giới hạn]]\n- [[Đạo hàm]]\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]"
-    },
-    {
-        "name": "Khối đa diện.md",
-        "content": "```markdown\n# Khối đa diện\n\n## Các đơn vị kiến thức\n- [[Khái niệm về khối đa diện, khối đa diện lồi và khối đa diện đều]]\n- [[Thể tích của khối đa diện]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Phương pháp tọa độ trong không gian]]\n```"
-    },
-    {
-        "name": "Mặt nón, Mặt trụ, Mặt cầu.md",
-        "content": "# Mặt nón, Mặt trụ, Mặt cầu\n\n## Các đơn vị kiến thức\n- [[Khái niệm về mặt nón, mặt trụ, mặt cầu]]\n- [[Diện tích và thể tích của mặt nón, mặt trụ, mặt cầu]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Vectơ]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Khối đa diện]]\n- [[Giá trị lượng giác của một cung]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Phương pháp tọa độ trong không gian]]"
-    },
-    {
-        "name": "Mệnh đề. Tập hợp.md",
-        "content": "# Mệnh đề. Tập hợp\n\n## Các đơn vị kiến thức\n- [[Mệnh đề]]\n- [[Tập hợp]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Phương trình, Hệ phương trình]]\n- [[Thống kê]]\n- [[Tổ hợp và Xác suất]]"
-    },
-    {
-        "name": "Nguyên hàm, Tích phân và Ứng dụng.md",
-        "content": "# Nguyên hàm, Tích phân và Ứng dụng\n\n## Các đơn vị kiến thức\n- [[Nguyên hàm]]\n- [[Tích phân]]\n- [[Ứng dụng của tích phân trong hình học]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Đạo hàm]]\n- [[Giới hạn]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Mặt nón, Mặt trụ, Mặt cầu]]\n- [[Phương pháp tọa độ trong không gian]]\n- [[Phương pháp tọa độ trong mặt phẳng]]"
-    },
-    {
-        "name": "Phép dời hình và phép đồng dạng trong mặt phẳng.md",
-        "content": "# Phép dời hình và phép đồng dạng trong mặt phẳng\n\n## Các đơn vị kiến thức\n- [[Phép biến hình và phép tịnh tiến]]\n- [[Phép đối xứng trục]]\n- [[Phép đối xứng tâm]]\n- [[Phép quay]]\n- [[Khái niệm về phép dời hình và hai hình bằng nhau]]\n- [[Phép vị tự và phép đồng dạng]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Cung, góc và công thức lượng giác]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Số phức]]"
-    },
-    {
-        "name": "Phương pháp tọa độ trong không gian.md",
-        "content": "# Phương pháp tọa độ trong không gian\n\n## Các đơn vị kiến thức\n- [[Hệ tọa độ trong không gian]]\n- [[Phương trình mặt phẳng]]\n- [[Phương trình đường thẳng]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Tích vô hướng của hai vectơ]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Mặt nón, Mặt trụ, Mặt cầu]]"
-    },
-    {
-        "name": "Phương pháp tọa độ trong mặt phẳng.md",
-        "content": "# Phương pháp tọa độ trong mặt phẳng\n## Đơn vị kiến thức\n- [[Phương trình đường thẳng]]\n- [[Phương trình đường tròn]]\n- [[Phương trình đường elip]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Tích vô hướng của hai vectơ]]\n- [[Phương trình, Hệ phương trình]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Phương pháp tọa độ trong không gian]]\n- [[Số phức]]\n- [[Phép dời hình và phép đồng dạng trong mặt phẳng]]"
-    },
-    {
-        "name": "Phương trình, Hệ phương trình.md",
-        "content": "# Phương trình, Hệ phương trình\n\n## Các đơn vị kiến thức\n- [[Đại cương về phương trình]]\n- [[Phương trình quy về phương trình bậc nhất, bậc hai]]\n- [[Phương trình và hệ phương trình bậc nhất nhiều ẩn]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Hàm số bậc nhất và bậc hai]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Số phức]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Phương pháp tọa độ trong không gian]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Dãy số, Cấp số cộng và Cấp số nhân]]"
-    },
-    {
-        "name": "Số phức.md",
-        "content": "```markdown\n# Số phức\n\n## Các đơn vị kiến thức\n- [[Khái niệm số phức]]\n- [[Phép cộng, trừ và nhân số phức]]\n- [[Phép chia số phức]]\n- [[Phương trình bậc hai với hệ số thực]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Cung, góc và công thức lượng giác]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Phương trình, Hệ phương trình]]\n```"
-    },
-    {
-        "name": "Sự đồng biến, nghịch biến của hàm số.md",
-        "content": "# Sự đồng biến, nghịch biến của hàm số\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Đạo hàm]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]"
-    },
-    {
-        "name": "Thống kê.md",
-        "content": "# Thống kê\n## Các đơn vị kiến thức\n- [[Khái niệm cơ bản về thống kê]]\n- [[Phương sai và độ lệch chuẩn]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Tổ hợp và Xác suất]]"
-    },
-    {
-        "name": "Toán 10.md",
-        "content": "```markdown\n# Toán 10\n\n## Các đơn vị kiến thức\n- [[Mệnh đề. Tập hợp]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Phương trình, Hệ phương trình]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Thống kê]]\n- [[Cung, góc và công thức lượng giác]]\n- [[Giá trị lượng giác của một cung]]\n- [[Vectơ]]\n- [[Tích vô hướng của hai vectơ]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Toán 11]]\n```"
-    },
-    {
-        "name": "Toán 11.md",
-        "content": "```markdown\n# Toán 11\n\n## Các đơn vị kiến thức\n- [[Hàm số lượng giác và phương trình lượng giác]]\n- [[Tổ hợp và Xác suất]]\n- [[Dãy số, Cấp số cộng và Cấp số nhân]]\n- [[Giới hạn]]\n- [[Đạo hàm]]\n- [[Phép dời hình và phép đồng dạng trong mặt phẳng]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Toán 10]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Toán 12]]\n```"
-    },
-    {
-        "name": "Toán 12.md",
-        "content": "# Toán 12\n\n## Các đơn vị kiến thức\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Số phức]]\n- [[Khối đa diện]]\n- [[Mặt nón, Mặt trụ, Mặt cầu]]\n- [[Phương pháp tọa độ trong không gian]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Toán 11]]"
-    },
-    {
-        "name": "Toán phổ thông.md",
-        "content": "# Toán phổ thông\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n- [[Phương trình, Hệ phương trình]]\n- [[Hàm số bậc nhất và bậc hai]]\n- [[Vectơ]]"
-    },
-    {
-        "name": "Tích vô hướng của hai vectơ.md",
-        "content": "```markdown\n# Tích vô hướng của hai vectơ\n## Các đơn vị kiến thức\n- [[Giá trị lượng giác của một góc bất kỳ từ 0° đến 180°]]\n- [[Tích vô hướng của hai vec tơ]]\n- [[Các hệ thức lượng trong tam giác]]\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Cung, góc và công thức lượng giác]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Phương pháp tọa độ trong không gian]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Phương pháp tọa độ trong không gian]]\n```"
-    },
-    {
-        "name": "Tổ hợp và Xác suất.md",
-        "content": "# Tổ hợp và Xác suất\n\n## Các đơn vị kiến thức\n- [[Quy tắc đếm]]\n- [[Hoán vị, Chỉnh hợp, Tổ hợp]]\n- [[Nhị thức Niu-tơn]]\n- [[Phép thử và biến cố]]\n- [[Xác suất của biến cố]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Mệnh đề. Tập hợp]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Thống kê]]"
-    },
-    {
-        "name": "Vectơ và quan hệ vuông góc trong không gian.md",
-        "content": "# Vectơ và quan hệ vuông góc trong không gian\n\n## Các đơn vị kiến thức\n- [[Vectơ trong không gian]]\n- [[Hai đường thẳng vuông góc]]\n- [[Đường thẳng vuông góc với mặt phẳng]]\n- [[Hai mặt phẳng vuông góc]]\n- [[Khoảng cách]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Tích vô hướng của hai vectơ]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Phương pháp tọa độ trong không gian]]"
-    },
-    {
-        "name": "Vectơ.md",
-        "content": "# Vectơ\n\n## Các đơn vị kiến thức\n- [[Vectơ và các phép toán]]\n- [[Hệ trục tọa độ]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Tích vô hướng của hai vectơ]]\n- [[Phương pháp tọa độ trong mặt phẳng]]\n- [[Phép dời hình và phép đồng dạng trong mặt phẳng]]\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Đường thẳng, mặt phẳng và quan hệ song song trong không gian]]\n- [[Phương pháp tọa độ trong không gian]]"
-    },
-    {
-        "name": "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
-        "content": "```markdown\n# Đường thẳng, mặt phẳng và quan hệ song song trong không gian\n\n## Các đơn vị kiến thức\n- [[Đại cương về đường thẳng và mặt phẳng]]\n- [[Hai đường thẳng chéo nhau và hai đường thẳng song song]]\n- [[Đường thẳng và mặt phẳng song song]]\n- [[Hai mặt phẳng song song]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Vectơ]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Vectơ và quan hệ vuông góc trong không gian]]\n- [[Khối đa diện]]\n- [[Mặt nón, Mặt trụ, Mặt cầu]]\n- [[Phương pháp tọa độ trong không gian]]\n```"
-    },
-    {
-        "name": "Đạo hàm.md",
-        "content": "# Đạo hàm\n\n## Các đơn vị kiến thức\n- [[Định nghĩa và ý nghĩa của đạo hàm]]\n- [[Quy tắc tính đạo hàm]]\n- [[Đạo hàm của hàm số lượng giác]]\n- [[Đạo hàm cấp hai]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Giới hạn]]\n- [[Hàm số lũy thừa, hàm số mũ và hàm số logarit]]\n- [[Hàm số lượng giác và phương trình lượng giác]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]\n- [[Bất đẳng thức. Bất phương trình]]"
-    },
-    {
-        "name": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
-        "content": "# Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số\n\n## Các đơn vị kiến thức\n- [[Sự đồng biến, nghịch biến của hàm số]]\n- [[Cực trị của hàm số]]\n- [[Giá trị lớn nhất và giá trị nhỏ nhất của hàm số]]\n- [[Bảng biến thiên và đồ thị của hàm số]]\n- [[Đường tiệm cận]]\n\n---\n## Liên kết kiến thức\n\n### Kiến thức tiên quyết (Nền tảng)\n- [[Đạo hàm]]\n- [[Giới hạn]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Phương trình, Hệ phương trình]]\n- [[Hàm số bậc nhất và bậc hai]]\n\n### Kiến thức kế thừa (Ứng dụng)\n- [[Phương trình, Hệ phương trình]]\n- [[Bất đẳng thức. Bất phương trình]]\n- [[Nguyên hàm, Tích phân và Ứng dụng]]"
-    }
-];
-
-
-        // === XỬ LÝ DỮ LIỆU ===
-        const fileNames = rawFiles.map(f => f.name.replace('.md', ''));
-        const allNodesMap = new Map();
-        const allLinksSet = new Set();
-        const fileContentMap = new Map();
-
-        rawFiles.forEach(file => {
-            const name = file.name.replace('.md', '');
-            fileContentMap.set(name, file.content);
-            allNodesMap.set(name, { id: name, label: name, isFile: true });
-
-            const matches = file.content.match(/\[\[([^\]\]]+)\]\]/g) || [];
-            matches.forEach(m => {
-                const link = m.slice(2, -2).trim();
-                if (!allNodesMap.has(link)) {
-                    allNodesMap.set(link, { id: link, label: link, isFile: fileNames.includes(link) });
-                }
-                const key = `${name}→${link}`;
-                if (!allLinksSet.has(key)) allLinksSet.add(key);
-            });
+    // LỚP 11
+    { id: "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC", group: 11, color: '#f5d442', val: 11, type: 'chapter', description: "Hàm tuần hoàn và phương trình lượng giác", lessons: ["Giá trị lượng giác của góc lượng giác", "Công thức lượng giác", "Hàm số lượng giác", "Phương trình lượng giác cơ bản"], prerequisites: ["CHƯƠNG III. HỆ THỨC LƯỢNG TRONG TAM GIÁC", "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"], applications: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN"] },
+    { id: "CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN", group: 11, color: '#f5d442', val: 9, type: 'chapter', description: "Hàm số với tập xác định là số nguyên dương", lessons: ["Dãy số", "Cấp số cộng", "Cấp số nhân"], prerequisites: ["CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"], applications: ["CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC"] },
+    { id: "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM", group: 11, color: '#f5d442', val: 7, type: 'chapter', description: "Thống kê cho dữ liệu ghép nhóm", lessons: ["Mẫu số liệu ghép nhóm", "Số đặc trưng đo xu thế trung tâm"], prerequisites: ["CHƯƠNG V. CÁC SỐ ĐẶC TRƯNG CỦA MẪU SỐ LIỆU KHÔNG GHÉP NHÓM"], applications: ["CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO MỨC ĐỘ PHÂN TÁN CỦA MẪU SỐ LIỆU GHÉP NHÓM"] },
+    { id: "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN", group: 11, color: '#f5d442', val: 10, type: 'chapter', description: "Quan hệ song song giữa đường thẳng và mặt phẳng", lessons: ["Đường thẳng và mặt phẳng", "Hai đường thẳng song song", "Đường thẳng song song mặt phẳng", "Hai mặt phẳng song song", "Phép chiếu song song"], prerequisites: ["CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"], applications: ["CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN", "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"] },
+    { id: "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC", group: 11, color: '#f5d442', val: 11, type: 'chapter', description: "Khái niệm vô cùng bé và vô cùng lớn - Nền móng Giải tích", lessons: ["Giới hạn của dãy số", "Giới hạn của hàm số", "Hàm số liên tục"], prerequisites: ["CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN", "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"], applications: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ"] },
+    { id: "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT", group: 11, color: '#f5d442', val: 10, type: 'chapter', description: "Hai lớp hàm quan trọng trong thực tế", lessons: ["Lũy thừa với số mũ thực", "Logarit", "Hàm số mũ và logarit", "Phương trình, bất phương trình mũ và logarit"], prerequisites: ["CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"], applications: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN"] },
+    { id: "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN", group: 11, color: '#f5d442', val: 11, type: 'chapter', description: "Quan hệ vuông góc, khoảng cách, góc và thể tích", lessons: ["Hai đường thẳng vuông góc", "Đường thẳng vuông góc mặt phẳng", "Phép chiếu vuông góc", "Hai mặt phẳng vuông góc", "Khoảng cách", "Thể tích"], prerequisites: ["CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN"], applications: ["CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"] },
+    { id: "CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT", group: 11, color: '#f5d442', val: 9, type: 'chapter', description: "Biến cố hợp, giao, độc lập và công thức cộng và nhân", lessons: ["Biến cố hợp, giao, độc lập", "Công thức cộng xác suất", "Công thức nhân xác suất"], prerequisites: ["CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN", "CHƯƠNH VIII. ĐẠI SỐ TỔ HỢP"], applications: ["CHƯƠNG VI. XÁC SUẤT CÓ ĐIỀU KIỆN"] },
+    { id: "CHƯƠNG IX. ĐẠO HÀM", group: 11, color: '#f5d442', val: 13, type: 'chapter', description: "Công cụ vi phân - Trái tim của Giải tích THPT", lessons: ["Định nghĩa và ý nghĩa", "Các quy tắc tính đạo hàm", "Đạo hàm cấp hai"], prerequisites: ["CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC", "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG", "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC", "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT"], applications: ["CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ", "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN"] },
+    
+    // LỚP 12
+    { id: "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ", group: 12, color: '#ffd700', val: 13, type: 'chapter', description: "Khảo sát và vẽ đồ thị hàm số", lessons: ["Tính đơn điệu và cực trị", "Giá trị lớn nhất và nhỏ nhất", "Đường tiệm cận", "Khảo sát hàm số", "Ứng dụng thực tiễn"], prerequisites: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC"], applications: ["CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"] },
+    { id: "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", group: 12, color: '#ff8c42', val: 10, type: 'chapter', description: "Mở rộng vectơ từ 2D lên 3D", lessons: ["Vectơ trong không gian", "Hệ trục toạ độ trong không gian", "Biểu thức toạ độ của các phép toán vectơ"], prerequisites: ["CHƯƠNG IV. VECTO", "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG", "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN", "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN"], applications: ["CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"] },
+    { id: "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO MỨC ĐỘ PHÂN TÁN CỦA MẪU SỐ LIỆU GHÉP NHÓM", group: 12, color: '#ff8c42', val: 7, type: 'chapter', description: "Hoàn thiện Thống kê mô tả", lessons: ["Khoảng biến thiên và khoảng tứ phân vị", "Phương sai và độ lệch chuẩn"], prerequisites: ["CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM"], applications: [] },
+    { id: "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN", group: 12, color: '#ffd700', val: 12, type: 'chapter', description: "Phép toán ngược của đạo hàm", lessons: ["Nguyên hàm", "Tích phân", "Ứng dụng hình học của tích phân"], prerequisites: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC", "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT"], applications: [] },
+    { id: "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN", group: 12, color: '#ff8c42', val: 14, type: 'chapter', description: "Đỉnh cao của Hình học giải tích", lessons: ["Phương trình mặt phẳng", "Phương trình đường thẳng trong không gian", "Công thức tính góc trong không gian", "Phương trình mặt cầu"], prerequisites: ["CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN", "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN", "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG", "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ"], applications: [] },
+    { id: "CHƯƠNG VI. XÁC SUẤT CÓ ĐIỀU KIỆN", group: 12, color: '#ff8c42', val: 9, type: 'chapter', description: "Đỉnh cao của Xác suất THPT", lessons: ["Xác suất có điều kiện", "Công thức xác suất toàn phần và công thức Bayes"], prerequisites: ["CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT", "CHƯƠNH VIII. ĐẠI SỐ TỔ HỢP"], applications: [] }
+  ],
+  links: []
+};
+    
+    // Thêm các node bài học (lessons) vào graph
+    const lessonNodes = [];
+    fullKnowledgeData.nodes.forEach(chapter => {
+      if (chapter.type === 'chapter' && chapter.lessons) {
+        chapter.lessons.forEach((lesson, index) => {
+          lessonNodes.push({
+            id: `${chapter.id}_lesson_${index}`, // ID duy nhất cho bài học
+            name: lesson,
+            group: chapter.group,
+            color: chapter.color,
+            val: 3, // Kích thước nhỏ hơn cho node bài học
+            type: 'lesson',
+            parentChapter: chapter.id
+          });
         });
-        
-        const graphData = {
-            nodes: Array.from(allNodesMap.values()),
-            links: Array.from(allLinksSet).map(k => {
-                const [s, t] = k.split('→');
-                return { source: s, target: t };
-            })
-        };
+      }
+    });
 
-        // === GRAPH SETUP ===
-        const Graph = ForceGraph();
-        let showLabels = true;
-        let physicsEnabled = true;
-        const nodeInfo = document.getElementById('node-info');
+    // Bước 2: Thêm các node bài học vừa tạo vào danh sách node chính
+    fullKnowledgeData.nodes.push(...lessonNodes);
+    
+    // Bước 3: Tạo tất cả các link một cách chính xác
+    const nodeMap = new Map(fullKnowledgeData.nodes.map(node => [node.id, node]));
+    const linkTracker = new Set(); // Dùng Set để theo dõi các link đã được thêm
 
-        let highlightNodes = new Set();
-        let highlightLinks = new Set();
-        let hoverNode = null;
-        let clickedNode = null;
-        let isDragging = false;
-        
-        let nodeDegrees = {};
-        let selectedResultIndex = -1;
-        let searchResults = [];
+    // 3.1: Tạo link PHÂN RÃ từ Chương -> Bài học
+    fullKnowledgeData.nodes.forEach(node => {
+      if (node.type === 'lesson' && node.parentChapter && nodeMap.has(node.parentChapter)) {
+        fullKnowledgeData.links.push({
+          source: node.parentChapter,
+          target: node.id,
+          type: 'sub_knowledge'
+        });
+      }
+    });
 
-        function initializeGraph() {
-            graphData.nodes.forEach(n => nodeDegrees[n.id] = 0);
-            graphData.links.forEach(l => { 
-                nodeDegrees[l.source]++; 
-                nodeDegrees[l.target]++; 
-            });
+    // 3.2: Duyệt qua TẤT CẢ các node để tạo link quan hệ
+    fullKnowledgeData.nodes.forEach(node => {
+      if (node.type === 'chapter') {
+        // Xử lý TIÊN QUYẾT (Mũi tên đi vào node hiện tại)
+        if (node.prerequisites) {
+          node.prerequisites.forEach(prereqId => {
+            const linkKey = `${prereqId} -> ${node.id}`; // Tạo một key duy nhất cho link
+            if (nodeMap.has(prereqId) && !linkTracker.has(linkKey)) {
+              fullKnowledgeData.links.push({
+                source: prereqId,
+                target: node.id,
+                type: "relationship"
+              });
+              linkTracker.add(linkKey); // Đánh dấu link này đã được thêm
+            }
+          });
+        }
 
-            document.getElementById('node-count').textContent = graphData.nodes.length;
-            document.getElementById('link-count').textContent = graphData.links.length;
+        // Xử lý ỨNG DỤNG (Mũi tên đi ra từ node hiện tại)
+        if (node.applications) {
+          node.applications.forEach(appId => {
+            const linkKey = `${node.id} -> ${appId}`; // Tạo một key duy nhất cho link
+            if (nodeMap.has(appId) && !linkTracker.has(linkKey)) {
+              fullKnowledgeData.links.push({
+                source: node.id,
+                target: appId,
+                type: "relationship"
+              });
+              linkTracker.add(linkKey); // Đánh dấu link này đã được thêm
+            }
+          });
+        }
+      }
+    });
 
-            const getNodeColor = n => {
-                const deg = nodeDegrees[n.id] || 0;
-                if (deg > 10) return '#E8B86D';
-                if (deg > 5) return '#D4A574';
-                if (deg > 2) return '#6B9BD1';
-                return '#7A8A9A';
-            };
+    // ===== HỆ THỐNG MÀU SẮC =====
+    // ✨ UPDATE: Thay đổi màu trung tính để hòa vào nền tốt hơn
+    const NEUTRAL_COLOR = 'rgba(50, 60, 100, 0.2)';
+    const PREREQUISITE_COLOR = '#ff6961';
+    const APPLICATION_COLOR = '#77dd77';
+    const SUB_KNOWLEDGE_COLOR = '#6CA0DC';
+
+    // ===== TRẠNG THÁI =====
+    let selectedNode = null;
+    let hoveredNode = null;
+    let highlightNodes = new Set();
+    let highlightLinks = new Set();
+    let isNodeSelected = false;
+
+    // Cập nhật thống kê
+    const chapterCount = fullKnowledgeData.nodes.filter(n => n.type === 'chapter').length;
+    document.getElementById('total-chapters').textContent = chapterCount;
+    document.getElementById('total-links').textContent = fullKnowledgeData.links.length;
+
+    // ===== HÀM TÍNH ĐỘ DÀY LINK =====
+    function calculateLinkWidth(link) {
+      if (link.type === 'sub_knowledge') {
+        return 1;
+      }
+      
+      const sourceNode = fullKnowledgeData.nodes.find(n => n.id === (link.source.id || link.source));
+      const targetNode = fullKnowledgeData.nodes.find(n => n.id === (link.target.id || link.target));
+      
+      if (sourceNode && targetNode && sourceNode.type === 'chapter' && targetNode.type === 'chapter') {
+        const importance = (sourceNode.val + targetNode.val) / 6;
+        return Math.max(2, Math.min(5, importance));
+      }
+      
+      return 2;
+    }
+
+    // ===== HÀM XÁC ĐỊNH MÀU LINK =====
+    function getLinkColor(link) {
+        const sourceId = link.source.id || link.source;
+        const targetId = link.target.id || link.target;
+        const currentNodeId = selectedNode ? selectedNode.id : (hoveredNode ? hoveredNode.id : null);
+
+        // Giữ nguyên màu cho các link mặc định và link phân rã
+        if (!currentNodeId || !highlightLinks.has(link)) {
+            if (link.type === 'sub_knowledge') return SUB_KNOWLEDGE_COLOR;
+            return NEUTRAL_COLOR;
+        }
+        if (link.type === 'sub_knowledge') return SUB_KNOWLEDGE_COLOR;
+
+        // Logic tô màu thông minh
+        const sourceNode = nodeMap.get(sourceId);
+        const targetNode = nodeMap.get(targetId);
+
+        if (sourceNode && targetNode) {
+            // MÀU ĐỎ (Tiên quyết): Khi node được chọn là ĐÍCH, và node ĐÍCH có khai báo node NGUỒN là tiên quyết.
+            if (currentNodeId === targetId && targetNode.prerequisites && targetNode.prerequisites.includes(sourceId)) {
+            return PREREQUISITE_COLOR;
+            }
             
-            const getNodeSize = n => {
-                const deg = nodeDegrees[n.id] || 0;
-                const baseSize = n.isFile ? 7 : 3.5;
-                const scaleFactor = n.isFile ? 3 : 1.8;
-                return Math.max(baseSize, Math.sqrt(deg) * scaleFactor);
-            };
+            // MÀU XANH (Ứng dụng): Khi node được chọn là NGUỒN, và node NGUỒN có khai báo node ĐÍCH là ứng dụng.
+            if (currentNodeId === sourceId && sourceNode.applications && sourceNode.applications.includes(targetId)) {
+            return APPLICATION_COLOR;
+            }
+        }
+        
+        // Nếu không rơi vào các trường hợp trên, nó là một liên kết có liên quan nhưng không trực tiếp -> màu trung tính.
+        return NEUTRAL_COLOR;
+        }
+    
+    
+        // ===== KHỞI TẠO GRAPH =====
+    const Graph = ForceGraph3D()
+      (document.getElementById('graph-container'))
+        .backgroundColor('#0a0e27')
+        .graphData(fullKnowledgeData)
+        .nodeLabel(node => node.type === 'lesson' ? node.name : node.id)
+        .nodeVal('val')
+        .nodeThreeObject(node => {
+            const group = new THREE.Group();
+            
+            // TỐI ƯU HÓA: Giảm độ phức tạp của Geometry
+            const geometry = new THREE.SphereGeometry(node.val, 16, 16); 
+            
+            // Không cần thay đổi phần material
+            const material = new THREE.MeshPhongMaterial({
+                color: node.color,
+                emissive: node.color,
+                emissiveIntensity: 0.4,
+                shininess: 100,
+                specular: 0x444444,
+                transparent: true,
+                opacity: 0.95
+            });
+            const sphere = new THREE.Mesh(geometry, material);
+            group.add(sphere);
 
-            Graph(document.getElementById('graph'))
-                .graphData(graphData)
-                .nodeId('id')
-                .nodeVal(getNodeSize)
-                .nodeColor(getNodeColor)
-                .nodeLabel('')
-                .nodeCanvasObject((node, ctx, scale) => {
-                    const size = getNodeSize(node);
-                    ctx.beginPath();
-                    ctx.arc(node.x, node.y, size, 0, 2 * Math.PI);
-                    
-                    const isHighlighted = highlightNodes.has(node.id) && (hoverNode || clickedNode || isDragging);
-                    const isActive = node === hoverNode || node === clickedNode;
-                    
-                    let fillColor = getNodeColor(node);
-                    let strokeColor = getNodeColor(node);
-                    let lineWidth = 1.5;
-                    
-                    if (isHighlighted) {
-                        if (isActive) {
-                            fillColor = '#8BC4B8';
-                            strokeColor = '#8BC4B8';
-                            lineWidth = 4;
+            // --- SỬA LỖI FONT VÀ XỬ LÝ TEXT DÀI ---
+            if (node.type === 'chapter' || node.type === 'lesson') {
+                const text = node.type === 'chapter' ? node.id : node.name;
+                
+                // Tự động ngắt dòng cho text dài
+                const wrapText = (text, maxWidth) => {
+                    if (text.length <= maxWidth) return text;
+                    const words = text.split(' ');
+                    let lines = [];
+                    let currentLine = words[0];
+                    for (let i = 1; i < words.length; i++) {
+                        if (currentLine.length + words[i].length + 1 <= maxWidth) {
+                            currentLine += ' ' + words[i];
                         } else {
-                            fillColor = getNodeColor(node);
-                            strokeColor = '#9BCFC4';
-                            lineWidth = 2.5;
+                            lines.push(currentLine);
+                            currentLine = words[i];
                         }
-                    } else if (hoverNode || clickedNode || isDragging) {
-                        fillColor = 'rgba(80, 80, 80, 0.12)';
-                        strokeColor = 'rgba(80, 80, 80, 0.12)';
-                        lineWidth = 1;
                     }
+                    lines.push(currentLine);
+                    return lines.join('\n'); // Ký tự \n để xuống dòng
+                };
 
-                    ctx.fillStyle = fillColor;
-                    ctx.strokeStyle = strokeColor;
-                    ctx.lineWidth = lineWidth;
-                    ctx.fill(); 
-                    ctx.stroke();
+                const wrappedText = node.type === 'chapter' ? wrapText(text, 25) : text; // Chỉ ngắt dòng cho tên chương
 
-                    if (showLabels && scale > 0.4) {
-                        const baseFontSize = 12;
-                        const fontSize = isHighlighted ? baseFontSize * 1.2 : baseFontSize;
-                        ctx.font = `${isHighlighted ? '600' : '500'} ${fontSize / scale}px Inter`;
-                        
-                        let labelColor;
-                        if (isHighlighted) {
-                            labelColor = isActive ? '#A8D5CC' : '#D0E0DC';
-                        } else if (hoverNode || clickedNode || isDragging) {
-                            labelColor = 'rgba(140, 150, 160, 0.2)';
-                        } else {
-                            labelColor = 'rgba(180, 190, 200, 0.45)';
-                        }
+                const sprite = new SpriteText(wrappedText);
+                sprite.fontFace = 'Arial'; // Chỉ định rõ ràng font Arial
+                sprite.fontWeight = 'bold';
 
-                        ctx.fillStyle = labelColor;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        
-                        if (isHighlighted) {
-                            ctx.shadowColor = 'rgba(139, 196, 184, 0.4)';
-                            ctx.shadowBlur = 8;
-                        }
-                        
-                        ctx.fillText(node.label, node.x, node.y + size + fontSize / scale * 0.85);
-                        ctx.shadowBlur = 0;
-                    }
-                })
-                .linkCanvasObject((link, ctx) => {
-                    const isHighlighted = highlightLinks.has(link);
-                    const color = isHighlighted ? 'rgba(155, 207, 196, 0.6)' : 'rgba(100, 120, 140, 0.12)';
-                    const width = isHighlighted ? 2 : 0.8;
-
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = width;
-                    
-                    if (isHighlighted) {
-                        ctx.shadowColor = 'rgba(139, 196, 184, 0.3)';
-                        ctx.shadowBlur = 6;
-                    }
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(link.source.x, link.source.y);
-                    ctx.lineTo(link.target.x, link.target.y);
-                    ctx.stroke();
-                    ctx.shadowBlur = 0;
-                })
-                .linkDirectionalParticles(link => highlightLinks.has(link) ? 3 : 0)
-                .linkDirectionalParticleWidth(2)
-                .linkDirectionalParticleSpeed(0.005)
-                .linkDirectionalParticleColor(() => '#9BCFC4')
-                .backgroundColor('#0a0e14')
-                .d3Force('charge', d3.forceManyBody().strength(node => {
-                    const deg = nodeDegrees[node.id] || 0;
-                    if (deg > 10) return -1200;
-                    if (deg > 5) return -800;
-                    return -600;
-                }))
-                .d3Force('link', d3.forceLink().distance(link => {
-                    const sourceDeg = nodeDegrees[link.source.id] || 0;
-                    const targetDeg = nodeDegrees[link.target.id] || 0;
-                    if (sourceDeg > 10 || targetDeg > 10) return 180;
-                    if (sourceDeg > 5 || targetDeg > 5) return 140;
-                    return 110;
-                }).strength(0.3))
-                .d3Force('center', d3.forceCenter())
-                .d3Force('collision', d3.forceCollide().radius(node => {
-                    const deg = nodeDegrees[node.id] || 0;
-                    return getNodeSize(node) + (deg > 10 ? 35 : 22);
-                }).strength(0.7))
-                .onEngineStop(() => {
-                    document.getElementById('loading').classList.add('hide');
-                    Graph.zoomToFit(1000, 100);
-                })
-                .onNodeHover(node => {
-                    if (isDragging || clickedNode) return;
-                    
-                    highlightNodes.clear();
-                    highlightLinks.clear();
-                    hoverNode = node || null;
-                    
-                    if (node) {
-                        updateNodeInfo(node);
-                        highlightNodes.add(node.id);
-                        
-                        graphData.links.forEach(link => {
-                            if (link.source.id === node.id || link.target.id === node.id) {
-                                highlightLinks.add(link);
-                                highlightNodes.add(link.source.id);
-                                highlightNodes.add(link.target.id);
-                            }
-                        });
-                        
-                        freezeUnrelatedNodes();
-                    } else {
-                        nodeInfo.classList.remove('show');
-                        unfreezeAllNodes();
-                    }
-                    
-                    Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-                })
-                .onNodeClick(node => {
-                    if (clickedNode === node) {
-                        clickedNode = null;
-                        highlightNodes.clear();
-                        highlightLinks.clear();
-                        nodeInfo.classList.remove('show');
-                        unfreezeAllNodes();
-                    } else {
-                        clickedNode = node;
-                        highlightNodes.clear();
-                        highlightLinks.clear();
-                        highlightNodes.add(node.id);
-                        
-                        graphData.links.forEach(link => {
-                            if (link.source.id === node.id || link.target.id === node.id) {
-                                highlightLinks.add(link);
-                                highlightNodes.add(link.source.id);
-                                highlightNodes.add(link.target.id);
-                            }
-                        });
-                        
-                        updateNodeInfo(node);
-                        freezeUnrelatedNodes();
-                    }
-                    
-                    Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-                })
-                .onNodeDragStart(node => {
-                    isDragging = true;
-                    clickedNode = null;
-                    highlightNodes.clear();
-                    highlightLinks.clear();
-                    hoverNode = node;
-                    
-                    highlightNodes.add(node.id);
-                    graphData.links.forEach(link => {
-                        if (link.source.id === node.id || link.target.id === node.id) {
-                            highlightLinks.add(link);
-                            highlightNodes.add(link.source.id);
-                            highlightNodes.add(link.target.id);
-                        }
-                    });
-                    
-                    updateNodeInfo(node);
-                    freezeUnrelatedNodes();
-                    Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-                })
-                .onNodeDrag(node => {
-                    Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-                })
-                .onNodeDragEnd(node => {
-                    isDragging = false;
-                    hoverNode = null;
-                    setTimeout(() => {
-                        if (!clickedNode) {
-                            highlightNodes.clear();
-                            highlightLinks.clear();
-                            nodeInfo.classList.remove('show');
-                            unfreezeAllNodes();
-                            Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-                        }
-                    }, 300);
-                })
-                .onBackgroundClick(() => {
-                    if (clickedNode) {
-                        clickedNode = null;
-                        highlightNodes.clear();
-                        highlightLinks.clear();
-                        nodeInfo.classList.remove('show');
-                        unfreezeAllNodes();
-                        Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-                    }
-                });
-
-            function freezeUnrelatedNodes() {
-                graphData.nodes.forEach(n => {
-                    if (!highlightNodes.has(n.id)) {
-                        n.fx = n.x;
-                        n.fy = n.y;
-                    }
-                });
-            }
-
-            function unfreezeAllNodes() {
-                graphData.nodes.forEach(n => {
-                    n.fx = undefined;
-                    n.fy = undefined;
-                });
-            }
-
-            document.getElementById('graph').addEventListener('mousemove', e => {
-                if (nodeInfo.classList.contains('show')) {
-                    const offsetX = 20;
-                    const offsetY = 20;
-                    let left = e.clientX + offsetX;
-                    let top = e.clientY + offsetY;
-                    if (left + nodeInfo.offsetWidth > window.innerWidth) {
-                        left = e.clientX - nodeInfo.offsetWidth - offsetX;
-                    }
-                    if (top + nodeInfo.offsetHeight > window.innerHeight) {
-                        top = e.clientY - nodeInfo.offsetHeight - offsetY;
-                    }
-                    nodeInfo.style.left = left + 'px';
-                    nodeInfo.style.top = top + 'px';
-                }
-            });
-
-            setupSearch();
-        }
-
-        // ⭐ SEARCH FUNCTIONALITY
-        function setupSearch() {
-            const searchInput = document.getElementById('search-input');
-            const searchResultsDiv = document.getElementById('search-results');
-            
-            // Focus on Enter key press
-            document.addEventListener('keydown', e => {
-                if (e.key === 'Enter' && document.activeElement !== searchInput) {
-                    searchInput.focus();
-                    e.preventDefault();
-                }
-            });
-            
-            // Input event - realtime search
-            searchInput.addEventListener('input', e => {
-                const term = e.target.value.toLowerCase().trim();
-                selectedResultIndex = -1;
-                
-                if (!term) {
-                    searchResultsDiv.classList.remove('show');
-                    searchResults = [];
-                    return;
+                if (node.type === 'chapter') {
+                    sprite.textHeight = 6;
+                    sprite.position.y = node.val + 8;
+                } else { // lesson
+                    sprite.textHeight = 3;
+                    sprite.position.y = node.val + 4;
                 }
                 
-                // Find matching nodes
-                searchResults = graphData.nodes
-                    .filter(n => n.label.toLowerCase().includes(term))
-                    .sort((a, b) => {
-                        const degA = nodeDegrees[a.id] || 0;
-                        const degB = nodeDegrees[b.id] || 0;
-                        return degB - degA;
-                    })
-                    .slice(0, 10);
-                
-                renderSearchResults();
-            });
-            
-            // Keyboard navigation
-            searchInput.addEventListener('keydown', e => {
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    if (!searchResults.length) return;
-                    selectedResultIndex = Math.min(selectedResultIndex + 1, searchResults.length - 1);
-                    renderSearchResults();
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    if (!searchResults.length) return;
-                    selectedResultIndex = Math.max(selectedResultIndex - 1, -1);
-                    renderSearchResults();
-                } else if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (searchResults.length === 0) return;
-                    
-                    const targetNode = selectedResultIndex >= 0 
-                        ? searchResults[selectedResultIndex] 
-                        : searchResults[0];
-                    
-                    if (targetNode) {
-                        window.selectNode(targetNode.id);
-                    }
-                } else if (e.key === 'Escape') {
-                    searchInput.value = '';
-                    searchResultsDiv.classList.remove('show');
-                    searchResults = [];
-                    searchInput.blur();
-                }
-            });
-            
-            // Click outside to close
-            document.addEventListener('click', e => {
-                if (!e.target.closest('#search-container')) {
-                    searchResultsDiv.classList.remove('show');
-                }
-            });
-        }
-
-
-        function renderSearchResults() {
-            const searchResultsDiv = document.getElementById('search-results');
-            
-            if (searchResults.length === 0) {
-                searchResultsDiv.innerHTML = '<div class="no-results">Không tìm thấy kết quả</div>';
-                searchResultsDiv.classList.add('show');
-                return;
+                sprite.color = node.type === 'chapter' ? '#ffffff' : '#cccccc';
+                group.add(sprite);
             }
             
-            let html = '';
-            searchResults.forEach((node, index) => {
-                const deg = nodeDegrees[node.id] || 0;
-                const icon = node.isFile ? '📄' : '⚠️';
-                const badge = node.isFile 
-                    ? '<span class="result-badge file">File</span>' 
-                    : '<span class="result-badge missing">Missing</span>';
-                const selectedClass = index === selectedResultIndex ? 'selected' : '';
-                
-                html += `
-                    <div class="result-item ${selectedClass}" onclick="selectNode('${node.id}')">
-                        <div class="result-icon">${icon}</div>
-                        <div class="result-content">
-                            <div class="result-name">${node.label}</div>
-                            <div class="result-meta">
-                                ${badge}
-                                <span>${deg} kết nối</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            searchResultsDiv.innerHTML = html;
-            searchResultsDiv.classList.add('show');
-        }
+            return group;
+        })
+        .linkColor(link => getLinkColor(link))
+        .linkWidth(link => {
+          const baseWidth = calculateLinkWidth(link);
+          if (highlightLinks.size === 0) return baseWidth;
+          return highlightLinks.has(link) ? baseWidth * 1.5 : baseWidth * 0.3;
+        })
+        .linkDirectionalArrowLength(link => {
+          if (link.type === 'sub_knowledge') return 3;
+          if (highlightLinks.size === 0) return 6;
+          return highlightLinks.has(link) ? 8 : 4;
+        })
+        .linkDirectionalArrowRelPos(1)
+        .linkDirectionalArrowColor(link => getLinkColor(link))
+        .linkOpacity(link => {
+          if (highlightLinks.size === 0) return 0.6;
+          return highlightLinks.has(link) ? 0.9 : 0.1;
+        })
+        .linkCurvature(0.2)
+        .linkDirectionalParticles(link => {
+          return (highlightLinks.has(link) && link.type !== 'sub_knowledge') ? 4 : 0;
+        })
+        .linkDirectionalParticleWidth(3)
+        .linkDirectionalParticleSpeed(0.006)
+        .onNodeHover(node => {
+          if (!isNodeSelected) {
+            hoveredNode = node;
+            if (node && node.type === 'chapter') {
+              highlightNodeConnections(node, false);
+            } else {
+              clearHighlight();
+            }
+          }
+        })
+        .onNodeClick(node => {
+          if (node.type === 'chapter') {
+            isNodeSelected = true;
+            selectedNode = node;
+            showNodeDetail(node);
+            highlightNodeConnections(node, true);
+          }
+        })
+        .onBackgroundClick(() => {
+          closeDetail();
+          clearHighlight();
+          isNodeSelected = false;
+          hoveredNode = null;
+        });
 
-        window.selectNode = function(nodeId) {
-            const node = graphData.nodes.find(n => n.id === nodeId);
-            if (!node) return;
-            
-            // Clear search
-            document.getElementById('search-input').value = '';
-            document.getElementById('search-results').classList.remove('show');
-            searchResults = [];
-            
-            // Focus node
-            Graph.centerAt(node.x, node.y, 1000);
-            Graph.zoom(3, 1000);
-            
-            setTimeout(() => {
-                clickedNode = node;
-                highlightNodes.clear();
-                highlightLinks.clear();
-                highlightNodes.add(node.id);
-                
-                graphData.links.forEach(link => {
-                    if (link.source.id === node.id || link.target.id === node.id) {
-                        highlightLinks.add(link);
-                        highlightNodes.add(link.source.id);
-                        highlightNodes.add(link.target.id);
-                    }
-                });
-                
-                updateNodeInfo(node);
-                
-                graphData.nodes.forEach(n => {
-                    if (!highlightNodes.has(n.id)) {
-                        n.fx = n.x;
-                        n.fy = n.y;
-                    }
-                });
-                
-                Graph.nodeCanvasObject(Graph.nodeCanvasObject()).linkCanvasObject(Graph.linkCanvasObject());
-            }, 500);
-        };
+    // Cấu hình lực
+    Graph.d3Force('charge').strength(-400);
+    Graph.d3Force('link').distance(link => link.type === 'sub_knowledge' ? 30 : 120);
+    Graph.d3Force('center').strength(0.2);
 
-        function updateNodeInfo(node) {
-            const deg = nodeDegrees[node.id] || 0;
-            const titleColor = node.isFile ? '#9BCFC4' : '#D97790';
-            const statusIcon = node.isFile ? '✅' : '⚠️';
-            const statusText = node.isFile ? 'Đã có file' : 'Chưa có file';
-            let inLinks = 0, outLinks = 0;
-            graphData.links.forEach(link => {
-                if (link.target.id === node.id) inLinks++;
-                if (link.source.id === node.id) outLinks++;
-            });
-            nodeInfo.innerHTML = `
-                <div class="title" style="color:${titleColor}">
-                    ${statusIcon} <strong>${node.label}</strong>
-                </div>
-                <div style="font-size:10px; color:#B0BCC8; margin:6px 0;">
-                    ${statusText}
-                </div>
-                <div class="connections">
-                    📊 <strong>${deg}</strong> kết nối 
-                    (${inLinks} vào, ${outLinks} ra)
-                </div>
-            `;
-            nodeInfo.classList.add('show');
-        }
-
-        function togglePhysics() { 
-            physicsEnabled = !physicsEnabled; 
-            document.getElementById('physics-btn').classList.toggle('active'); 
-            physicsEnabled ? Graph.resumeAnimation() : Graph.pauseAnimation(); 
+    // Lực phân tầng
+    const layerForce = (alpha) => {
+      fullKnowledgeData.nodes.forEach(node => {
+        let targetY = 0;
+        if (node.group === 12) targetY = 150;
+        else if (node.group === 11) targetY = 0;
+        else if (node.group === 10) targetY = -150;
+        
+        node.vy -= (node.y - targetY) * 0.8 * alpha;
+        
+        const maxDistance = 300;
+        const dx = node.x;
+        const dz = node.z;
+        const distance = Math.sqrt(dx * dx + dz * dz);
+        
+        if (distance > maxDistance) {
+          const scale = maxDistance / distance;
+          node.vx -= (node.x - dx * scale) * 0.15;
+          node.vz -= (node.z - dz * scale) * 0.15;
         }
         
-        function toggleLabels() { 
-            showLabels = !showLabels; 
-            document.getElementById('labels-btn').classList.toggle('active'); 
-            Graph.refresh(); 
+        if (alpha < 0.01) {
+          node.y = targetY;
+          node.vy = 0;
+        }
+      });
+    };
+    Graph.d3Force('layering', layerForce);
+
+    // Thêm ánh sáng và mặt phẳng HÌNH TRÒN đã được nâng cấp
+    setTimeout(() => {
+      const scene = Graph.scene();
+      
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      
+      const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight1.position.set(200, 200, 200);
+      scene.add(directionalLight1);
+      
+      const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+      directionalLight2.position.set(-200, -200, -200);
+      scene.add(directionalLight2);
+
+      // ✨ UPDATE: Hàm tạo mặt phẳng với hiệu ứng gradient và vòng sáng (glow)
+      function createCirclePlane(y, label, color) {
+        const radius = 400;
+        const segments = 64;
+        
+        // 1. Tạo mặt phẳng nền với gradient tinh tế
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = 512;
+        canvas.height = 512;
+        const gradient = context.createRadialGradient(256, 256, 0, 256, 256, 256);
+        gradient.addColorStop(0, 'rgba(40, 50, 90, 0.3)'); // Màu trung tâm
+        gradient.addColorStop(1, 'rgba(20, 25, 45, 0.1)'); // Màu rìa
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, 512, 512);
+
+        const planeTexture = new THREE.CanvasTexture(canvas);
+        const planeMaterial = new THREE.MeshBasicMaterial({
+            map: planeTexture,
+            transparent: true,
+            side: THREE.DoubleSide
+        });
+        const planeGeometry = new THREE.CircleGeometry(radius, segments);
+        const circlePlane = new THREE.Mesh(planeGeometry, planeMaterial);
+        circlePlane.position.set(0, y, 0);
+        circlePlane.rotation.x = Math.PI / 2;
+        scene.add(circlePlane);
+
+        // 2. Tạo vòng sáng (glow ring) bằng Torus và AdditiveBlending
+        const ringGeometry = new THREE.TorusGeometry(radius, 2, 16, 100);
+        const ringMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            blending: THREE.AdditiveBlending, // Hiệu ứng glow
+            transparent: true,
+            opacity: 0.7
+        });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.position.set(0, y, 0);
+        ring.rotation.x = Math.PI / 2;
+        scene.add(ring);
+        
+        // 3. Giữ nguyên phần label
+        const labelSprite = new SpriteText(label);
+        labelSprite.color = '#FFFFFF';
+        labelSprite.textHeight = 16;
+        labelSprite.fontWeight = 'bold';
+        labelSprite.position.set(radius - 50, y + 20, 0);
+        scene.add(labelSprite);
+      }
+
+      createCirclePlane(150, 'Toán 12 - Tổng hợp & Ứng dụng', 0xff8844);
+      createCirclePlane(0, 'Toán 11 - Xây dựng Công cụ', 0xffdd44);
+      createCirclePlane(-150, 'Toán 10 - Nền tảng', 0x8888ff);
+    }, 100);
+
+    // Góc nhìn mặc định
+    setTimeout(() => {
+    Graph.cameraPosition(
+        { x: 0, y: 350, z: 800 }, // <-- Giá trị mới: xa hơn (z=800), cao hơn (y=350), trực diện hơn (x=0)
+        { x: 0, y: 0, z: 0 }, // Nhìn vào trung tâm
+        1500 // Tăng thời gian chuyển động cho mượt hơn
+    );
+    }, 500);
+
+    // ===== HÀM HIGHLIGHT NODE CONNECTIONS =====
+    function highlightNodeConnections(node, isPermanent) {
+    highlightNodes.clear();
+    highlightLinks.clear();
+
+    if (node) {
+        highlightNodes.add(node.id);
+        
+        fullKnowledgeData.links.forEach(link => {
+            const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+            const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+            
+            if (sourceId === node.id || targetId === node.id) {
+                highlightLinks.add(link);
+                highlightNodes.add(sourceId);
+                highlightNodes.add(targetId);
+            }
+        });
+    }
+
+    // --- THAY ĐỔI LỚN: KHÔNG TÁI TẠO OBJECT, CHỈ CẬP NHẬT THUỘC TÍNH ---
+    Graph.graphData().nodes.forEach(n => {
+        if (!n.__threeObj) return; // Bỏ qua nếu đối tượng 3D chưa được tạo
+
+        const isHighlighted = highlightNodes.has(n.id);
+        const shouldBeVisible = isHighlighted || highlightNodes.size === 0;
+
+        // Cập nhật Sphere (quả cầu)
+        const sphere = n.__threeObj.children[0];
+        if (sphere && sphere.material) {
+            sphere.material.opacity = shouldBeVisible ? 0.95 : 0.15;
+            sphere.material.emissiveIntensity = isHighlighted ? 0.4 : 0.1;
+        }
+        
+        // Cập nhật Text (nhãn)
+        const sprite = n.__threeObj.children[1];
+        if (sprite && sprite.material) {
+             sprite.material.opacity = shouldBeVisible ? 1 : 0.2;
+        }
+    });
+
+    // Cập nhật màu sắc và thuộc tính của Link
+    Graph.linkColor(Graph.linkColor())
+         .linkWidth(Graph.linkWidth())
+         .linkOpacity(Graph.linkOpacity())
+         .linkDirectionalParticles(Graph.linkDirectionalParticles());
+}
+
+    function clearHighlight() {
+    highlightNodes.clear();
+    highlightLinks.clear();
+    
+    // ✅ CẬP NHẬT CẢ NODE VÀ LINK
+    Graph.nodeThreeObject(Graph.nodeThreeObject());
+    Graph.linkColor(Graph.linkColor());
+    Graph.linkDirectionalArrowColor(Graph.linkDirectionalArrowColor());
+    }
+
+    // ===== HÀM HIỂN THỊ CHI TIẾT NODE =====
+    function showNodeDetail(node) {
+      if (node.type !== 'chapter') return;
+      
+      const detail = document.getElementById('node-detail');
+      const content = document.getElementById('detail-content');
+      
+      const badge = `<span class="badge badge-${node.group}">Lớp ${node.group}</span>`;
+      
+      let prerequisitesHTML = '';
+      if (node.prerequisites && node.prerequisites.length > 0) {
+        prerequisitesHTML = '<h3>🔴 Kiến thức tiên quyết:</h3><ul>';
+        node.prerequisites.forEach(prereq => {
+          prerequisitesHTML += `<li>${prereq}</li>`;
+        });
+        prerequisitesHTML += '</ul>';
+      }
+      
+      let applicationsHTML = '';
+      if (node.applications && node.applications.length > 0) {
+        applicationsHTML = '<h3>🟢 Kiến thức ứng dụng:</h3><ul>';
+        node.applications.forEach(app => {
+          applicationsHTML += `<li>${app}</li>`;
+        });
+        applicationsHTML += '</ul>';
+      }
+      
+      let lessonsHTML = '<h3>📖 Các bài học:</h3><ul>';
+      if (node.lessons) {
+        node.lessons.forEach(lesson => {
+          lessonsHTML += `<li>${lesson}</li>`;
+        });
+      }
+      lessonsHTML += '</ul>';
+      
+      content.innerHTML = `
+        <h2>${badge} ${node.id}</h2>
+        <p style="color: #aaa; font-size: 11px; margin-bottom: 10px;">${node.description || ''}</p>
+        ${prerequisitesHTML}
+        ${applicationsHTML}
+        ${lessonsHTML}
+      `;
+      
+      detail.classList.add('active');
+    }
+
+    function closeDetail() {
+      document.getElementById('node-detail').classList.remove('active');
+      selectedNode = null;
+    }
+
+    function searchNode(query) {
+      if (!query) {
+        clearHighlight();
+        isNodeSelected = false;
+        hoveredNode = null;
+        closeDetail();
+        return;
+      }
+      
+      const found = fullKnowledgeData.nodes.find(node => 
+        node.type === 'chapter' && node.id.toLowerCase().includes(query.toLowerCase())
+      );
+      
+      if (found) {
+        isNodeSelected = true;
+        highlightNodeConnections(found, true);
+        showNodeDetail(found);
+        Graph.cameraPosition(
+          { x: found.x + 100, y: found.y + 50, z: found.z + 100 },
+          { x: found.x, y: found.y, z: found.z },
+          1000
+        );
+      }
+    }
+
+    
+
+    function viewAngle() {
+        Graph.cameraPosition(
+            { x: 0, y: 350, z: 800 },
+            { x: 0, y: 0, z: 0 },
+            1000
+        );
         }
 
-        window.onload = initializeGraph;
-    </script>
+    function viewTop() {
+      Graph.cameraPosition(
+        { x: 0, y: 600, z: 0 },
+        { x: 0, y: 0, z: 0 },
+        1000
+      );
+    }
+
+    function viewSide() {
+      Graph.cameraPosition(
+        { x: 600, y: 0, z: 0 },
+        { x: 0, y: 0, z: 0 },
+        1000
+      );
+    }
+
+    function resetView() {
+      clearHighlight();
+      closeDetail();
+      isNodeSelected = false;
+      hoveredNode = null;
+      document.getElementById('search-input').value = '';
+      viewAngle();
+    }
+
+    let physicsEnabled = true;
+    function togglePhysics() {
+      physicsEnabled = !physicsEnabled;
+      if (physicsEnabled) {
+        Graph.d3ReheatSimulation();
+      } else {
+        Graph.d3AlphaDecay(1);
+      }
+    }
+  </script>
 </body>
 </html>
