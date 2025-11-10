@@ -11,10 +11,14 @@
             "id": "3846802b5f50c739",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "Toán 12.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "Toán 12"
             }
           }
         ]
@@ -188,79 +192,43 @@
       "3d-graph-new:Global 3D Graph": false
     }
   },
-  "floating": {
-    "id": "e0977114aed8667b",
-    "type": "floating",
-    "children": [
-      {
-        "id": "3e929205a34b5961",
-        "type": "window",
-        "children": [
-          {
-            "id": "10ed5603a48cae28",
-            "type": "tabs",
-            "children": [
-              {
-                "id": "216392bf9b3473f4",
-                "type": "leaf",
-                "state": {
-                  "type": "graph",
-                  "state": {},
-                  "icon": "lucide-git-fork",
-                  "title": "Graph view"
-                }
-              }
-            ]
-          }
-        ],
-        "direction": "vertical",
-        "x": 2267,
-        "y": 38,
-        "width": 1443,
-        "height": 975,
-        "maximize": true,
-        "zoom": 0
-      }
-    ]
-  },
-  "active": "216392bf9b3473f4",
+  "active": "3846802b5f50c739",
   "lastOpenFiles": [
-    "Cung, góc và công thức lượng giác.md",
-    "Phương trình, Hệ phương trình.md",
-    "Đại cương về phương trình.md",
-    "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
     "Đạo hàm.md",
-    "Sự đồng biến, nghịch biến của hàm số.md",
     "Phương pháp tọa độ trong mặt phẳng.md",
+    "test.html",
+    "Knowledge_graph_3d.html",
+    "Nguyên hàm, Tích phân và Ứng dụng.md",
+    "Hàm số lượng giác và phương trình lượng giác.md",
+    "Khối đa diện.md",
+    "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số.md",
+    "Toán 12.md",
+    "Mặt nón, Mặt trụ, Mặt cầu.md",
+    "Hàm số bậc nhất và bậc hai.md",
+    "Mệnh đề. Tập hợp.md",
+    "Toán 10.md",
+    "Toán phổ thông.md",
+    "Phương trình, Hệ phương trình.md",
+    "Tổ hợp và Xác suất.md",
+    "Tích vô hướng của hai vectơ.md",
+    "Cung, góc và công thức lượng giác.md",
+    "Đại cương về phương trình.md",
+    "Sự đồng biến, nghịch biến của hàm số.md",
     "Vectơ.md",
     "Toán 11.md",
-    "Toán 10.md",
-    "Tổ hợp và Xác suất.md",
-    "Toán 12.md",
     "Dãy số, Cấp số cộng và Cấp số nhân.md",
     "Đường thẳng, mặt phẳng và quan hệ song song trong không gian.md",
-    "Hàm số bậc nhất và bậc hai.md",
     "Hàm số lũy thừa, hàm số mũ và hàm số logarit.md",
-    "Nguyên hàm, Tích phân và Ứng dụng.md",
-    "Toán phổ thông.md",
     "Vectơ và quan hệ vuông góc trong không gian.md",
     "Số phức.md",
-    "Khối đa diện.md",
-    "Hàm số lượng giác và phương trình lượng giác.md",
-    "Giới hạn.md",
     "reformat_notes.py",
     "reform",
-    "Phương pháp tọa độ trong không gian.md",
-    "Bất đẳng thức. Bất phương trình.md",
-    "Mặt nón, Mặt trụ, Mặt cầu.md",
     "index.html",
     "index,html",
     "vercel.json",
     "data.js",
     "generate_graph_data.py",
     "obsidian_graph_v3.html",
-    "toan_hoc_graph.mmd",
-    "Data2.txt",
     "Untitled.canvas",
     "Untitled 3.canvas",
     "Untitled 2.canvas",

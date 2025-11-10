@@ -10,9 +10,6 @@
 
 ### Kiến thức tiên quyết (Nền tảng)
 - [[Mệnh đề. Tập hợp]]
-- [[Phương trình, Hệ phương trình]]
-- [[Bất đẳng thức. Bất phương trình]]
-- [[Phương pháp tọa độ trong mặt phẳng]]
 
 ### Kiến thức kế thừa (Ứng dụng)
 - [[Sự đồng biến, nghịch biến của hàm số]]

@@ -1,0 +1,363 @@
+<script>
+    // ===== DỮ LIỆU GỐC (Đã sửa BPT và giữ nguyên) =====
+    const fullKnowledgeData = {
+      nodes: [
+        // LỚP 10
+        { id: "Mệnh đề và Tập hợp", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Nền tảng logic và ngôn ngữ toán học", lessons: ["Mệnh đề", "Tập hợp và các phép toán trên tập hợp"], prerequisites: [], applications: ["Bất phương trình bậc nhất hai ẩn", "Hàm số và Đồ thị", "Xác suất cổ điển", "Quan hệ song song (Hình học không gian)"] },
+        { id: "Bất phương trình bậc nhất hai ẩn", group: 10, color: '#9999ff', val: 8, type: 'chapter', description: "Xác định miền nghiệm để giải các bài toán tối ưu", lessons: ["Bất phương trình bậc nhất hai ẩn", "Hệ bất phương trình bậc nhất hai ẩn"], prerequisites: ["Mệnh đề và Tập hợp"], applications: ["Ứng dụng đạo hàm"] },
+        { id: "Hệ thức lượng trong tam giác", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Định lý sin, cosin và các hệ thức lượng giác cơ bản", lessons: ["Giá trị lượng giác của góc 0°-180°", "Hệ thức lượng trong tam giác"], prerequisites: [], applications: ["Hàm số lượng giác"] },
+        { id: "Vectơ", group: 10, color: '#9999ff', val: 10, type: 'chapter', description: "Khái niệm vectơ, các phép toán và tích vô hướng", lessons: ["Các khái niệm mở đầu", "Tổng và hiệu vectơ", "Tích vectơ với số", "Vectơ trong mặt phẳng toạ độ", "Tích vô hướng"], prerequisites: [], applications: ["Phương pháp toạ độ (Oxy)", "Vectơ trong không gian"] },
+        { id: "Thống kê (không ghép nhóm)", group: 10, color: '#9999ff', val: 7, type: 'chapter', description: "Các số đặc trưng đo xu thế trung tâm và độ phân tán", lessons: ["Số gần đúng và sai số", "Số đặc trưng đo xu thế trung tâm", "Số đặc trưng đo độ phân tán"], prerequisites: [], applications: ["Thống kê (ghép nhóm - xu thế trung tâm)"] },
+        { id: "Hàm số và Đồ thị", group: 10, color: '#9999ff', val: 11, type: 'chapter', description: "Khái niệm hàm số, tính chất và đồ thị - Nền tảng của Giải tích", lessons: ["Hàm số", "Hàm số bậc hai", "Dấu tam thức bậc hai", "Phương trình quy về bậc hai"], prerequisites: ["Mệnh đề và Tập hợp"], applications: ["Dãy số", "Giới hạn", "Đạo hàm", "Hàm số lượng giác", "Hàm số mũ và Logarit"] },
+        { id: "Phương pháp toạ độ (Oxy)", group: 10, color: '#9999ff', val: 10, type: 'chapter', description: "Đại số hóa hình học phẳng bằng hệ toạ độ", lessons: ["Phương trình đường thẳng", "Đường thẳng trong Oxy", "Đường tròn trong Oxy", "Ba đường conic"], prerequisites: ["Vectơ"], applications: ["Vectơ trong không gian", "Phương pháp toạ độ (Oxyz)"] },
+        { id: "Đại số tổ hợp", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Nghệ thuật đếm: Hoán vị, Chỉnh hợp, Tổ hợp", lessons: ["Quy tắc đếm", "Hoán vị, chỉnh hợp, tổ hợp", "Nhị thức Newton"], prerequisites: [], applications: ["Xác suất cổ điển", "Các quy tắc tính xác suất", "Xác suất có điều kiện"] },
+        { id: "Xác suất cổ điển", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Định nghĩa xác suất: P(A) = |A| / |Ω|", lessons: ["Biến cố và định nghĩa cổ điển", "Thực hành tính xác suất"], prerequisites: ["Đại số tổ hợp", "Mệnh đề và Tập hợp"], applications: ["Các quy tắc tính xác suất"] },
+        // LỚP 11
+        { id: "Hàm số lượng giác", group: 11, color: '#f5d442', val: 11, type: 'chapter', description: "Hàm tuần hoàn và phương trình lượng giác", lessons: ["Giá trị lượng giác của góc lượng giác", "Công thức lượng giác", "Hàm số lượng giác", "Phương trình lượng giác cơ bản"], prerequisites: ["Hệ thức lượng trong tam giác", "Hàm số và Đồ thị"], applications: ["Đạo hàm", "Nguyên hàm và Tích phân"] },
+        { id: "Dãy số", group: 11, color: '#f5d442', val: 9, type: 'chapter', description: "Hàm số với tập xác định là số nguyên dương", lessons: ["Dãy số", "Cấp số cộng", "Cấp số nhân"], prerequisites: ["Hàm số và Đồ thị"], applications: ["Giới hạn"] },
+        { id: "Thống kê (ghép nhóm - xu thế trung tâm)", group: 11, color: '#f5d442', val: 7, type: 'chapter', description: "Thống kê cho dữ liệu ghép nhóm", lessons: ["Mẫu số liệu ghép nhóm", "Số đặc trưng đo xu thế trung tâm"], prerequisites: ["Thống kê (không ghép nhóm)"], applications: ["Thống kê (độ phân tán)"] },
+        { id: "Quan hệ song song (Hình học không gian)", group: 11, color: '#f5d442', val: 10, type: 'chapter', description: "Quan hệ song song giữa đường thẳng và mặt phẳng", lessons: ["Đường thẳng và mặt phẳng", "Hai đường thẳng song song", "Đường thẳng song song mặt phẳng", "Hai mặt phẳng song song", "Phép chiếu song song"], prerequisites: ["Mệnh đề và Tập hợp"], applications: ["Quan hệ vuông góc (Hình học không gian)", "Vectơ trong không gian", "Phương pháp toạ độ (Oxyz)"] },
+        { id: "Giới hạn", group: 11, color: '#f5d442', val: 11, type: 'chapter', description: "Khái niệm vô cùng bé và vô cùng lớn - Nền móng Giải tích", lessons: ["Giới hạn của dãy số", "Giới hạn của hàm số", "Hàm số liên tục"], prerequisites: ["Dãy số", "Hàm số và Đồ thị"], applications: ["Đạo hàm", "Ứng dụng đạo hàm"] },
+        { id: "Hàm số mũ và Logarit", group: 11, color: '#f5d442', val: 10, type: 'chapter', description: "Hai lớp hàm quan trọng trong thực tế", lessons: ["Lũy thừa với số mũ thực", "Logarit", "Hàm số mũ và logarit", "Phương trình, bất phương trình mũ và logarit"], prerequisites: ["Hàm số và Đồ thị"], applications: ["Đạo hàm", "Nguyên hàm và Tích phân"] },
+        { id: "Quan hệ vuông góc (Hình học không gian)", group: 11, color: '#f5d442', val: 11, type: 'chapter', description: "Quan hệ vuông góc, khoảng cách, góc và thể tích", lessons: ["Hai đường thẳng vuông góc", "Đường thẳng vuông góc mặt phẳng", "Phép chiếu vuông góc", "Hai mặt phẳng vuông góc", "Khoảng cách", "Thể tích"], prerequisites: ["Quan hệ song song (Hình học không gian)"], applications: ["Vectơ trong không gian", "Phương pháp toạ độ (Oxyz)"] },
+        { id: "Các quy tắc tính xác suất", group: 11, color: '#f5d442', val: 9, type: 'chapter', description: "Biến cố hợp, giao, độc lập và công thức cộng và nhân", lessons: ["Biến cố hợp, giao, độc lập", "Công thức cộng xác suất", "Công thức nhân xác suất"], prerequisites: ["Xác suất cổ điển", "Đại số tổ hợp"], applications: ["Xác suất có điều kiện"] },
+        { id: "Đạo hàm", group: 11, color: '#f5d442', val: 13, type: 'chapter', description: "Công cụ vi phân - Trái tim của Giải tích THPT", lessons: ["Định nghĩa và ý nghĩa", "Các quy tắc tính đạo hàm", "Đạo hàm cấp hai"], prerequisites: ["Giới hạn", "Hàm số và Đồ thị", "Hàm số lượng giác", "Hàm số mũ và Logarit"], applications: ["Ứng dụng đạo hàm", "Nguyên hàm và Tích phân"] },
+        // LỚP 12
+        { id: "Ứng dụng đạo hàm", group: 12, color: '#ffd700', val: 13, type: 'chapter', description: "Khảo sát và vẽ đồ thị hàm số", lessons: ["Tính đơn điệu và cực trị", "Giá trị lớn nhất và nhỏ nhất", "Đường tiệm cận", "Khảo sát hàm số", "Ứng dụng thực tiễn"], prerequisites: ["Đạo hàm", "Giới hạn"], applications: ["Phương pháp toạ độ (Oxyz)"] },
+        { id: "Vectơ trong không gian", group: 12, color: '#ff8c42', val: 10, type: 'chapter', description: "Mở rộng vectơ từ 2D lên 3D", lessons: ["Vectơ trong không gian", "Hệ trục toạ độ không gian", "Biểu thức toạ độ phép toán vectơ"], prerequisites: ["Vectơ", "Phương pháp toạ độ (Oxy)", "Quan hệ song song (Hình học không gian)", "Quan hệ vuông góc (Hình học không gian)"], applications: ["Phương pháp toạ độ (Oxyz)"] },
+        { id: "Thống kê (độ phân tán)", group: 12, color: '#ff8c42', val: 7, type: 'chapter', description: "Hoàn thiện Thống kê mô tả", lessons: ["Khoảng biến thiên và tứ phân vị", "Phương sai và độ lệch chuẩn"], prerequisites: ["Thống kê (ghép nhóm - xu thế trung tâm)"], applications: [] },
+        { id: "Nguyên hàm và Tích phân", group: 12, color: '#ffd700', val: 12, type: 'chapter', description: "Phép toán ngược của đạo hàm", lessons: ["Nguyên hàm", "Tích phân", "Ứng dụng hình học của tích phân"], prerequisites: ["Đạo hàm", "Hàm số lượng giác", "Hàm số mũ và Logarit"], applications: [] },
+        { id: "Phương pháp toạ độ (Oxyz)", group: 12, color: '#ff8c42', val: 14, type: 'chapter', description: "Đỉnh cao của Hình học giải tích", lessons: ["Phương trình mặt phẳng", "Phương trình đường thẳng không gian", "Công thức tính góc không gian", "Phương trình mặt cầu"], prerequisites: ["Vectơ trong không gian", "Quan hệ song song (Hình học không gian)", "Quan hệ vuông góc (Hình học không gian)", "Phương pháp toạ độ (Oxy)", "Ứng dụng đạo hàm"], applications: [] },
+        { id: "Xác suất có điều kiện", group: 12, color: '#ff8c42', val: 9, type: 'chapter', description: "Đỉnh cao của Xác suất THPT", lessons: ["Xác suất có điều kiện", "Công thức xác suất toàn phần và Bayes"], prerequisites: ["Các quy tắc tính xác suất", "Đại số tổ hợp"], applications: [] }
+      ],
+      links: []
+    };
+    
+    // ===== LOGIC TẠO NODE VÀ LINK (GIỮ NGUYÊN PHIÊN BẢN ĐÚNG) =====
+    const lessonNodes = [];
+    fullKnowledgeData.nodes.forEach(chapter => {
+      if (chapter.type === 'chapter' && chapter.lessons) {
+        chapter.lessons.forEach((lesson, index) => {
+          lessonNodes.push({
+            id: `${chapter.id}_lesson_${index}`,
+            name: lesson,
+            group: chapter.group,
+            color: chapter.color,
+            val: 3,
+            type: 'lesson',
+            parentChapter: chapter.id
+          });
+        });
+      }
+    });
+    fullKnowledgeData.nodes.push(...lessonNodes);
+    
+    const nodeMap = new Map(fullKnowledgeData.nodes.map(node => [node.id, node]));
+    
+    fullKnowledgeData.nodes.forEach(node => {
+      if (node.type === 'lesson' && node.parentChapter && nodeMap.has(node.parentChapter)) {
+        fullKnowledgeData.links.push({
+          source: node.parentChapter,
+          target: node.id,
+          type: 'sub_knowledge'
+        });
+      }
+    });
+
+    fullKnowledgeData.nodes.forEach(node => {
+      if (node.type === 'chapter' && node.prerequisites) {
+        node.prerequisites.forEach(prereqId => {
+          if (nodeMap.has(prereqId)) {
+            fullKnowledgeData.links.push({
+              source: prereqId,
+              target: node.id,
+              type: "relationship"
+            });
+          }
+        });
+      }
+    });
+
+    // ===== HỆ THỐNG MÀU SẮC =====
+    const NEUTRAL_COLOR = 'rgba(100, 120, 180, 0.4)';
+    const PREREQUISITE_COLOR = '#ff6961';
+    const APPLICATION_COLOR = '#77dd77';
+    const SUB_KNOWLEDGE_COLOR = '#6CA0DC';
+
+    // ===== TRẠNG THÁI =====
+    let selectedNode = null;
+    let hoveredNode = null;
+    let highlightNodes = new Set();
+    let highlightLinks = new Set();
+    let isNodeSelected = false;
+
+    // Cập nhật thống kê
+    const chapterCount = fullKnowledgeData.nodes.filter(n => n.type === 'chapter').length;
+    document.getElementById('total-chapters').textContent = chapterCount;
+    document.getElementById('total-links').textContent = fullKnowledgeData.links.length;
+
+    // ===== HÀM TÍNH ĐỘ DÀY LINK (TỐI ƯU HÓA) =====
+    function calculateLinkWidth(link) {
+      if (link.type === 'sub_knowledge') return 1;
+      const sourceNode = nodeMap.get(link.source.id || link.source);
+      const targetNode = nodeMap.get(link.target.id || link.target);
+      if (sourceNode && targetNode && sourceNode.type === 'chapter' && targetNode.type === 'chapter') {
+        const importance = (sourceNode.val + targetNode.val) / 6;
+        return Math.max(2, Math.min(5, importance));
+      }
+      return 2;
+    }
+
+    // ===== HÀM XÁC ĐỊNH MÀU LINK (GIỮ NGUYÊN PHIÊN BẢN ĐÚNG) =====
+    function getLinkColor(link) {
+      const sourceId = link.source.id || link.source;
+      const targetId = link.target.id || link.target;
+      const currentNodeId = selectedNode ? selectedNode.id : (hoveredNode ? hoveredNode.id : null);
+      
+      if (!currentNodeId || !highlightLinks.has(link)) {
+        if (link.type === 'sub_knowledge') return SUB_KNOWLEDGE_COLOR;
+        return NEUTRAL_COLOR;
+      }
+      
+      if (link.type === 'sub_knowledge') return SUB_KNOWLEDGE_COLOR;
+      if (sourceId === currentNodeId) return APPLICATION_COLOR;
+      if (targetId === currentNodeId) return PREREQUISITE_COLOR;
+      
+      return NEUTRAL_COLOR;
+    }
+    
+    // ===== KHỞI TẠO GRAPH =====
+    const Graph = ForceGraph3D()
+      (document.getElementById('graph-container'))
+        .backgroundColor('#0a0e27')
+        .graphData(fullKnowledgeData)
+        .nodeLabel(node => node.type === 'lesson' ? node.name : node.id)
+        .nodeVal('val')
+        // TỐI ƯU HÓA SỐ 1: CACHING ĐỐI TƯỢNG 3D
+        .nodeThreeObject(node => {
+          // Dùng đối tượng đã cache nếu có
+          if (node.threeObj) return node.threeObj;
+          
+          const group = new THREE.Group();
+          
+          // TỐI ƯU HÓA SỐ 2: GIẢM ĐỘ PHỨC TẠP HÌNH HỌC
+          const geometry = new THREE.SphereGeometry(node.val, 16, 16);
+          
+          // TỐI ƯU HÓA SỐ 3: DÙNG VẬT LIỆU ĐƠN GIẢN HƠN
+          const material = new THREE.MeshLambertMaterial({
+            color: node.color,
+            emissive: node.color,
+            emissiveIntensity: 0.4,
+            transparent: true,
+            opacity: 0.95
+          });
+          const sphere = new THREE.Mesh(geometry, material);
+          group.add(sphere);
+          
+          if (node.type === 'chapter' || node.type === 'lesson') {
+            const sprite = new SpriteText(node.type === 'chapter' ? node.id : node.name);
+            sprite.color = node.type === 'chapter' ? '#ffffff' : '#dddddd';
+            sprite.textHeight = node.type === 'chapter' ? 5 : 2.5;
+            sprite.fontFace = 'Arial, sans-serif';
+            sprite.fontWeight = node.type === 'chapter' ? 'bold' : 'normal';
+            sprite.position.y = node.val + (node.type === 'chapter' ? 8 : 4);
+            group.add(sprite);
+          }
+          
+          node.threeObj = group; // Cache đối tượng
+          return group;
+        })
+        .linkColor(link => getLinkColor(link))
+        .linkWidth(link => {
+          const baseWidth = calculateLinkWidth(link);
+          if (highlightLinks.size === 0) return baseWidth;
+          return highlightLinks.has(link) ? baseWidth * 1.5 : baseWidth * 0.3;
+        })
+        .linkDirectionalArrowLength(link => {
+          if (link.type === 'sub_knowledge') return 3;
+          if (highlightLinks.size === 0) return 6;
+          return highlightLinks.has(link) ? 8 : 4;
+        })
+        .linkDirectionalArrowRelPos(1)
+        .linkDirectionalArrowColor(link => getLinkColor(link))
+        .linkOpacity(link => {
+          if (highlightLinks.size === 0) return 0.6;
+          return highlightLinks.has(link) ? 0.9 : 0.1;
+        })
+        .linkCurvature(0.2)
+        .linkDirectionalParticles(link => {
+          return (highlightLinks.has(link) && link.type !== 'sub_knowledge' && isNodeSelected) ? 4 : 0;
+        })
+        .linkDirectionalParticleWidth(3)
+        .linkDirectionalParticleSpeed(0.006)
+        .onNodeHover(node => {
+          document.body.style.cursor = node ? 'pointer' : 'default';
+          if (!isNodeSelected) {
+            hoveredNode = node;
+            if (node && node.type === 'chapter') {
+              highlightNodeConnections(node);
+            } else {
+              clearHighlight();
+            }
+          }
+        })
+        .onNodeClick(node => {
+          if (node.type === 'chapter') {
+            isNodeSelected = true;
+            selectedNode = node;
+            showNodeDetail(node);
+            highlightNodeConnections(node);
+          }
+        })
+        .onBackgroundClick(() => {
+          closeDetail();
+          clearHighlight();
+        });
+
+    // TỐI ƯU HÓA SỐ 4: CHO VẬT LÝ "NGHỈ NGƠI"
+    Graph.d3AlphaDecay(0.1);
+
+    // Cấu hình lực
+    Graph.d3Force('charge').strength(-400);
+    Graph.d3Force('link').distance(link => link.type === 'sub_knowledge' ? 30 : 120);
+    Graph.d3Force('center').strength(0.2);
+
+    // Lực phân tầng (Giữ nguyên)
+    const layerForce = (alpha) => {
+      fullKnowledgeData.nodes.forEach(node => {
+        let targetY = 0;
+        if (node.group === 12) targetY = 150;
+        else if (node.group === 11) targetY = 0;
+        else if (node.group === 10) targetY = -150;
+        
+        node.vy -= (node.y - targetY) * 0.1 * alpha; // Giảm cường độ lực một chút
+      });
+    };
+    Graph.d3Force('layering', layerForce);
+
+    // Thêm ánh sáng và mặt phẳng (Giữ nguyên)
+    setTimeout(() => {
+      const scene = Graph.scene();
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+      directionalLight.position.set(200, 200, 200);
+      scene.add(directionalLight);
+
+      function createCirclePlane(y, label, color) {
+        const radius = 400; const segments = 64;
+        const geometry = new THREE.CircleGeometry(radius, segments);
+        const material = new THREE.MeshBasicMaterial({ color: 0x2a2a4a, transparent: true, opacity: 0.12, side: THREE.DoubleSide });
+        const circle = new THREE.Mesh(geometry, material);
+        circle.position.set(0, y, 0); circle.rotation.x = Math.PI / 2;
+        scene.add(circle);
+        const labelSprite = new SpriteText(label);
+        labelSprite.color = '#FFFFFF'; labelSprite.textHeight = 16; labelSprite.fontWeight = 'bold';
+        labelSprite.position.set(radius - 50, y + 20, 0);
+        scene.add(labelSprite);
+        const edgesGeometry = new THREE.EdgesGeometry(geometry);
+        const lineMaterial = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.4, linewidth: 2 });
+        const wireframe = new THREE.LineSegments(edgesGeometry, lineMaterial);
+        wireframe.position.copy(circle.position); wireframe.rotation.copy(circle.rotation);
+        scene.add(wireframe);
+      }
+      createCirclePlane(150, 'Toán 12 - Tổng hợp & Ứng dụng', 0xff8844);
+      createCirclePlane(0, 'Toán 11 - Xây dựng Công cụ', 0xffdd44);
+      createCirclePlane(-150, 'Toán 10 - Nền tảng', 0x8888ff);
+    }, 100);
+
+    // Góc nhìn mặc định (Đã sửa)
+    setTimeout(() => {
+      Graph.cameraPosition({ x: 0, y: 350, z: 800 }, { x: 0, y: 0, z: 0 }, 1500);
+    }, 500);
+
+    // ===== HÀM HIGHLIGHT NODE CONNECTIONS (TỐI ƯU HÓA SỐ 5) =====
+    function highlightNodeConnections(node) {
+      highlightNodes.clear();
+      highlightLinks.clear();
+      
+      if (node) {
+        highlightNodes.add(node);
+        // Duyệt qua các link của node hiệu quả hơn nhiều
+        (node.links || []).forEach(link => {
+          highlightLinks.add(link);
+          const neighbor = (link.source === node) ? link.target : link.source;
+          highlightNodes.add(neighbor);
+        });
+      }
+
+      // Cập nhật lại giao diện
+      Graph.nodeThreeObject(Graph.nodeThreeObject())
+         .linkColor(Graph.linkColor());
+    }
+
+    function clearHighlight() {
+      highlightNodes.clear();
+      highlightLinks.clear();
+      isNodeSelected = false;
+      hoveredNode = null;
+      
+      Graph.nodeThreeObject(Graph.nodeThreeObject())
+         .linkColor(Graph.linkColor());
+    }
+
+    // ===== HÀM HIỂN THỊ CHI TIẾT NODE (GIỮ NGUYÊN) =====
+    function showNodeDetail(node) {
+      if (node.type !== 'chapter') return;
+      const detail = document.getElementById('node-detail');
+      const content = document.getElementById('detail-content');
+      const badge = `<span class="badge badge-${node.group}">Lớp ${node.group}</span>`;
+      let prerequisitesHTML = '';
+      if (node.prerequisites && node.prerequisites.length > 0) {
+        prerequisitesHTML = '<h3>🔴 Kiến thức tiên quyết:</h3><ul>';
+        node.prerequisites.forEach(prereq => { prerequisitesHTML += `<li>${prereq}</li>`; });
+        prerequisitesHTML += '</ul>';
+      }
+      let applicationsHTML = '';
+      if (node.applications && node.applications.length > 0) {
+        applicationsHTML = '<h3>🟢 Kiến thức ứng dụng:</h3><ul>';
+        node.applications.forEach(app => { applicationsHTML += `<li>${app}</li>`; });
+        applicationsHTML += '</ul>';
+      }
+      let lessonsHTML = '<h3>📖 Các bài học:</h3><ul>';
+      if (node.lessons) {
+        node.lessons.forEach(lesson => { lessonsHTML += `<li>${lesson}</li>`; });
+      }
+      lessonsHTML += '</ul>';
+      content.innerHTML = `<h2>${badge} ${node.id}</h2><p style="color: #aaa; font-size: 11px; margin-bottom: 10px;">${node.description || ''}</p>${prerequisitesHTML}${applicationsHTML}${lessonsHTML}`;
+      detail.classList.add('active');
+    }
+
+    function closeDetail() {
+      document.getElementById('node-detail').classList.remove('active');
+      selectedNode = null;
+    }
+
+    // ===== CÁC HÀM ĐIỀU KHIỂN (Đã sửa `resetView` và `viewAngle`) =====
+    function searchNode(query) {
+      if (!query) { resetView(); return; }
+      const found = fullKnowledgeData.nodes.find(node => node.type === 'chapter' && node.id.toLowerCase().includes(query.toLowerCase()));
+      if (found) {
+        isNodeSelected = true; selectedNode = found;
+        highlightNodeConnections(found);
+        showNodeDetail(found);
+        Graph.cameraPosition({ x: found.x + 100, y: found.y + 50, z: found.z + 100 }, found, 1000);
+      }
+    }
+    function viewAngle() { Graph.cameraPosition({ x: 0, y: 350, z: 800 }, { x: 0, y: 0, z: 0 }, 1000); }
+    function viewTop() { Graph.cameraPosition({ x: 0, y: 800, z: 0 }, { x: 0, y: 0, z: 0 }, 1000); }
+    function viewSide() { Graph.cameraPosition({ x: 800, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }, 1000); }
+    function resetView() {
+      closeDetail(); clearHighlight();
+      document.getElementById('search-input').value = '';
+      viewAngle();
+    }
+    let physicsEnabled = true;
+    function togglePhysics() {
+      physicsEnabled = !physicsEnabled;
+      if (physicsEnabled) { Graph.d3ReheatSimulation(); Graph.d3AlphaDecay(0.1); } 
+      else { Graph.d3AlphaDecay(1); }
+    }
+  </script>
+</body>
+</html>
