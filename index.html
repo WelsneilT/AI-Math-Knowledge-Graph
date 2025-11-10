@@ -394,6 +394,14 @@
             { level: "Thông hiểu", content: "Giải phương trình chứa căn (2 dạng trong SGK)." },
             { level: "Vận dụng", content: "Vận dụng được kiến thức vào giải các bài toán liên quan thực tế." }
           ]
+        },
+        {
+          name: "Bài tập cuối chương VI",
+          type: 'consolidation_practice', // Một type mới để định danh
+          learning_objectives: [
+            { level: "Vận dụng", content: "Tích hợp kiến thức về hàm số, đồ thị, dấu tam thức bậc hai để giải quyết các bài toán tổng hợp." },
+            { level: "Vận dụng cao", content: "Giải quyết các bài toán thực tế phức tạp liên quan đến toàn bộ nội dung chương." }
+          ]
         }
       ] 
     },
@@ -550,7 +558,10 @@
   ],
   links: []
 };
-    // Thêm các node bài học (lessons) vào graph
+    
+
+
+// Thêm các node bài học (lessons) vào graph
     const lessonNodes = [];
     fullKnowledgeData.nodes.forEach(chapter => {
       if (chapter.type === 'chapter' && chapter.lessons) {
