@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đồ thị Kiến thức Toán THPT 3D - Trải nghiệm Trung tính & Gợi mở</title>
+  <title>Đồ thị Kiến thức Toán THPT 3D - Nâng cao</title>
   <style>
     * {
       margin: 0;
@@ -148,10 +148,6 @@
       line-height: 1.5;
     }
     
-    .instructions strong {
-      color: #6ca0dc;
-    }
-    
     .node-detail {
       top: 50%;
       right: 10px;
@@ -200,7 +196,7 @@
     
     .node-detail li {
       margin: 6px 0;
-      padding-left: 15px;
+      padding-left: 20px;
       position: relative;
       font-size: 11px;
       line-height: 1.5;
@@ -288,18 +284,22 @@
   <div id="graph-container"></div>
 
   <div class="panel info">
-    <h3>📚 Chú thích</h3>
+    <h3>Chú thích</h3>
     <div class="legend-item">
       <div class="legend-color" style="background-color: #ff6961;"></div>
       <span>Kiến thức tiên quyết</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #77dd77;"></div>
+      <span>Kiến thức ứng dụng</span>
     </div>
     <div class="legend-item">
       <div class="legend-color" style="background-color: #6CA0DC;"></div>
       <span>Phân rã kiến thức</span>
     </div>
     <div class="legend-item">
-      <div class="legend-color" style="background-color: #77dd77;"></div>
-      <span>Kiến thức ứng dụng</span>
+      <div class="legend-color" style="background-color: #D3D3D3;"></div>
+      <span>Tổng hợp kiến thức</span>
     </div>
     <div class="legend-note">
      <strong>Hover</strong> để xem trước<br>
@@ -339,387 +339,2764 @@
   <script src="https://unpkg.com/3d-force-graph@1.73.3/dist/3d-force-graph.min.js"></script>
 
   <script>
-    const fullKnowledgeData = {
+  // Dữ liệu giữ nguyên, không thay đổi
+  // 
+
+  const COLOR_CHAPTER_10 = '#9999ff';
+  const COLOR_CHAPTER_11 = '#f5d442';
+  const COLOR_CHAPTER_12 = '#ff8c42';
+  const COLOR_CONSOLIDATION_NODE = '#F0F0F0'; // Màu Trắng Ngọc Trai cho Bài tập cuối chương
+
+  // --- Màu Liên kết ---
+  const COLOR_NEUTRAL = 'rgba(50, 60, 100, 0.4)';      // Màu trung tính mặc định
+  const COLOR_PREREQUISITE = '#ff6961';             // ĐỎ: Cho TẤT CẢ các loại tiên quyết
+  const COLOR_APPLICATION = '#77dd77';              // XANH LÁ: Cho kiến thức ứng dụng
+  const COLOR_SUB_KNOWLEDGE = '#6CA0DC';             // XANH DƯƠNG: Chương -> Bài
+  const COLOR_CONSOLIDATION_LINK = '#D3D3D3';        // XÁM NHẠT: Bài -> Bài tập cuối chương
+
+  const fullKnowledgeData = {
   nodes: [
     // LỚP 10
-    { id: "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Nền tảng logic và ngôn ngữ toán học", lessons: ["Mệnh đề", "Tập hợp và các phép toán trên tập hợp"], prerequisites: [], applications: ["CHƯƠNG II. BẤT PHƯƠNG TRÌNH VÀ HỆ BẤT PHƯƠNG TRÌNH BẬC NHẤT HAI ẨN", "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG", "CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN", "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN"] },
-    { id: "CHƯƠNG II. BẤT PHƯƠNG TRÌNH VÀ HỆ BẤT PHƯƠNG TRÌNH BẬC NHẤT HAI ẨN", group: 10, color: '#9999ff', val: 8, type: 'chapter', description: "Giải bất phương trình và hệ bất phương trình trong không gian 2D", lessons: ["Bất phương trình bậc nhất hai ẩn", "Hệ bất phương trình bậc nhất hai ẩn"], prerequisites: ["CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"], applications: ["CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ"] },
-    { id: "CHƯƠNG III. HỆ THỨC LƯỢNG TRONG TAM GIÁC", group: 10, color: '#9999ff', val: 9, type: 'chapter', description: "Định lý sin, cosin và các hệ thức lượng giác cơ bản", lessons: ["Giá trị lượng giác của góc 0°-180°", "Hệ thức lượng trong tam giác"], prerequisites: [], applications: ["CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC"] },
-    { id: "CHƯƠNG IV. VECTO", group: 10, color: '#9999ff', val: 10, type: 'chapter', description: "Khái niệm vectơ, các phép toán và tích vô hướng", lessons: ["Các khái niệm mở đầu", "Tổng và hiệu vectơ", "Tích vectơ với số", "Vectơ trong mặt phẳng toạ độ", "Tích vô hướng"], prerequisites: [], applications: ["CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG", "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN"] },
-    { id: "CHƯƠNG V. CÁC SỐ ĐẶC TRƯNG CỦA MẪU SỐ LIỆU KHÔNG GHÉP NHÓM", group: 10, color: '#9999ff', val: 7, type: 'chapter', description: "Các số đặc trưng đo xu thế trung tâm và độ phân tán", lessons: ["Số gần đúng và sai số", "Số đặc trưng đo xu thế trung tâm", "Số đặc trưng đo độ phân tán"], prerequisites: [], applications: ["CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM"] },
     
-    // --- CHƯƠNG VI ĐÃ ĐƯỢC CẬP NHẬT CHI TIẾT ---
-    { 
-      id: "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG", 
-      group: 10, 
-      color: '#9999ff', 
-      val: 11, 
-      type: 'chapter', 
-      description: "Khái niệm hàm số, tính chất và đồ thị - Nền tảng của Giải tích", 
-      prerequisites: ["CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"], 
-      applications: ["CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN", "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC", "CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC", "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT"],
-      lessons: [
+    {
+      "id": "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP",
+      "group": 10,
+      "color": "#9999ff",
+      "val": 9,
+      "type": "chapter",
+      "description": "Nền tảng logic và ngôn ngữ toán học",
+      "prerequisites": [],
+      "applications": [
+        "CHƯƠNG II. BẤT PHƯƠNG TRÌNH VÀ HỆ BẤT PHƯƠNG TRÌNH BẬC NHẤT HAI ẨN",
+        "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG",
+        "CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN"
+      ],
+      "lessons": [
         {
-          name: "Bài 15. Hàm số",
-          learning_objectives: [
-            { level: "Nhận biết", content: "Nhận biết giá trị của hàm số dựa vào bảng giá trị." },
-            { level: "Nhận biết", content: "Nhận biết được khoảng đồng biến, nghịch biến của hàm số dựa vào đồ thị hàm số." },
-            { level: "Thông hiểu", content: "Mô tả các khái niệm cơ bản về hàm số: định nghĩa hàm số, tập xác định, tập giá trị, hàm số đồng biến, hàm số nghịch biến, đồ thị của hàm số." },
-            { level: "Thông hiểu", content: "Mô tả các đặc trưng hình học của đồ thị hàm số đồng biến, hàm số nghịch biến." },
-            { level: "Vận dụng", content: "Vận dụng kiến thức của hàm số vào giải quyết bài toán thực tiễn." }
+          "id": "L10_C1_B1",
+          "name": "Bài 1: Mệnh đề",
+          "prerequisites_lessons": [],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Thiết lập và phát biểu mệnh đề phủ định, mệnh đề đảo, mệnh đề kéo theo, mệnh đề tương đương."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Thiết lập và phát biểu các mệnh đề có chứa kí hiệu ∀, ∃."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Xác định tính đúng sai của một mệnh đề trong những trường hợp đơn giản."
+            }
           ]
         },
         {
-          name: "Bài 16. Hàm số bậc hai",
-          learning_objectives: [
-            { level: "Nhận biết", content: "Nhận biết các tính chất cơ bản của parabol như đỉnh, trục đối xứng." },
-            { level: "Thông hiểu", content: "Giải thích được các tính chất của hàm số bậc hai thông qua đồ thị." },
-            { level: "Thông hiểu", content: "Vẽ được parabol là đồ thị hàm số bậc hai." },
-            { level: "Vận dụng", content: "Vận dụng kiến thức về hàm số bậc hai và đồ thị vào giải quyết bài toán thực tiễn." }
+          "id": "L10_C1_B2",
+          "name": "Bài 2: Tập hợp và các phép toán trên tập hợp",
+          "prerequisites_lessons": [
+            "L10_C1_B1"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết các khái niệm cơ bản về tập hợp."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Thực hiện các phép toán trên tập hợp và vận dụng giải một số bài toán có nội dung thực tiễn."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng biểu đồ Ven để biểu diễn tập hợp và các phép toán trên tập hợp."
+            }
           ]
         },
         {
-          name: "Bài 17. Dấu của tam thức bậc hai",
-          learning_objectives: [
-            { level: "Nhận biết", content: "Nhận biết định lí về dấu của tam thức bậc hai." },
-            { level: "Thông hiểu", content: "Giải thích định lí về dấu của tam thức bậc hai từ việc quan sát đồ thị của hàm số bậc hai." },
-            { level: "Thông hiểu", content: "Giải bất phương trình bậc hai." },
-            { level: "Vận dụng", content: "Vận dụng bất phương trình bậc hai một ẩn vào giải quyết bài toán thực tiễn." }
-          ]
-        },
-        {
-          name: "Bài 18. Phương trình quy về phương trình bậc hai",
-          learning_objectives: [
-            { level: "Nhận biết", content: "Nhận biết nghiệm của phương trình chứa căn (2 dạng trong SGK)." },
-            { level: "Thông hiểu", content: "Giải phương trình chứa căn (2 dạng trong SGK)." },
-            { level: "Vận dụng", content: "Vận dụng được kiến thức vào giải các bài toán liên quan thực tế." }
-          ]
-        },
-        {
-          name: "Bài tập cuối chương VI",
-          type: 'consolidation_practice', // Một type mới để định danh
-          learning_objectives: [
-            { level: "Vận dụng", content: "Tích hợp kiến thức về hàm số, đồ thị, dấu tam thức bậc hai để giải quyết các bài toán tổng hợp." },
-            { level: "Vận dụng cao", content: "Giải quyết các bài toán thực tế phức tạp liên quan đến toàn bộ nội dung chương." }
+          "id": "L10_C1_BT",
+          "name": "Bài tập cuối chương I",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L10_C1_B1",
+            "L10_C1_B2"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận dạng được mệnh đề, mệnh đề chứa biến, các loại mệnh đề (phủ định, kéo theo, tương đương) và các kí hiệu tập hợp, phép toán tập hợp."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Xét được tính đúng sai của một mệnh đề phức hợp và biểu diễn được các tập hợp bằng các cách khác nhau (liệt kê, chỉ ra tính chất)."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Thực hiện thành thạo các phép toán trên tập hợp (giao, hợp, hiệu, phần bù) và sử dụng biểu đồ Ven để giải các bài toán đếm số phần tử."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Vận dụng kết hợp logic mệnh đề và lý thuyết tập hợp để giải quyết các bài toán thực tế, ví dụ như bài toán khảo sát số liệu."
+            }
           ]
         }
-      ] 
-    },
-
-    // --- CHƯƠNG VII ĐÃ ĐƯỢC CẬP NHẬT CHI TIẾT ---
-    { 
-      id: "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG", 
-      group: 10, 
-      color: '#9999ff', 
-      val: 10, 
-      type: 'chapter', 
-      description: "Đại số hóa hình học phẳng bằng hệ toạ độ", 
-      prerequisites: ["CHƯƠNG IV. VECTO"], 
-      applications: ["CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"],
-      lessons: [
-          {
-              name: "Bài 19. Phương trình đường thẳng",
-              learning_objectives: [
-                  { level: "Nhận biết", content: "Vectơ pháp tuyến hoặc vectơ chỉ phương của đường thẳng." },
-                  { level: "Nhận biết", content: "Điểm thuộc (không thuộc) đường thẳng."},
-                  { level: "Nhận biết", content: "Nhận dạng phương trình tham số của đường thẳng khi biết đường thẳng đi qua 1 điểm và nhận 1 vectơ chỉ phương." },
-                  { level: "Thông hiểu", content: "Xác định được phương trình tổng quát của đường thẳng khi biết đường thẳng đi qua 1 điểm và nhận 1 vectơ pháp tuyến." },
-                  { level: "Thông hiểu", content: "Viết phương trình đường thẳng đi qua 2 điểm cho trước." },
-                  { level: "Thông hiểu", content: "Chuyển dạng phương trình đường thẳng (từ dạng tham số sang dạng tổng quát và ngược lại)." },
-                  { level: "Vận dụng", content: "Vận dụng các kiến thức tổng hợp để viết phương trình đường thẳng." },
-                  { level: "Vận dụng cao", content: "Viết phương trình đường thẳng thỏa mãn các điều kiện phức tạp (ví dụ: liên quan đến diện tích, khoảng cách, đường phân giác...)." }
-              ]
-          },
-          {
-              name: "Bài 20. Vị trí tương đối giữa hai đường thẳng. Góc và khoảng cách",
-              learning_objectives: [
-                  { level: "Nhận biết", content: "Nhận biết vị trí tương đối giữa hai đường thẳng." },
-                  { level: "Nhận biết", content: "Nhận biết công thức tính khoảng cách từ một điểm đến một đường thẳng." },
-                  { level: "Nhận biết", content: "Nhận biết công thức tính góc giữa hai đường thẳng." },
-                  { level: "Thông hiểu", content: "Tính khoảng cách từ một điểm đến một đường thẳng." },
-                  { level: "Thông hiểu", content: "Tính góc giữa hai đường thẳng." },
-                  { level: "Thông hiểu", content: "Xác định vị trí tương đối giữa hai đường thẳng." },
-                  { level: "Thông hiểu", content: "Tìm giao điểm của hai đường thẳng." },
-                  { level: "Thông hiểu", content: "Tìm điều kiện để hai đường thẳng song song hoặc vuông góc." }
-              ]
-          },
-          {
-              name: "Bài 21. Đường tròn trong mặt phẳng tọa độ",
-              learning_objectives: [
-                  { level: "Nhận biết", content: "Nhận biết phương trình đường tròn." },
-                  { level: "Nhận biết", content: "Xác định được tâm và bán kính đường tròn khi biết phương trình của nó." },
-                  { level: "Thông hiểu", content: "Xác định được phương trình đường tròn khi biết tâm và bán kính cho trước." },
-                  { level: "Thông hiểu", content: "Xác định được phương trình đường tròn khi biết tâm và điểm đi qua." },
-                  { level: "Thông hiểu", content: "Xác định được phương trình đường tròn khi biết đường kính AB." },
-                  { level: "Thông hiểu", content: "Xác định được phương trình đường tròn khi biết tâm và tiếp xúc với đường thẳng cho trước." },
-                  { level: "Thông hiểu", content: "Viết được phương trình tiếp tuyến của đường tròn tại điểm thuộc đường tròn." },
-                  { level: "Vận dụng", content: "Vận dụng kiến thức về phương trình đường tròn để giải một số bài toán liên quan đến thực tiễn." }
-              ]
-          },
-          {
-              name: "Bài 22. Ba đường conic",
-              learning_objectives: [
-                  { level: "Nhận biết", content: "Nhận biết được ba đường conic bằng hình học." },
-                  { level: "Nhận biết", content: "Nhận biết phương trình chính tắc của ba đường conic trong mặt phẳng toạ độ." },
-                  { level: "Thông hiểu", content: "Viết được phương trình ba đường conic." },
-                  { level: "Vận dụng", content: "Giải quyết một số vấn đề thực tiễn với ba đường conic." }
-              ]
-          }
       ]
     },
-
-    // --- CHƯƠNG VIII ĐÃ ĐƯỢC CẬP NHẬT CHI TIẾT ---
-    { 
-      id: "CHƯƠNH VIII. ĐẠI SỐ TỔ HỢP", 
-      group: 10, 
-      color: '#9999ff', 
-      val: 9, 
-      type: 'chapter', 
-      description: "Nghệ thuật đếm: Hoán vị, Chỉnh hợp, Tổ hợp", 
-      prerequisites: [], 
-      applications: ["CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN", "CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT", "CHƯƠNG VI. XÁC SUẤT CÓ ĐIỀU KIỆN"],
-      lessons: [
-          {
-              name: "Bài 23. Quy tắc đếm",
-              learning_objectives: [
-                  { level: "Nhận biết", content: "Nhận biết và phân biệt được quy tắc cộng và quy tắc nhân." },
-                  { level: "Vận dụng", content: "Vận dụng được quy tắc cộng và quy tắc nhân trong các bài toán đơn giản." },
-                  { level: "Vận dụng", content: "Vận dụng được sơ đồ cây với các bài toán đếm cơ bản là các đối tượng toán học." }
-              ]
-          },
-          {
-              name: "Bài 24. Hoán vị, chỉnh hợp và tổ hợp",
-              learning_objectives: [
-                  { level: "Nhận biết", content: "Nhận biết được định nghĩa hoán vị, chỉnh hợp và tổ hợp." },
-                  { level: "Thông hiểu", content: "Tính số các hoán vị, chỉnh hợp và tổ hợp." },
-                  { level: "Thông hiểu", content: "Tính số các hoán vị, chỉnh hợp, tổ hợp bằng máy tính cầm tay." },
-                  { level: "Vận dụng", content: "Vận dụng hoán vị, chỉnh hợp và tổ hợp vào bài toán thực tiễn." }
-              ]
-          },
-          {
-              name: "Bài 25. Nhị thức Newton",
-              learning_objectives: [
-                  { level: "Nhận biết", content: "Nhận biết được công thức tổng quát của nhị thức Newton." },
-                  { level: "Thông hiểu", content: "Tìm được hệ số của các số hạng trong khai triển nhị thức Newton (a+b)^n với số mũ thấp bằng cách vận dụng tổ hợp." },
-                  { level: "Vận dụng", content: "Vận dụng nhị thức Newton để tính tổng, tìm tham số thỏa mãn một điều kiện cho trước." }
-              ]
-          }
+    {
+      "id": "CHƯƠNG II. BẤT PHƯƠNG TRÌNH VÀ HỆ BẤT PHƯƠNG TRÌNH BẬC NHẤT HAI ẨN",
+      "group": 10,
+      "color": "#9999ff",
+      "val": 8,
+      "type": "chapter",
+      "description": "Biểu diễn miền nghiệm và giải bài toán tối ưu hóa tuyến tính.",
+      "prerequisites": [
+        "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"
+      ],
+      "applications": [
+        "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ"
+      ],
+      "lessons": [
+        {
+          "id": "L10_C2_B3",
+          "name": "Bài 3: Bất phương trình bậc nhất hai ẩn",
+          "prerequisites_lessons": [
+            "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết bất phương trình bậc nhất hai ẩn."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Biết biểu diễn miền nghiệm của bất phương trình bậc nhất hai ẩn trên mặt phẳng toạ độ."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng kiến thức về bất phương trình bậc nhất hai ẩn vào giải quyết bài toán thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L10_C2_B4",
+          "name": "Bài 4: Hệ bất phương trình bậc nhất hai ẩn",
+          "prerequisites_lessons": [
+            "L10_C2_B3"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết hệ bất phương trình bậc nhất hai ẩn."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Biết biểu diễn miền nghiệm của hệ bất phương trình bậc nhất hai ẩn trên mặt phẳng toạ độ."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng kiến thức về hệ bất phương trình bậc nhất hai ẩn vào giải quyết bài toán thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L10_C2_BT",
+          "name": "Bài tập cuối chương II",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L10_C2_B3",
+            "L10_C2_B4"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận dạng được bất phương trình và hệ bất phương trình bậc nhất hai ẩn."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Xác định được miền nghiệm của một bất phương trình hoặc hệ bất phương trình trên mặt phẳng tọa độ."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Mô hình hóa một bài toán thực tế đơn giản bằng hệ bất phương trình bậc nhất hai ẩn."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết bài toán tối ưu (tìm giá trị lớn nhất/nhỏ nhất của biểu thức F(x;y)) trên miền nghiệm của một hệ bất phương trình."
+            }
+          ]
+        }
       ]
     },
-
-    // --- CHƯƠNG IX ĐÃ ĐƯỢC CẬP NHẬT CHI TIẾT ---
-    { 
-      id: "CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN", 
-      group: 10, 
-      color: '#9999ff', 
-      val: 9, 
-      type: 'chapter', 
-      description: "Định nghĩa xác suất: P(A) = |A| / |Ω|", 
-      prerequisites: ["CHƯƠNH VIII. ĐẠI SỐ TỔ HỢP", "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"], 
-      applications: ["CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT"],
-      lessons: [
-          {
-              name: "Bài 26. Biến cố và định nghĩa cổ điển của xác suất",
-              learning_objectives: [
-                  { level: "Nhận biết", content: "Nhận biết một số khái niệm về xác suất cổ điển, phép thử ngẫu nhiên, không gian mẫu và biến cố." },
-                  { level: "Thông hiểu", content: "Mô tả không gian mẫu, biến cố trong một số trường hợp đơn giản." }
-              ]
-          },
-          {
-              name: "Bài 27. Thực hành tính xác suất theo định nghĩa cổ điển",
-              learning_objectives: [
-                  { level: "Thông hiểu", content: "Tính được số kết quả thuận lợi cho biến cố." },
-                  { level: "Vận dụng", content: "Tính xác suất của biến cố trong một số bài toán đơn giản bằng phương pháp tổ hợp." },
-                  { level: "Vận dụng", content: "Tính xác suất trong một số thí nghiệm lặp bằng cách sử dụng sơ đồ hình cây." },
-                  { level: "Vận dụng", content: "Tính xác suất của biến cố đối." }
-              ]
-          }
+    {
+      "id": "CHƯƠNG III. HỆ THỨC LƯỢNG TRONG TAM GIÁC",
+      "group": 10,
+      "color": "#9999ff",
+      "val": 9,
+      "type": "chapter",
+      "description": "Các công cụ để giải tam giác và ứng dụng trong đo đạc.",
+      "prerequisites": [],
+      "applications": [
+        "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC"
+      ],
+      "lessons": [
+        {
+          "id": "L10_C3_B5",
+          "name": "Bài 5: Giá trị lượng giác của một góc từ 0° đến 180°",
+          "prerequisites_lessons": [],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết giá trị lượng giác của một góc từ 0° đến 180°."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích hệ thức liên hệ giữa các giá trị lượng giác của hai góc phụ nhau, bù nhau."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng máy tính cầm tay để tính giá trị lượng giác của một góc và vận dụng vào các bài toán có nội dung thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L10_C3_B6",
+          "name": "Bài 6: Hệ thức lượng trong tam giác",
+          "prerequisites_lessons": [
+            "L10_C3_B5"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Hiểu định lí côsin, định lí sin, công thức tính diện tích tam giác."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải tam giác và giải quyết một số bài toán trong đo đạc."
+            }
+          ]
+        },
+        {
+          "id": "L10_C3_BT",
+          "name": "Bài tập cuối chương III",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L10_C3_B5",
+            "L10_C3_B6"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhắc lại được các công thức của định lí sin, định lí côsin và các công thức tính diện tích tam giác."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Tính toán được các giá trị lượng giác của các góc đặc biệt và sử dụng mối quan hệ giữa các góc bù nhau, phụ nhau."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Áp dụng các hệ thức lượng để tính các cạnh, góc chưa biết trong một tam giác (bài toán giải tam giác)."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Mô hình hóa và giải quyết các bài toán thực tế liên quan đến đo đạc khoảng cách, chiều cao mà không thể đo trực tiếp được."
+            }
+          ]
+        }
       ]
     },
-    
-    // LỚP 11 (Các chương không có trong bảng đặc tả vẫn giữ nguyên cấu trúc cũ)
-    { id: "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC", group: 11, color: '#f5d442', val: 11, type: 'chapter', description: "Hàm tuần hoàn và phương trình lượng giác", lessons: ["Giá trị lượng giác của góc lượng giác", "Công thức lượng giác", "Hàm số lượng giác", "Phương trình lượng giác cơ bản"], prerequisites: ["CHƯƠNG III. HỆ THỨC LƯỢNG TRONG TAM GIÁC", "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"], applications: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN"] },
-    { id: "CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN", group: 11, color: '#f5d442', val: 9, type: 'chapter', description: "Hàm số với tập xác định là số nguyên dương", lessons: ["Dãy số", "Cấp số cộng", "Cấp số nhân"], prerequisites: ["CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"], applications: ["CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC"] },
-    { id: "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM", group: 11, color: '#f5d442', val: 7, type: 'chapter', description: "Thống kê cho dữ liệu ghép nhóm", lessons: ["Mẫu số liệu ghép nhóm", "Số đặc trưng đo xu thế trung tâm"], prerequisites: ["CHƯƠNG V. CÁC SỐ ĐẶC TRƯNG CỦA MẪU SỐ LIỆU KHÔNG GHÉP NHÓM"], applications: ["CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO MỨC ĐỘ PHÂN TÁN CỦA MẪU SỐ LIỆU GHÉP NHÓM"] },
-    { id: "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN", group: 11, "color": "#f5d442", "val": 10, "type": "chapter", "description": "Quan hệ song song giữa đường thẳng và mặt phẳng", "lessons": ["Đường thẳng và mặt phẳng", "Hai đường thẳng song song", "Đường thẳng song song mặt phẳng", "Hai mặt phẳng song song", "Phép chiếu song song"], "prerequisites": ["CHƯƠNG IV. VECTO", "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG"], "applications": ["CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN", "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"] },
-    { id: "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC", group: 11, color: '#f5d442', val: 11, type: 'chapter', description: "Khái niệm vô cùng bé và vô cùng lớn - Nền móng Giải tích", lessons: ["Giới hạn của dãy số", "Giới hạn của hàm số", "Hàm số liên tục"], prerequisites: ["CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN", "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"], applications: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ"] },
-    { id: "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT", group: 11, color: '#f5d442', val: 10, type: 'chapter', description: "Hai lớp hàm quan trọng trong thực tế", lessons: ["Lũy thừa với số mũ thực", "Logarit", "Hàm số mũ và logarit", "Phương trình, bất phương trình mũ và logarit"], prerequisites: ["CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"], applications: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN"] },
-    { id: "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN", group: 11, color: '#f5d442', val: 11, type: 'chapter', description: "Quan hệ vuông góc, khoảng cách, góc và thể tích", lessons: ["Hai đường thẳng vuông góc", "Đường thẳng vuông góc mặt phẳng", "Phép chiếu vuông góc", "Hai mặt phẳng vuông góc", "Khoảng cách", "Thể tích"], prerequisites: ["CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN"], applications: ["CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"] },
-    { id: "CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT", group: 11, color: '#f5d442', val: 9, type: 'chapter', description: "Biến cố hợp, giao, độc lập và công thức cộng và nhân", lessons: ["Biến cố hợp, giao, độc lập", "Công thức cộng xác suất", "Công thức nhân xác suất"], prerequisites: ["CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN", "CHƯƠNH VIII. ĐẠI SỐ TỔ HỢP"], applications: ["CHƯƠNG VI. XÁC SUẤT CÓ ĐIỀU KIỆN"] },
-    { id: "CHƯƠNG IX. ĐẠO HÀM", group: 11, color: '#f5d442', val: 13, type: 'chapter', description: "Công cụ vi phân - Trái tim của Giải tích THPT", lessons: ["Định nghĩa và ý nghĩa", "Các quy tắc tính đạo hàm", "Đạo hàm cấp hai"], prerequisites: ["CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC", "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG", "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC", "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT"], applications: ["CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ", "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN"] },
-    
-    // LỚP 12
-    { id: "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ", group: 12, color: '#ffd700', val: 13, type: 'chapter', description: "Khảo sát và vẽ đồ thị hàm số", lessons: ["Tính đơn điệu và cực trị", "Giá trị lớn nhất và nhỏ nhất", "Đường tiệm cận", "Khảo sát hàm số", "Ứng dụng thực tiễn"], prerequisites: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC"], applications: ["CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"] },
-    { id: "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", group: 12, color: '#ff8c42', val: 10, type: 'chapter', description: "Mở rộng vectơ từ 2D lên 3D", lessons: ["Vectơ trong không gian", "Hệ trục toạ độ trong không gian", "Biểu thức toạ độ của các phép toán vectơ"], prerequisites: ["CHƯƠNG IV. VECTO", "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG", "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN", "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN"], applications: ["CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"] },
-    { id: "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO MỨC ĐỘ PHÂN TÁN CỦA MẪU SỐ LIỆU GHÉP NHÓM", group: 12, color: '#ff8c42', val: 7, type: 'chapter', description: "Hoàn thiện Thống kê mô tả", lessons: ["Khoảng biến thiên và khoảng tứ phân vị", "Phương sai và độ lệch chuẩn"], prerequisites: ["CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM"], applications: [] },
-    { id: "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN", group: 12, color: '#ffd700', val: 12, type: 'chapter', description: "Phép toán ngược của đạo hàm", lessons: ["Nguyên hàm", "Tích phân", "Ứng dụng hình học của tích phân"], prerequisites: ["CHƯƠNG IX. ĐẠO HÀM", "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC", "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT"], applications: [] },
-    { id: "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN", group: 12, color: '#ff8c42', val: 14, type: 'chapter', description: "Đỉnh cao của Hình học giải tích", lessons: ["Phương trình mặt phẳng", "Phương trình đường thẳng trong không gian", "Công thức tính góc trong không gian", "Phương trình mặt cầu"], prerequisites: ["CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN", "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN", "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN", "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG", "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ"], applications: [] },
-    { id: "CHƯƠNG VI. XÁC SUẤT CÓ ĐIỀU KIỆN", group: 12, color: '#ff8c42', val: 9, type: 'chapter', description: "Đỉnh cao của Xác suất THPT", lessons: ["Xác suất có điều kiện", "Công thức xác suất toàn phần và công thức Bayes"], prerequisites: ["CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT", "CHƯƠNH VIII. ĐẠI SỐ TỔ HỢP"], applications: [] }
+    {
+      "id": "CHƯƠNG IV. VECTO",
+      "group": 10,
+      "color": "#9999ff",
+      "val": 10,
+      "type": "chapter",
+      "description": "Công cụ đại số để mô tả các đối tượng hình học và các đại lượng vật lý.",
+      "prerequisites": [],
+      "applications": [
+        "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG",
+        "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN"
+      ],
+      "lessons": [
+        {
+          "id": "L10_C4_B7",
+          "name": "Bài 7: Các khái niệm mở đầu",
+          "prerequisites_lessons": [],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm vectơ, vectơ-không, độ dài của vectơ, hai vectơ cùng phương, cùng hướng, hai vectơ bằng nhau."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Biểu thị một số đại lượng như lực, vận tốc bằng vectơ."
+            }
+          ]
+        },
+        {
+          "id": "L10_C4_B8",
+          "name": "Bài 8: Tổng và hiệu của hai vecto",
+          "prerequisites_lessons": [
+            "L10_C4_B7"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Thực hiện các phép toán cộng, trừ vectơ."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả trung điểm của đoạn thẳng, trọng tâm của tam giác bằng vectơ."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng trong bài toán tổng hợp lực, tổng hợp vận tốc."
+            }
+          ]
+        },
+        {
+          "id": "L10_C4_B9",
+          "name": "Bài 9: Tích của một vecto với một số",
+          "prerequisites_lessons": [
+            "L10_C4_B8"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Thực hiện phép nhân vectơ với một số."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả các mối quan hệ cùng phương, cùng hướng bằng vectơ."
+            }
+          ]
+        },
+        {
+          "id": "L10_C4_B10",
+          "name": "Bài 10: Vectơ trong mặt phẳng toạ độ",
+          "prerequisites_lessons": [
+            "L10_C4_B9"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết toạ độ của vectơ và thể hiện các phép toán vectơ theo toạ độ."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Thể hiện mối quan hệ giữa các vectơ thông qua toạ độ của chúng."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Ứng dụng của toạ độ vectơ trong bài toán xác định vị trí của vật trên mặt phẳng toạ độ."
+            }
+          ]
+        },
+        {
+          "id": "L10_C4_B11",
+          "name": "Bài 11: Tích vô hướng của hai vecto",
+          "prerequisites_lessons": [
+            "L10_C4_B10"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Tính góc, tích vô hướng của hai vectơ trong những trường hợp cụ thể."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Liên hệ khái niệm tích vô hướng với khái niệm công trong Vật lí."
+            }
+          ]
+        },
+        {
+          "id": "L10_C4_BT",
+          "name": "Bài tập cuối chương IV",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L10_C4_B7",
+            "L10_C4_B8",
+            "L10_C4_B9",
+            "L10_C4_B10",
+            "L10_C4_B11"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết và phân biệt được các phép toán vectơ (cộng, trừ, nhân với số, tích vô hướng) và các tính chất tương ứng."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Biểu diễn một vectơ theo hai vectơ không cùng phương; xác định tọa độ của điểm và vectơ."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Chứng minh các đẳng thức vectơ, các tính chất hình học (thẳng hàng, trung điểm, trọng tâm) bằng công cụ vectơ."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán vật lí (tổng hợp lực, vận tốc) và các bài toán hình học phức tạp bằng phương pháp vectơ và tọa độ."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG V. CÁC SỐ ĐẶC TRƯNG CỦA MẪU SỐ LIỆU KHÔNG GHÉP NHÓM",
+      "group": 10,
+      "color": "#9999ff",
+      "val": 7,
+      "type": "chapter",
+      "description": "Các công cụ thống kê mô tả cơ bản cho dữ liệu rời rạc.",
+      "prerequisites": [],
+      "applications": [
+        "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM"
+      ],
+      "lessons": [
+        {
+          "id": "L10_C5_B12",
+          "name": "Bài 12: Số gần đúng và sai số",
+          "prerequisites_lessons": [],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Hiểu khái niệm số gần đúng, sai số tuyệt đối, sai số tương đối, độ chính xác."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Xác định số quy tròn của số gần đúng với độ chính xác cho trước."
+            }
+          ]
+        },
+        {
+          "id": "L10_C5_B13",
+          "name": "Bài 13: Các số đặc trưng đo xu thế trung tâm",
+          "prerequisites_lessons": [
+            "L10_C5_B12"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Lựa chọn và tính các số đặc trưng đo xu thế trung tâm của một mẫu số liệu: số trung bình, trung vị, tứ phân vị, mốt."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích ý nghĩa và vai trò của các số đặc trưng trong mẫu số liệu thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L10_C5_B14",
+          "name": "Bài 14: Các số đặc trưng đo độ phân tán",
+          "prerequisites_lessons": [
+            "L10_C5_B13"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Tính các số đặc trưng đo độ phân tán: khoảng biến thiên, khoảng tứ phân vị, phương sai, độ lệch chuẩn."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Biết ý nghĩa của các số đặc trưng đo độ phân tán."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Phát hiện các giá trị bất thường bằng sử dụng các công cụ thống kê."
+            }
+          ]
+        },
+        {
+          "id": "L10_C5_BT",
+          "name": "Bài tập cuối chương V",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L10_C5_B12",
+            "L10_C5_B13",
+            "L10_C5_B14"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết và phân biệt được các số đặc trưng đo xu thế trung tâm (trung bình, trung vị, mốt) và đo độ phân tán (khoảng biến thiên, độ lệch chuẩn)."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Tính toán được các số đặc trưng cho một mẫu số liệu không ghép nhóm cho trước."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Lựa chọn số đặc trưng phù hợp để mô tả dữ liệu trong một tình huống cụ thể (ví dụ: dùng trung vị thay cho trung bình khi có giá trị bất thường)."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "So sánh và đưa ra kết luận về hai hay nhiều mẫu số liệu dựa trên việc phân tích các số đặc trưng của chúng."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG",
+      "group": 10,
+      "color": "#9999ff",
+      "val": 11,
+      "type": "chapter",
+      "description": "Nền tảng của Giải tích, nghiên cứu mối quan hệ giữa các đại lượng.",
+      "prerequisites": [
+        "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"
+      ],
+      "applications": [
+        "CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN",
+        "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC",
+        "CHƯƠNG IX. ĐẠO HÀM",
+        "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC",
+        "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT"
+      ],
+      "lessons": [
+        {
+          "id": "L10_C6_B15",
+          "name": "Bài 15: Hàm số",
+          "prerequisites_lessons": [
+            "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết những mô hình thực tiễn dẫn đến khái niệm hàm số."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả các khái niệm cơ bản về hàm số (tập xác định, tập giá trị, đồ thị, tính đồng biến, nghịch biến)."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng kiến thức về hàm số vào giải quyết một số bài toán thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L10_C6_B16",
+          "name": "Bài 16: Hàm số bậc hai",
+          "prerequisites_lessons": [
+            "L10_C6_B15"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết hàm số bậc hai và các yếu tố cơ bản của parabol (đỉnh, trục đối xứng)."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Lập bảng biến thiên và vẽ đồ thị của hàm số bậc hai."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng kiến thức về hàm số bậc hai và đồ thị vào giải quyết bài toán thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L10_C6_B17",
+          "name": "Bài 17: Dấu của tam thức bậc hai",
+          "prerequisites_lessons": [
+            "L10_C6_B16"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích định lí về dấu của tam thức bậc hai từ việc quan sát đồ thị."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải bất phương trình bậc hai vào giải quyết bài toán thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L10_C6_B18",
+          "name": "Bài 18: Phương trình quy về phương trình bậc hai",
+          "prerequisites_lessons": [
+            "L10_C6_B17"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Giải một số phương trình chứa căn bậc hai đơn giản có thể quy về phương trình bậc hai."
+            }
+          ]
+        },
+        {
+          "id": "L10_C6_BT",
+          "name": "Bài tập cuối chương VI",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L10_C6_B15",
+            "L10_C6_B16",
+            "L10_C6_B17",
+            "L10_C6_B18"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận dạng được hàm số bậc hai, tam thức bậc hai, bất phương trình bậc hai và phương trình quy về bậc hai."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Xác định được tập xác định, các khoảng đồng biến/nghịch biến và vẽ được đồ thị hàm số bậc hai."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải được bất phương trình bậc hai và các phương trình quy về bậc hai (dạng chứa căn thức đơn giản)."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Tìm tham số m để tam thức bậc hai luôn dương/âm hoặc giải các bài toán thực tế (ví dụ: tìm giá trị lớn nhất/nhỏ nhất) bằng cách ứng dụng hàm số bậc hai."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG",
+      "group": 10,
+      "color": "#9999ff",
+      "val": 10,
+      "type": "chapter",
+      "description": "Đại số hóa hình học phẳng bằng hệ toạ độ.",
+      "prerequisites": [
+        "CHƯƠNG IV. VECTO"
+      ],
+      "applications": [
+        "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN",
+        "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"
+      ],
+      "lessons": [
+        {
+          "id": "L10_C7_B19",
+          "name": "Bài 19: Phương trình đường thẳng",
+          "prerequisites_lessons": [
+            "CHƯƠNG IV. VECTO"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả phương trình tổng quát và phương trình tham số của đường thẳng."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Lập phương trình đường thẳng và giải quyết các bài toán liên quan."
+            }
+          ]
+        },
+        {
+          "id": "L10_C7_B20",
+          "name": "Bài 20: Vị trí tương đối giữa hai đường thẳng. Góc và khoảng cách",
+          "prerequisites_lessons": [
+            "L10_C7_B19"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết hai đường thẳng cắt nhau, song song, trùng nhau, vuông góc."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Thiết lập công thức và tính góc giữa hai đường thẳng, khoảng cách từ một điểm đến một đường thẳng."
+            }
+          ]
+        },
+        {
+          "id": "L10_C7_B21",
+          "name": "Bài 21: Đường tròn trong mặt phẳng toạ độ",
+          "prerequisites_lessons": [
+            "L10_C7_B20"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Lập phương trình đường tròn và lập phương trình tiếp tuyến của đường tròn."
+            }
+          ]
+        },
+        {
+          "id": "L10_C7_B22",
+          "name": "Bài 22: Ba đường conic",
+          "prerequisites_lessons": [
+            "L10_C7_B21"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết ba đường conic và phương trình chính tắc của chúng."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải quyết một số vấn đề thực tiễn gắn với ba đường conic."
+            }
+          ]
+        },
+        {
+          "id": "L10_C7_BT",
+          "name": "Bài tập cuối chương VII",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L10_C7_B19",
+            "L10_C7_B20",
+            "L10_C7_B21",
+            "L10_C7_B22"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận dạng được phương trình của đường thẳng, đường tròn, elip, hypebol, parabol."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Xác định được các yếu tố hình học (tâm, bán kính, tiêu điểm,...) từ phương trình cho trước."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Viết được phương trình của đường thẳng, đường tròn và các đường conic khi biết các yếu tố cơ bản."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán tổng hợp về vị trí tương đối, tiếp tuyến, hoặc các bài toán có yếu tố thực tiễn liên quan đến các đường conic."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG VIII. ĐẠI SỐ TỔ HỢP",
+      "group": 10,
+      "color": "#9999ff",
+      "val": 9,
+      "type": "chapter",
+      "description": "Nghệ thuật đếm: Hoán vị, Chỉnh hợp, Tổ hợp.",
+      "prerequisites": [],
+      "applications": [
+        "CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN",
+        "CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT",
+        "CHƯƠNG VI. XÁC SUẤT CÓ ĐIỀU KIỆN"
+      ],
+      "lessons": [
+        {
+          "id": "L10_C8_B23",
+          "name": "Bài 23: Quy tắc đếm",
+          "prerequisites_lessons": [],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng quy tắc cộng, quy tắc nhân và sử dụng sơ đồ hình cây để giải các bài toán đếm đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L10_C8_B24",
+          "name": "Bài 24: Hoán vị, chỉnh hợp và tổ hợp",
+          "prerequisites_lessons": [
+            "L10_C8_B23"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Tính số hoán vị, chỉnh hợp, tổ hợp bằng công thức và máy tính cầm tay."
+            }
+          ]
+        },
+        {
+          "id": "L10_C8_B25",
+          "name": "Bài 25: Nhị thức Newton",
+          "prerequisites_lessons": [
+            "L10_C8_B24"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Khai triển nhị thức Newton (a + b)^n với số mũ thấp (n = 4 hoặc n = 5)."
+            }
+          ]
+        },
+        {
+          "id": "L10_C8_BT",
+          "name": "Bài tập cuối chương VIII",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L10_C8_B23",
+            "L10_C8_B24",
+            "L10_C8_B25"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Phân biệt được sự khác nhau giữa hoán vị, chỉnh hợp và tổ hợp trong một bài toán chọn."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Áp dụng được quy tắc cộng, quy tắc nhân trong các tình huống đếm có nhiều giai đoạn."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải các bài toán đếm sử dụng hoán vị, chỉnh hợp, tổ hợp, ví dụ như lập số, chọn người, xếp đồ vật."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Tìm hệ số của một số hạng trong khai triển nhị thức Newton hoặc giải các bài toán đếm có điều kiện phức tạp (ví dụ: xếp chỗ có ràng buộc, chọn số thỏa mãn tính chất chia hết)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN",
+      "group": 10,
+      "color": "#9999ff",
+      "val": 9,
+      "type": "chapter",
+      "description": "Các khái niệm cơ bản về xác suất và cách tính trong các phép thử đơn giản.",
+      "prerequisites": [
+        "CHƯƠNG VIII. ĐẠI SỐ TỔ HỢP",
+        "CHƯƠNG I. MỆNH ĐỀ VÀ TẬP HỢP"
+      ],
+      "applications": [
+        "CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT"
+      ],
+      "lessons": [
+        {
+          "id": "L10_C9_B26",
+          "name": "Bài 26: Biến cố và định nghĩa cổ điển của xác suất",
+          "prerequisites_lessons": [
+            "CHƯƠNG VIII. ĐẠI SỐ TỔ HỢP"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết một số khái niệm: Phép thử ngẫu nhiên, không gian mẫu, biến cố, biến cố đối."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả không gian mẫu, biến cố trong một số phép thử đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L10_C9_B27",
+          "name": "Bài 27: Thực hành tính xác suất theo định nghĩa cổ điển",
+          "prerequisites_lessons": [
+            "L10_C9_B26"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Tính xác suất trong một số bài toán đơn giản bằng phương pháp tổ hợp hoặc sơ đồ hình cây."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nắm và vận dụng quy tắc tính xác suất của biến cố đối."
+            }
+          ]
+        },
+        {
+          "id": "L10_C9_BT",
+          "name": "Bài tập cuối chương IX",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L10_C9_B26",
+            "L10_C9_B27"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Mô tả được không gian mẫu và biến cố trong các phép thử đơn giản (gieo xúc xắc, rút thẻ)."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Tính được số phần tử của không gian mẫu và biến cố bằng các quy tắc đếm cơ bản."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính được xác suất của biến cố bằng định nghĩa cổ điển trong các bài toán yêu cầu sử dụng tổ hợp, chỉnh hợp, hoán vị."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Sử dụng biến cố đối để giải quyết các bài toán tính xác suất 'ít nhất một' hoặc các bài toán có không gian mẫu phức tạp."
+            }
+          ]
+        }
+      ]
+    },    
+    // LỚP 11
+    {
+      "id": "CHƯƠNG I. HÀM SỐ LƯỢNG GIÁC VÀ PHƯƠNG TRÌNH LƯỢNG GIÁC",
+      "group": 11,
+      "color": "#f5d442",
+      "val": 11,
+      "type": "chapter",
+      "description": "Nghiên cứu các hàm số tuần hoàn và giải các phương trình liên quan đến chúng.",
+      "prerequisites": [
+        "CHƯƠNG III. HỆ THỨC LƯỢNG TRONG TAM GIÁC",
+        "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"
+      ],
+      "applications": [
+        "CHƯƠNG IX. ĐẠO HÀM",
+        "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN"
+      ],
+      "lessons": [
+        {
+          "id": "L11_C1_B1",
+          "name": "Bài 1: Giá trị lượng giác của góc lượng giác",
+          "prerequisites_lessons": [
+            "CHƯƠNG III. HỆ THỨC LƯỢNG TRONG TAM GIÁC"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết các khái niệm cơ bản về góc lượng giác, số đo và đường tròn lượng giác."
+            },
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm giá trị lượng giác của một góc lượng giác."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả bảng giá trị lượng giác của một số góc lượng giác thường gặp; hệ thức cơ bản và mối quan hệ giữa các giá trị lượng giác của các góc có liên quan đặc biệt (bù nhau, phụ nhau, đối nhau, hơn kém π)."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng máy tính cầm tay để tính giá trị lượng giác của một góc khi biết số đo của góc đó."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải quyết một số vấn đề thực tiễn gắn với giá trị lượng giác của góc lượng giác."
+            }
+          ]
+        },
+        {
+          "id": "L11_C1_B2",
+          "name": "Bài 2: Công thức lượng giác",
+          "prerequisites_lessons": [
+            "L11_C1_B1"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả các phép biến đổi lượng giác cơ bản: công thức cộng, công thức nhân đôi, công thức biến đổi tích thành tổng và công thức biến đổi tổng thành tích."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải quyết một số vấn đề thực tiễn gắn với giá trị lượng giác của góc lượng giác và các phép biến đổi lượng giác."
+            }
+          ]
+        },
+        {
+          "id": "L11_C1_B3",
+          "name": "Bài 3: Hàm số lượng giác",
+          "prerequisites_lessons": [
+            "L11_C1_B2"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết các khái niệm về hàm số chẵn, hàm số lẻ, hàm số tuần hoàn."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận biết các đặc trưng hình học của đồ thị hàm số chẵn, hàm số lẻ, hàm số tuần hoàn."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vẽ đồ thị của các hàm số y = sin x, y = cos x, y = tan x, y = cot x và giải thích các tính chất của chúng."
+            }
+          ]
+        },
+        {
+          "id": "L11_C1_B4",
+          "name": "Bài 4: Phương trình lượng giác cơ bản",
+          "prerequisites_lessons": [
+            "L11_C1_B3"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết công thức nghiệm của phương trình lượng giác cơ bản bằng cách vận dụng đồ thị hàm số lượng giác tương ứng."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Tính nghiệm gần đúng của phương trình lượng giác cơ bản bằng máy tính cầm tay."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải quyết một số vấn đề thực tiễn gắn với phương trình lượng giác."
+            }
+          ]
+        },
+        {
+          "id": "L11_C1_BT",
+          "name": "Bài tập cuối chương I",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L11_C1_B1",
+            "L11_C1_B2",
+            "L11_C1_B3",
+            "L11_C1_B4"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận dạng được các công thức lượng giác cơ bản và công thức nghiệm của các phương trình lượng giác cơ bản."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Sử dụng các công thức lượng giác để rút gọn biểu thức, tính giá trị và chứng minh các đẳng thức đơn giản."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải các phương trình lượng giác cơ bản và các phương trình có thể quy về dạng cơ bản."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Vận dụng tổng hợp kiến thức về hàm số, đồ thị và phương trình lượng giác để giải quyết các bài toán biện luận nghiệm hoặc các bài toán thực tế phức tạp."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN",
+      "group": 11,
+      "color": "#f5d442",
+      "val": 9,
+      "type": "chapter",
+      "description": "Nghiên cứu các dãy số có quy luật đặc biệt và ứng dụng.",
+      "prerequisites": [
+        "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"
+      ],
+      "applications": [
+        "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC"
+      ],
+      "lessons": [
+        {
+          "id": "L11_C2_B5",
+          "name": "Bài 5: Dãy số",
+          "prerequisites_lessons": [
+            "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết dãy số hữu hạn, dãy số vô hạn."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Thể hiện cách cho dãy số bằng các cách khác nhau: công thức tổng quát, hệ thức truy hồi, mô tả."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận biết tính tăng, giảm, bị chặn của dãy số trong những trường hợp đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L11_C2_B6",
+          "name": "Bài 6: Cấp số cộng",
+          "prerequisites_lessons": [
+            "L11_C2_B5"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết một dãy số là cấp số cộng."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích công thức xác định số hạng tổng quát và công thức tính tổng n số hạng đầu của cấp số cộng."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải quyết một số vấn đề thực tiễn gắn với cấp số cộng."
+            }
+          ]
+        },
+        {
+          "id": "L11_C2_B7",
+          "name": "Bài 7: Cấp số nhân",
+          "prerequisites_lessons": [
+            "L11_C2_B5"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết một dãy số là cấp số nhân."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích công thức xác định số hạng tổng quát và công thức tính tổng n số hạng đầu của cấp số nhân."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải quyết một số vấn đề thực tiễn gắn với cấp số nhân."
+            }
+          ]
+        },
+        {
+          "id": "L11_C2_BT",
+          "name": "Bài tập cuối chương II",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L11_C2_B5",
+            "L11_C2_B6",
+            "L11_C2_B7"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận dạng được dãy số, cấp số cộng, cấp số nhân qua công thức hoặc các số hạng đầu tiên."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Chứng minh một dãy số là cấp số cộng hoặc cấp số nhân và xác định các yếu tố của chúng."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tìm số hạng, công sai/công bội, tính tổng của cấp số khi biết một vài yếu tố cho trước."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán thực tế liên quan đến tăng trưởng, tài chính (lãi kép), vật lý có mô hình là cấp số cộng hoặc cấp số nhân."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM",
+      "group": 11,
+      "color": "#f5d442",
+      "val": 7,
+      "type": "chapter",
+      "description": "Phân tích và mô tả dữ liệu được tổ chức theo nhóm.",
+      "prerequisites": [
+        "CHƯƠNG V. CÁC SỐ ĐẶC TRƯNG CỦA MẪU SỐ LIỆU KHÔNG GHÉP NHÓM"
+      ],
+      "applications": [
+        "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO MỨC ĐỘ PHÂN TÁN CỦA MẪU SỐ LIỆU GHÉP NHÓM"
+      ],
+      "lessons": [
+        {
+          "id": "L11_C3_B8",
+          "name": "Bài 8: Mẫu số liệu ghép nhóm",
+          "prerequisites_lessons": [
+            "CHƯƠNG V. CÁC SỐ ĐẶC TRƯNG CỦA MẪU SỐ LIỆU KHÔNG GHÉP NHÓM"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Đọc và giải thích mẫu số liệu ghép nhóm."
+            }
+          ]
+        },
+        {
+          "id": "L11_C3_B9",
+          "name": "Bài 9: Các số đặc trưng đo xu thế trung tâm",
+          "prerequisites_lessons": [
+            "L11_C3_B8"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Tính các số đặc trưng đo xu thế trung tâm của mẫu số liệu ghép nhóm (số trung bình, trung vị, tứ phân vị, mốt)."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Hiểu ý nghĩa, vai trò của các số đặc trưng của mẫu số liệu ghép nhóm."
+            }
+          ]
+        },
+        {
+          "id": "L11_C3_BT",
+          "name": "Bài tập cuối chương III",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L11_C3_B8",
+            "L11_C3_B9"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết các đại lượng đặc trưng (trung bình, trung vị, mốt) qua bảng số liệu ghép nhóm cho trước."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích ý nghĩa của các số đặc trưng trong bối cảnh cụ thể của bài toán."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính toán thành thạo các số đặc trưng đo xu thế trung tâm từ bảng phân bố tần số ghép nhóm."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "So sánh và đưa ra kết luận về các tập dữ liệu khác nhau dựa trên các số đặc trưng đo xu thế trung tâm của chúng."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN",
+      "group": 11,
+      "color": "#f5d442",
+      "val": 10,
+      "type": "chapter",
+      "description": "Nền tảng của hình học không gian, nghiên cứu các đối tượng song song.",
+      "prerequisites": [
+        "CHƯƠNG IV. VECTO"
+      ],
+      "applications": [
+        "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN",
+        "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN",
+        "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"
+      ],
+      "lessons": [
+        {
+          "id": "L11_C4_B10",
+          "name": "Bài 10: Đường thẳng và mặt phẳng trong không gian",
+          "prerequisites_lessons": [
+            "CHƯƠNG IV. VECTO"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết các quan hệ liên thuộc cơ bản giữa điểm, đường thẳng, mặt phẳng trong không gian."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả ba cách xác định mặt phẳng."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Xác định giao tuyến của hai mặt phẳng, giao điểm của đường thẳng và mặt phẳng."
+            }
+          ]
+        },
+        {
+          "id": "L11_C4_B11",
+          "name": "Bài 11: Hai đường thẳng song song",
+          "prerequisites_lessons": [
+            "L11_C4_B10"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết vị trí tương đối của hai đường thẳng trong không gian: trùng nhau, song song, cắt nhau, chéo nhau."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích tính chất cơ bản của hai đường thẳng song song trong không gian."
+            }
+          ]
+        },
+        {
+          "id": "L11_C4_B12",
+          "name": "Bài 12: Đường thẳng và mặt phẳng song song",
+          "prerequisites_lessons": [
+            "L11_C4_B11"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết đường thẳng song song với mặt phẳng."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích điều kiện và tính chất cơ bản về đường thẳng song song với mặt phẳng."
+            }
+          ]
+        },
+        {
+          "id": "L11_C4_B13",
+          "name": "Bài 13: Hai mặt phẳng song song",
+          "prerequisites_lessons": [
+            "L11_C4_B12"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết hai mặt phẳng song song."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích điều kiện, tính chất cơ bản và định lí Thalès trong không gian."
+            }
+          ]
+        },
+        {
+          "id": "L11_C4_B14",
+          "name": "Bài 14: Phép chiếu song song",
+          "prerequisites_lessons": [
+            "L11_C4_B13"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm và các tính chất cơ bản về phép chiếu song song."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Vẽ hình biểu diễn của một số hình khối đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L11_C4_BT",
+          "name": "Bài tập cuối chương IV",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L11_C4_B10",
+            "L11_C4_B11",
+            "L11_C4_B12",
+            "L11_C4_B13",
+            "L11_C4_B14"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết các vị trí tương đối (song song, cắt, chéo) của đường thẳng và mặt phẳng trong các hình đa diện cơ bản."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Xác định được giao tuyến của hai mặt phẳng và giao điểm của đường thẳng với mặt phẳng."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Chứng minh được các quan hệ song song (đường-đường, đường-mặt, mặt-mặt) dựa trên các định lí và tính chất đã học."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Xác định thiết diện của hình đa diện cắt bởi một mặt phẳng và giải các bài toán liên quan đến thiết diện đó."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC",
+      "group": 11,
+      "color": "#f5d442",
+      "val": 11,
+      "type": "chapter",
+      "description": "Nền tảng của giải tích, nghiên cứu sự hội tụ và tính liên tục.",
+      "prerequisites": [
+        "CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN"
+      ],
+      "applications": [
+        "CHƯƠNG IX. ĐẠO HÀM",
+        "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ"
+      ],
+      "lessons": [
+        {
+          "id": "L11_C5_B15",
+          "name": "Bài 15: Giới hạn của dãy số",
+          "prerequisites_lessons": [
+            "CHƯƠNG II. DÃY SỐ. CẤP SỐ CỘNG VÀ CẤP SỐ NHÂN"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm giới hạn hữu hạn của dãy số."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích một số giới hạn cơ bản và vận dụng các phép toán để tìm giới hạn của một số dãy số đơn giản."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính tổng của một cấp số nhân lùi vô hạn và vận dụng để giải quyết một số tình huống thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L11_C5_B16",
+          "name": "Bài 16: Giới hạn của hàm số",
+          "prerequisites_lessons": [
+            "L11_C5_B15"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm giới hạn hữu hạn của hàm số tại một điểm, tại vô cực và giới hạn một phía."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận biết khái niệm giới hạn vô cực."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính một số dạng giới hạn của hàm số và giải quyết một số vấn đề thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L11_C5_B17",
+          "name": "Bài 17: Hàm số liên tục",
+          "prerequisites_lessons": [
+            "L11_C5_B16"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm hàm số liên tục tại một điểm, trên một khoảng, hoặc trên một đoạn."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận dạng tính liên tục của một số hàm sơ cấp cơ bản trên tập xác định của chúng."
+            }
+          ]
+        },
+        {
+          "id": "L11_C5_BT",
+          "name": "Bài tập cuối chương V",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L11_C5_B15",
+            "L11_C5_B16",
+            "L11_C5_B17"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết các dạng vô định cơ bản (0/0, ∞/∞, ∞ - ∞) của giới hạn."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích được tính liên tục của hàm số tại một điểm dựa vào định nghĩa."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính được các giới hạn của dãy số và hàm số bằng cách sử dụng các quy tắc và phương pháp khử dạng vô định."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Sử dụng tính chất của hàm số liên tục để chứng minh một phương trình có nghiệm và tìm tham số để hàm số liên tục tại một điểm."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG VI. HÀM SỐ MŨ VÀ HÀM SỐ LÔGARIT",
+      "group": 11,
+      "color": "#f5d442",
+      "val": 10,
+      "type": "chapter",
+      "description": "Nghiên cứu các hàm mô tả sự tăng trưởng và suy giảm theo cấp số nhân.",
+      "prerequisites": [
+        "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"
+      ],
+      "applications": [
+        "CHƯƠNG IX. ĐẠO HÀM",
+        "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN"
+      ],
+      "lessons": [
+        {
+          "id": "L11_C6_B18",
+          "name": "Bài 18: Luỹ thừa với số mũ thực",
+          "prerequisites_lessons": [
+            "CHƯƠNG VI. HÀM SỐ, ĐỒ THỊ VÀ ỨNG DỤNG"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm luỹ thừa với số mũ nguyên, hữu tỉ và thực."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích các tính chất của phép tính luỹ thừa."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng tính chất luỹ thừa để rút gọn biểu thức và so sánh các luỹ thừa."
+            }
+          ]
+        },
+        {
+          "id": "L11_C6_B19",
+          "name": "Bài 19: Lôgarit",
+          "prerequisites_lessons": [
+            "L11_C6_B18"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm lôgarit cơ số a của một số thực dương."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích các tính chất của phép tính lôgarit."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng máy tính cầm tay để tính giá trị lôgarit."
+            }
+          ]
+        },
+        {
+          "id": "L11_C6_B20",
+          "name": "Bài 20: Hàm số mũ và hàm số lôgarit",
+          "prerequisites_lessons": [
+            "L11_C6_B19"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết hàm số mũ và hàm số lôgarit."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận dạng đồ thị và giải thích các tính chất của hàm số mũ, lôgarit."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải quyết các vấn đề thực tiễn gắn với hàm số mũ và lôgarit."
+            }
+          ]
+        },
+        {
+          "id": "L11_C6_B21",
+          "name": "Bài 21: Phương trình, bất phương trình mũ và lôgarit",
+          "prerequisites_lessons": [
+            "L11_C6_B20"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Giải phương trình, bất phương trình mũ và lôgarit ở dạng đơn giản."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải quyết các vấn đề thực tiễn gắn với phương trình, bất phương trình mũ và lôgarit."
+            }
+          ]
+        },
+        {
+          "id": "L11_C6_BT",
+          "name": "Bài tập cuối chương VI",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L11_C6_B18",
+            "L11_C6_B19",
+            "L11_C6_B20",
+            "L11_C6_B21"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết các tính chất của lũy thừa và lôgarit, nhận dạng phương trình mũ/lôgarit cơ bản."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Rút gọn các biểu thức chứa lũy thừa và lôgarit bằng cách áp dụng các quy tắc đã học."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Giải các phương trình và bất phương trình mũ, lôgarit bằng các phương pháp (đưa về cùng cơ số, đặt ẩn phụ, mũ hóa/lôgarit hóa)."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán thực tế (tăng trưởng, lãi suất, phân rã phóng xạ) bằng cách lập và giải phương trình/bất phương trình mũ hoặc lôgarit."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN",
+      "group": 11,
+      "color": "#f5d442",
+      "val": 11,
+      "type": "chapter",
+      "description": "Nghiên cứu các mối quan hệ vuông góc, là cơ sở để tính góc và khoảng cách.",
+      "prerequisites": [
+        "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN"
+      ],
+      "applications": [
+        "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN",
+        "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"
+      ],
+      "lessons": [
+        {
+          "id": "L11_C7_B22",
+          "name": "Bài 22: Hai đường thẳng vuông góc",
+          "prerequisites_lessons": [
+            "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết góc giữa hai đường thẳng và hai đường thẳng vuông góc."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Chứng minh hai đường thẳng vuông góc trong một số tình huống đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L11_C7_B23",
+          "name": "Bài 23: Đường thẳng vuông góc với mặt phẳng",
+          "prerequisites_lessons": [
+            "L11_C7_B22"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết đường thẳng vuông góc với mặt phẳng."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích mối liên hệ giữa quan hệ song song và quan hệ vuông góc của đường thẳng và mặt phẳng."
+            }
+          ]
+        },
+        {
+          "id": "L11_C7_B24",
+          "name": "Bài 24: Phép chiếu vuông góc. Góc giữa đường thẳng và mặt phẳng",
+          "prerequisites_lessons": [
+            "L11_C7_B23"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết phép chiếu vuông góc, hình chiếu vuông góc, định lí ba đường vuông góc."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận biết và tính góc giữa đường thẳng và mặt phẳng trong một số trường hợp đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L11_C7_B25",
+          "name": "Bài 25: Hai mặt phẳng vuông góc",
+          "prerequisites_lessons": [
+            "L11_C7_B24"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết góc giữa hai mặt phẳng, hai mặt phẳng vuông góc, góc nhị diện."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận biết góc phẳng của góc nhị diện, tính góc phẳng nhị diện trong một số trường hợp đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L11_C7_B26",
+          "name": "Bài 26: Khoảng cách",
+          "prerequisites_lessons": [
+            "L11_C7_B25"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Xác định khoảng cách giữa các đối tượng điểm, đường thẳng, mặt phẳng trong không gian."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Xác định đường vuông góc chung của hai đường thẳng chéo nhau trong các trường hợp đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L11_C7_B27",
+          "name": "Bài 27: Thể tích",
+          "prerequisites_lessons": [
+            "L11_C7_B26"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết công thức tính thể tích của khối chóp, khối lăng trụ, khối hộp, khối chóp cụt đều."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính thể tích của khối chóp, khối lăng trụ, khối hộp trong một số tình huống đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L11_C7_BT",
+          "name": "Bài tập cuối chương VII",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L11_C7_B22",
+            "L11_C7_B23",
+            "L11_C7_B24",
+            "L11_C7_B25",
+            "L11_C7_B26",
+            "L11_C7_B27"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nêu lại được các định nghĩa về quan hệ vuông góc (đường-đường, đường-mặt, mặt-mặt) và các công thức tính thể tích."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Chứng minh được các quan hệ vuông góc đơn giản trong hình chóp, hình lăng trụ."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Xác định và tính được góc, khoảng cách giữa các đối tượng (đường, mặt) và tính thể tích các khối đa diện."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán hình học không gian tổng hợp yêu cầu kết hợp nhiều kiến thức về quan hệ vuông góc, song song, góc, khoảng cách và thể tích."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT",
+      "group": 11,
+      "color": "#f5d442",
+      "val": 9,
+      "type": "chapter",
+      "description": "Xây dựng các công cụ tính xác suất cho các biến cố phức tạp hơn.",
+      "prerequisites": [
+        "CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN"
+      ],
+      "applications": [
+        "CHƯƠNG VI. XÁC SUẤT CÓ ĐIỀU KIỆN"
+      ],
+      "lessons": [
+        {
+          "id": "L11_C8_B28",
+          "name": "Bài 28: Biến cố hợp, biến cố giao, biến cố độc lập",
+          "prerequisites_lessons": [
+            "CHƯƠNG IX. TÍNH XÁC SUẤT THEO ĐỊNH NGHĨA CỔ ĐIỂN"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết các khái niệm biến cố hợp, biến cố giao, biến cố độc lập."
+            }
+          ]
+        },
+        {
+          "id": "L11_C8_B29",
+          "name": "Bài 29: Công thức cộng xác suất",
+          "prerequisites_lessons": [
+            "L11_C8_B28"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Tính xác suất của biến cố hợp của hai biến cố xung khắc."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính xác suất của biến cố hợp của hai biến cố bất kì bằng cách sử dụng công thức cộng xác suất và phương pháp tổ hợp."
+            }
+          ]
+        },
+        {
+          "id": "L11_C8_B30",
+          "name": "Bài 30: Công thức nhân xác suất cho hai biến cố độc lập",
+          "prerequisites_lessons": [
+            "L11_C8_B28"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Tính xác suất của biến cố giao của hai biến cố độc lập bằng cách sử dụng công thức nhân xác suất và sơ đồ hình cây."
+            }
+          ]
+        },
+        {
+          "id": "L11_C8_BT",
+          "name": "Bài tập cuối chương VIII",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L11_C8_B28",
+            "L11_C8_B29",
+            "L11_C8_B30"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Phát biểu được công thức cộng và công thức nhân xác suất cho các trường hợp tương ứng."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả được một biến cố phức tạp dưới dạng hợp hoặc giao của các biến cố đơn giản hơn."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Áp dụng các quy tắc cộng và nhân để tính xác suất của các biến cố trong các phép thử ngẫu nhiên."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán xác suất thực tế đòi hỏi sự kết hợp linh hoạt giữa các quy tắc đếm, quy tắc cộng và quy tắc nhân xác suất."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG IX. ĐẠO HÀM",
+      "group": 11,
+      "color": "#f5d442",
+      "val": 13,
+      "type": "chapter",
+      "description": "Công cụ cơ bản của giải tích, mô tả tốc độ thay đổi tức thời.",
+      "prerequisites": [
+        "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC"
+      ],
+      "applications": [
+        "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ",
+        "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN"
+      ],
+      "lessons": [
+        {
+          "id": "L11_C9_B31",
+          "name": "Bài 31: Định nghĩa và ý nghĩa của đạo hàm",
+          "prerequisites_lessons": [
+            "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết một số bài toán dẫn đến khái niệm đạo hàm."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận biết định nghĩa đạo hàm, ý nghĩa hình học của đạo hàm, thiết lập phương trình tiếp tuyến."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng định nghĩa đạo hàm vào giải quyết một số bài toán thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L11_C9_B32",
+          "name": "Bài 32: Các quy tắc tính đạo hàm",
+          "prerequisites_lessons": [
+            "L11_C9_B31"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Tính đạo hàm của một số hàm số sơ cấp cơ bản."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng các công thức tính đạo hàm của tổng, hiệu, tích, thương và hàm số hợp."
+            }
+          ]
+        },
+        {
+          "id": "L11_C9_B33",
+          "name": "Bài 33: Đạo hàm cấp hai",
+          "prerequisites_lessons": [
+            "L11_C9_B32"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm đạo hàm cấp hai của một hàm số."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Tính đạo hàm cấp hai của một số hàm số đơn giản."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng đạo hàm cấp hai để giải quyết một số bài toán thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L11_C9_BT",
+          "name": "Bài tập cuối chương IX",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L11_C9_B31",
+            "L11_C9_B32",
+            "L11_C9_B33"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Tái hiện được các quy tắc tính đạo hàm của tổng, hiệu, tích, thương, hàm hợp và đạo hàm của các hàm số cơ bản."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Tính được đạo hàm của các hàm số phức tạp hơn bằng cách kết hợp các quy tắc."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Viết phương trình tiếp tuyến của đồ thị hàm số tại một điểm hoặc biết hệ số góc."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán thực tế liên quan đến ý nghĩa vật lí của đạo hàm (vận tốc, gia tốc) và các bài toán chứa tham số."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG I. ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT VÀ VẼ ĐỒ THỊ HÀM SỐ",
+      "group": 12,
+      "color": "#ff8c42",
+      "val": 13,
+      "type": "chapter",
+      "description": "Sử dụng đạo hàm để phân tích chi tiết hình dạng của đồ thị hàm số và giải các bài toán tối ưu.",
+      "prerequisites": [
+        "CHƯƠNG IX. ĐẠO HÀM",
+        "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC"
+      ],
+      "applications": [],
+      "lessons": [
+        {
+          "id": "L12_C1_B1",
+          "name": "Bài 1: Tính đơn điệu và cực trị của hàm số",
+          "prerequisites_lessons": [
+            "CHƯƠNG IX. ĐẠO HÀM"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết tính đồng biến, nghịch biến của một hàm số trên một khoảng dựa vào dấu của đạo hàm cấp một."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Thể hiện tính đồng biến, nghịch biến trong bảng biến thiên và nhận biết điểm, giá trị cực trị qua bảng biến thiên hoặc đồ thị."
+            }
+          ]
+        },
+        {
+          "id": "L12_C1_B2",
+          "name": "Bài 2: Giá trị lớn nhất và giá trị nhỏ nhất của hàm số",
+          "prerequisites_lessons": [
+            "L12_C1_B1"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết giá trị lớn nhất, giá trị nhỏ nhất của hàm số trên một tập xác định."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Xác định giá trị lớn nhất, giá trị nhỏ nhất của hàm số bằng đạo hàm trong những trường hợp đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L12_C1_B3",
+          "name": "Bài 3: Đường tiệm cận của đồ thị hàm số",
+          "prerequisites_lessons": [
+            "CHƯƠNG V. GIỚI HẠN. HÀM SỐ LIÊN TỤC"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết hình ảnh hình học và định nghĩa của đường tiệm cận ngang, đứng, xiên."
+            }
+          ]
+        },
+        {
+          "id": "L12_C1_B4",
+          "name": "Bài 4: Khảo sát sự biến thiên và vẽ đồ thị của hàm số",
+          "prerequisites_lessons": [
+            "L12_C1_B1",
+            "L12_C1_B2",
+            "L12_C1_B3"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Mô tả sơ đồ tổng quát để khảo sát hàm số (tìm tập xác định, xét chiều biến thiên, tìm cực trị, tiệm cận, lập bảng biến thiên, vẽ đồ thị)."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Khảo sát và vẽ đồ thị các hàm số đa thức và phân thức hữu tỉ đơn giản."
+            }
+          ]
+        },
+        {
+          "id": "L12_C1_B5",
+          "name": "Bài 5: Ứng dụng đạo hàm để giải quyết một số vấn đề liên quan đến thực tiễn",
+          "prerequisites_lessons": [
+            "L12_C1_B4"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng đạo hàm và khảo sát hàm số để giải quyết một số vấn đề liên quan đến thực tiễn (tối ưu hóa, tốc độ thay đổi)."
+            }
+          ]
+        },
+        {
+          "id": "L12_C1_BT",
+          "name": "Bài tập cuối chương I",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L12_C1_B1",
+            "L12_C1_B2",
+            "L12_C1_B3",
+            "L12_C1_B4",
+            "L12_C1_B5"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận dạng được các khái niệm về đơn điệu, cực trị, GTLN/NN, tiệm cận từ đồ thị hoặc bảng biến thiên cho trước."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Tìm được các khoảng đơn điệu, điểm cực trị, GTLN/NN trên một đoạn và các đường tiệm cận của hàm số cho bởi công thức."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Thực hiện đầy đủ các bước khảo sát sự biến thiên và vẽ đồ thị của các hàm số quen thuộc. Sử dụng đồ thị để biện luận số nghiệm của phương trình."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán tối ưu hóa trong các bối cảnh thực tế (chi phí nhỏ nhất, lợi nhuận lớn nhất,...) và các bài toán chứa tham số liên quan đến tính chất của hàm số."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN",
+      "group": 12,
+      "color": "#ff8c42",
+      "val": 10,
+      "type": "chapter",
+      "description": "Xây dựng nền tảng cho phương pháp toạ độ trong không gian ba chiều.",
+      "prerequisites": [
+        "CHƯƠNG IV. VECTO",
+        "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN"
+      ],
+      "applications": [
+        "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN"
+      ],
+      "lessons": [
+        {
+          "id": "L12_C2_B6",
+          "name": "Bài 6: Vectơ trong không gian",
+          "prerequisites_lessons": [
+            "CHƯƠNG IV. VECTO",
+            "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết vectơ trong không gian."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận biết và thực hiện các phép toán vectơ trong không gian."
+            }
+          ]
+        },
+        {
+          "id": "L12_C2_B7",
+          "name": "Bài 7: Hệ trục toạ độ trong không gian",
+          "prerequisites_lessons": [
+            "L12_C2_B6"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết toạ độ của điểm, của vectơ đối với hệ trục toạ độ."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng toạ độ của vectơ để giải một số bài toán có liên quan đến thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L12_C2_B8",
+          "name": "Bài 8: Biểu thức toạ độ của các phép toán vectơ",
+          "prerequisites_lessons": [
+            "L12_C2_B7"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận biết biểu thức toạ độ của các phép toán vectơ (cộng, trừ, nhân với một số, tích vô hướng) trong không gian."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng biểu thức toạ độ của các phép toán vectơ để giải một số bài toán có liên quan đến thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L12_C2_BT",
+          "name": "Bài tập cuối chương II",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L12_C2_B6",
+            "L12_C2_B7",
+            "L12_C2_B8"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Xác định được tọa độ của điểm, vectơ trong không gian Oxyz và nhắc lại các công thức tính toán tọa độ."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Thực hiện được các phép toán cộng, trừ vectơ, nhân vectơ với một số, tính tích vô hướng thông qua biểu thức tọa độ."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng tọa độ vectơ để kiểm tra các tính chất hình học như sự cùng phương, đồng phẳng, vuông góc và tính độ dài, góc."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán hình học không gian tổng hợp (liên quan đến hình hộp, tứ diện,...) bằng phương pháp tọa độ."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO MỨC ĐỘ PHÂN TÁN CỦA MẪU SỐ LIỆU GHÉP NHÓM",
+      "group": 12,
+      "color": "#ff8c42",
+      "val": 7,
+      "type": "chapter",
+      "description": "Đánh giá sự biến động và phân tán của dữ liệu ghép nhóm.",
+      "prerequisites": [
+        "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM"
+      ],
+      "applications": [],
+      "lessons": [
+        {
+          "id": "L12_C3_B9",
+          "name": "Bài 9: Khoảng biến thiên và khoảng tứ phân vị",
+          "prerequisites_lessons": [
+            "CHƯƠNG III. CÁC SỐ ĐẶC TRƯNG ĐO XU THẾ TRUNG TÂM CỦA MẪU SỐ LIỆU GHÉP NHÓM"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Tính khoảng biến thiên, khoảng tứ phân vị của mẫu số liệu ghép nhóm."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Hiểu ý nghĩa, vai trò của khoảng biến thiên, khoảng tứ phân vị trong việc đo mức độ phân tán."
+            }
+          ]
+        },
+        {
+          "id": "L12_C3_B10",
+          "name": "Bài 10: Phương sai và độ lệch chuẩn",
+          "prerequisites_lessons": [
+            "L12_C3_B9"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Thông hiểu",
+              "content": "Tính phương sai, độ lệch chuẩn của mẫu số liệu ghép nhóm."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Hiểu ý nghĩa, vai trò của phương sai, độ lệch chuẩn trong việc đo mức độ phân tán."
+            }
+          ]
+        },
+        {
+          "id": "L12_C3_BT",
+          "name": "Bài tập cuối chương III",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L12_C3_B9",
+            "L12_C3_B10"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Xác định được các nhóm chứa tứ phân vị thứ nhất và thứ ba từ bảng số liệu."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích được ý nghĩa của các số đo độ phân tán (khoảng biến thiên, độ lệch chuẩn) trong ngữ cảnh của bài toán."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính toán đầy đủ các số đặc trưng đo độ phân tán cho một mẫu số liệu ghép nhóm cho trước."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Sử dụng các số đo độ phân tán để so sánh mức độ ổn định, rủi ro giữa hai hay nhiều bộ dữ liệu và đưa ra quyết định (ví dụ: lựa chọn phương án đầu tư, đánh giá chất lượng sản phẩm)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG IV. NGUYÊN HÀM VÀ TÍCH PHÂN",
+      "group": 12,
+      "color": "#ff8c42",
+      "val": 12,
+      "type": "chapter",
+      "description": "Phép toán ngược của đạo hàm và các ứng dụng quan trọng trong hình học, vật lý.",
+      "prerequisites": [
+        "CHƯƠNG IX. ĐẠO HÀM"
+      ],
+      "applications": [],
+      "lessons": [
+        {
+          "id": "L12_C4_B11",
+          "name": "Bài 11: Nguyên hàm",
+          "prerequisites_lessons": [
+            "CHƯƠNG IX. ĐẠO HÀM"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm nguyên hàm của một hàm số."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Giải thích một số tính chất của nguyên hàm và tìm được nguyên hàm của các hàm số sơ cấp thường gặp."
+            }
+          ]
+        },
+        {
+          "id": "L12_C4_B12",
+          "name": "Bài 12: Tích phân",
+          "prerequisites_lessons": [
+            "L12_C4_B11"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết định nghĩa và các tính chất của tích phân."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính tích phân trong những trường hợp đơn giản và giải một số bài toán thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L12_C4_B13",
+          "name": "Bài 13: Ứng dụng hình học của tích phân",
+          "prerequisites_lessons": [
+            "L12_C4_B12"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng tích phân để tính diện tích của một số hình phẳng."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng tích phân để tính thể tích của một số vật thể."
+            }
+          ]
+        },
+        {
+          "id": "L12_C4_BT",
+          "name": "Bài tập cuối chương IV",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L12_C4_B11",
+            "L12_C4_B12",
+            "L12_C4_B13"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Tái hiện được bảng nguyên hàm của các hàm số cơ bản và các tính chất của tích phân."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Tìm được họ nguyên hàm và tính được tích phân của các hàm số đơn giản bằng cách áp dụng trực tiếp công thức và tính chất."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Tính được diện tích hình phẳng giới hạn bởi các đường cong và tính thể tích khối tròn xoay."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán thực tiễn liên quan đến chuyển động (tính quãng đường từ vận tốc) hoặc các bài toán hình học phức tạp yêu cầu ứng dụng tích phân."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG V. PHƯƠNG PHÁP TOẠ ĐỘ TRONG KHÔNG GIAN",
+      "group": 12,
+      "color": "#ff8c42",
+      "val": 14,
+      "type": "chapter",
+      "description": "Giải quyết các bài toán hình học không gian bằng công cụ đại số.",
+      "prerequisites": [
+        "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN",
+        "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN",
+        "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN",
+        "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG"
+      ],
+      "applications": [],
+      "lessons": [
+        {
+          "id": "L12_C5_B14",
+          "name": "Bài 14: Phương trình mặt phẳng",
+          "prerequisites_lessons": [
+            "CHƯƠNG II. VECTƠ VÀ HỆ TRỤC TOẠ ĐỘ TRONG KHÔNG GIAN",
+            "CHƯƠNG IV. QUAN HỆ SONG SONG TRONG KHÔNG GIAN",
+            "CHƯƠNG VII. QUAN HỆ VUÔNG GÓC TRONG KHÔNG GIAN",
+            "CHƯƠNG VII. PHƯƠNG PHÁP TOẠ ĐỘ TRONG MẶT PHẲNG"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết phương trình mặt phẳng, vectơ pháp tuyến, cặp vectơ chỉ phương."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Viết phương trình mặt phẳng trong các trường hợp đơn giản, nhận biết hai mặt phẳng song song/vuông góc và tính khoảng cách."
+            }
+          ]
+        },
+        {
+          "id": "L12_C5_B15",
+          "name": "Bài 15: Phương trình đường thẳng trong không gian",
+          "prerequisites_lessons": [
+            "L12_C5_B14"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết phương trình tham số và chính tắc của đường thẳng."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Viết phương trình đường thẳng và nhận biết vị trí tương đối giữa hai đường thẳng."
+            }
+          ]
+        },
+        {
+          "id": "L12_C5_B16",
+          "name": "Bài 16: Công thức tính góc trong không gian",
+          "prerequisites_lessons": [
+            "L12_C5_B15"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Tính góc giữa hai đường thẳng, góc giữa đường thẳng và mặt phẳng, góc giữa hai mặt phẳng."
+            }
+          ]
+        },
+        {
+          "id": "L12_C5_B17",
+          "name": "Bài 17: Phương trình mặt cầu",
+          "prerequisites_lessons": [
+            "L12_C5_B14"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết phương trình mặt cầu."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Xác định tâm, bán kính và lập phương trình mặt cầu."
+            }
+          ]
+        },
+        {
+          "id": "L12_C5_BT",
+          "name": "Bài tập cuối chương V",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L12_C5_B14",
+            "L12_C5_B15",
+            "L12_C5_B16",
+            "L12_C5_B17"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận dạng được phương trình của mặt phẳng, đường thẳng, mặt cầu và các vectơ đặc trưng của chúng (VTPT, VTCP)."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Xác định được tâm, bán kính của mặt cầu; xác định được vị trí tương đối giữa các đối tượng trong không gian (song song, cắt, chéo)."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Viết được phương trình mặt phẳng, đường thẳng, mặt cầu thỏa mãn các điều kiện cho trước (đi qua điểm, song song/vuông góc với đối tượng khác)."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Giải quyết các bài toán tổng hợp yêu cầu tính góc, khoảng cách và các bài toán tìm điểm, đường thẳng, mặt phẳng thoả mãn điều kiện tối ưu (cực trị hình học)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHƯƠNG VI. XÁC SUẤT CÓ ĐIỀU KIỆN",
+      "group": 12,
+      "color": "#ff8c42",
+      "val": 9,
+      "type": "chapter",
+      "description": "Nâng cao lý thuyết xác suất với các công cụ suy luận mạnh mẽ.",
+      "prerequisites": [
+        "CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT"
+      ],
+      "applications": [],
+      "lessons": [
+        {
+          "id": "L12_C6_B18",
+          "name": "Bài 18: Xác suất có điều kiện",
+          "prerequisites_lessons": [
+            "CHƯƠNG VIII. CÁC QUY TẮC TÍNH XÁC SUẤT"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Nhận biết khái niệm về xác suất có điều kiện."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Nhận biết mối liên hệ giữa xác suất có điều kiện và xác suất của biến cố giao."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Vận dụng công thức nhân xác suất cho hai biến cố bất kì và giải thích ý nghĩa của nó trong một số tình huống thực tế."
+            }
+          ]
+        },
+        {
+          "id": "L12_C6_B19",
+          "name": "Bài 19: Công thức xác suất toàn phần và công thức Bayes",
+          "prerequisites_lessons": [
+            "L12_C6_B18"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Vận dụng",
+              "content": "Mô tả và biết vận dụng công thức xác suất toàn phần vào các tình huống có nội dung thực tiễn."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Nắm được và biết vận dụng công thức Bayes vào các tình huống có nội dung thực tiễn."
+            }
+          ]
+        },
+        {
+          "id": "L12_C6_BT",
+          "name": "Bài tập cuối chương VI",
+          "type": "consolidation_practice",
+          "color": "#ffd700",
+          "val": 5,
+          "prerequisites_lessons": [
+            "L12_C6_B18",
+            "L12_C6_B19"
+          ],
+          "learning_objectives": [
+            {
+              "level": "Nhận biết",
+              "content": "Phát biểu được định nghĩa xác suất có điều kiện và các công thức liên quan (nhân xác suất, toàn phần, Bayes)."
+            },
+            {
+              "level": "Thông hiểu",
+              "content": "Phân biệt được P(A|B) và P(B|A) trong một tình huống cụ thể và tính được xác suất có điều kiện trong các bài toán đơn giản."
+            },
+            {
+              "level": "Vận dụng",
+              "content": "Sử dụng sơ đồ hình cây và công thức xác suất toàn phần để tính xác suất của một biến cố xảy ra qua nhiều giai đoạn."
+            },
+            {
+              "level": "Vận dụng cao",
+              "content": "Áp dụng công thức Bayes để 'cập nhật' xác suất của một giả thuyết sau khi có thêm bằng chứng thực nghiệm (ví dụ: bài toán chẩn đoán y học, kiểm tra chất lượng sản phẩm)."
+            }
+          ]
+        }
+      ]
+    }
   ],
   links: []
 };
-    
+   // ===================================
+    // === BẮT ĐẦU PHẦN SCRIPT NÂNG CẤP ===
+    // ===================================
 
+  const lessonNodes = [];
+  fullKnowledgeData.nodes.forEach(chapter => {
+  // Gán màu sắc từ hằng số đã định nghĩa
+    if (chapter.group === 10) chapter.color = COLOR_CHAPTER_10;
+    if (chapter.group === 11) chapter.color = COLOR_CHAPTER_11;
+    if (chapter.group === 12) chapter.color = COLOR_CHAPTER_12;
 
-// Thêm các node bài học (lessons) vào graph
-    const lessonNodes = [];
-    fullKnowledgeData.nodes.forEach(chapter => {
-      if (chapter.type === 'chapter' && chapter.lessons) {
-        chapter.lessons.forEach((lesson, index) => {
-          // --- SỬA Ở ĐÂY ---
-          // Kiểm tra xem 'lesson' là object hay string để lấy tên cho đúng
-          const lessonName = typeof lesson === 'object' ? lesson.name : lesson;
+    if (chapter.type === 'chapter') {
+      chapter.val += 8;
+    }
 
-          lessonNodes.push({
-            id: `${chapter.id}_lesson_${index}`, // ID duy nhất cho bài học
-            name: lessonName, // Sử dụng tên đã được lấy ra chính xác
-            group: chapter.group,
-            color: chapter.color,
-            val: 3, // Kích thước nhỏ hơn cho node bài học
-            type: 'lesson',
-            parentChapter: chapter.id
-          });
-        });
-      }
-    });
-
-    // Bước 2: Thêm các node bài học vừa tạo vào danh sách node chính
-    fullKnowledgeData.nodes.push(...lessonNodes);
-    
-    // Bước 3: Tạo tất cả các link một cách chính xác
-    const nodeMap = new Map(fullKnowledgeData.nodes.map(node => [node.id, node]));
-    const linkTracker = new Set(); // Dùng Set để theo dõi các link đã được thêm
-
-    // 3.1: Tạo link PHÂN RÃ từ Chương -> Bài học
-    fullKnowledgeData.nodes.forEach(node => {
-      if (node.type === 'lesson' && node.parentChapter && nodeMap.has(node.parentChapter)) {
-        fullKnowledgeData.links.push({
-          source: node.parentChapter,
-          target: node.id,
-          type: 'sub_knowledge'
-        });
-      }
-    });
-
-    // 3.2: Duyệt qua TẤT CẢ các node để tạo link quan hệ
-    fullKnowledgeData.nodes.forEach(node => {
-      if (node.type === 'chapter') {
-        // Xử lý TIÊN QUYẾT (Mũi tên đi vào node hiện tại)
-        if (node.prerequisites) {
-          node.prerequisites.forEach(prereqId => {
-            const linkKey = `${prereqId} -> ${node.id}`; // Tạo một key duy nhất cho link
-            if (nodeMap.has(prereqId) && !linkTracker.has(linkKey)) {
-              fullKnowledgeData.links.push({
-                source: prereqId,
-                target: node.id,
-                type: "relationship"
-              });
-              linkTracker.add(linkKey); // Đánh dấu link này đã được thêm
-            }
-          });
+    if (chapter.type === 'chapter' && chapter.lessons) {
+      chapter.lessons.forEach((lesson, index) => {
+        let lessonColor = chapter.color; // Mặc định thừa kế màu của chương cha
+        
+        if (lesson.type === 'consolidation_practice') {
+          lesson.val = 10;
+          lessonColor = COLOR_CONSOLIDATION_NODE; // Áp dụng màu Trắng Ngọc Trai
         }
 
-        // Xử lý ỨNG DỤNG (Mũi tên đi ra từ node hiện tại)
-        if (node.applications) {
-          node.applications.forEach(appId => {
-            const linkKey = `${node.id} -> ${appId}`; // Tạo một key duy nhất cho link
-            if (nodeMap.has(appId) && !linkTracker.has(linkKey)) {
-              fullKnowledgeData.links.push({
-                source: node.id,
-                target: appId,
-                type: "relationship"
-              });
-              linkTracker.add(linkKey); // Đánh dấu link này đã được thêm
-            }
+        const lessonName = typeof lesson === 'object' ? lesson.name : lesson;
+        
+        const lessonNode = {
+          id: lesson.id || `${chapter.id}_lesson_${index}`,
+          name: lessonName,
+          group: chapter.group,
+          color: lessonColor, // Sử dụng màu đã được xác định
+          val: lesson.val || 6,
+          type: lesson.type || 'lesson',
+          parentChapter: chapter.id,
+          learning_objectives: lesson.learning_objectives || [],
+          prerequisites_lessons: lesson.prerequisites_lessons || []
+        };
+        
+        lessonNodes.push(lessonNode);
+      });
+    }
+  });
+
+fullKnowledgeData.nodes.push(...lessonNodes);
+
+const nodeMap = new Map(fullKnowledgeData.nodes.map(node => [node.id, node]));
+const linkTracker = new Set(); 
+
+// Logic tạo liên kết giữa chapter và lesson
+fullKnowledgeData.nodes.forEach(node => {
+  if (node.type === 'lesson' && node.parentChapter && nodeMap.has(node.parentChapter)) {
+    fullKnowledgeData.links.push({
+      source: node.parentChapter,
+      target: node.id,
+      type: 'sub_knowledge'
+    });
+  }
+});
+
+// ✨ THÊM: Tạo liên kết giữa các lesson có prerequisites_lessons
+fullKnowledgeData.nodes.forEach(node => {
+  if ((node.type === 'lesson' || node.type === 'consolidation_practice') && node.prerequisites_lessons) {
+    node.prerequisites_lessons.forEach(prereqId => {
+      if (nodeMap.has(prereqId)) {
+        const prereqNode = nodeMap.get(prereqId);
+        const linkKey = `${prereqId} -> ${node.id}`;
+        
+        if (!linkTracker.has(linkKey)) {
+          fullKnowledgeData.links.push({
+            source: prereqId,
+            target: node.id,
+            // ✅ Phân biệt loại link: chapter_prerequisite hoặc lesson_prerequisite
+            type: prereqNode.type === 'chapter' ? 'chapter_prerequisite' : 'lesson_prerequisite'
           });
+          linkTracker.add(linkKey);
         }
       }
     });
+  }
+});
 
-    // ===== HỆ THỐNG MÀU SẮC =====
-    // ✨ UPDATE: Thay đổi màu trung tính để hòa vào nền tốt hơn
+
+// Tạo liên kết consolidation
+const chapters = fullKnowledgeData.nodes.filter(n => n.type === 'chapter');
+chapters.forEach(chapter => {
+  const lessonNodesInChapter = fullKnowledgeData.nodes.filter(
+    n => n.parentChapter === chapter.id && n.type === 'lesson'
+  );
+  const consolidationNode = fullKnowledgeData.nodes.find(
+    n => n.parentChapter === chapter.id && n.type === 'consolidation_practice'
+  );
+
+  if (consolidationNode && lessonNodesInChapter.length > 0) {
+    lessonNodesInChapter.forEach(lessonNode => {
+      fullKnowledgeData.links.push({
+        source: lessonNode.id,
+        target: consolidationNode.id,
+        type: 'consolidation_link'
+      });
+    });
+  }
+});
+
+// Tạo liên kết giữa các chapter
+fullKnowledgeData.nodes.forEach(node => {
+  if (node.type === 'chapter') {
+    if (node.prerequisites) {
+      node.prerequisites.forEach(prereqId => {
+        const linkKey = `${prereqId} -> ${node.id}`;
+        if (nodeMap.has(prereqId) && !linkTracker.has(linkKey)) {
+          fullKnowledgeData.links.push({ source: prereqId, target: node.id, type: "relationship" });
+          linkTracker.add(linkKey);
+        }
+      });
+    }
+    if (node.applications) {
+      node.applications.forEach(appId => {
+        const linkKey = `${node.id} -> ${appId}`;
+        if (nodeMap.has(appId) && !linkTracker.has(linkKey)) {
+          fullKnowledgeData.links.push({ source: node.id, target: appId, type: "relationship" });
+          linkTracker.add(linkKey);
+        }
+      });
+    }
+  }
+});
+
+
+    // Định nghĩa màu sắc
     const NEUTRAL_COLOR = 'rgba(50, 60, 100, 0.2)';
     const PREREQUISITE_COLOR = '#ff6961';
     const APPLICATION_COLOR = '#77dd77';
     const SUB_KNOWLEDGE_COLOR = '#6CA0DC';
+    const CONSOLIDATION_COLOR = '#ff8c42'; 
 
-    // ===== TRẠNG THÁI =====
     let selectedNode = null;
     let hoveredNode = null;
     let highlightNodes = new Set();
     let highlightLinks = new Set();
     let isNodeSelected = false;
 
-    // Cập nhật thống kê
     const chapterCount = fullKnowledgeData.nodes.filter(n => n.type === 'chapter').length;
     document.getElementById('total-chapters').textContent = chapterCount;
     document.getElementById('total-links').textContent = fullKnowledgeData.links.length;
 
-    // ===== HÀM TÍNH ĐỘ DÀY LINK =====
     function calculateLinkWidth(link) {
-      if (link.type === 'sub_knowledge') {
-        return 1;
-      }
-      
+      if (link.type === 'sub_knowledge') return 1;
+      if (link.type === 'consolidation_link') return 1.5;
       const sourceNode = fullKnowledgeData.nodes.find(n => n.id === (link.source.id || link.source));
       const targetNode = fullKnowledgeData.nodes.find(n => n.id === (link.target.id || link.target));
-      
       if (sourceNode && targetNode && sourceNode.type === 'chapter' && targetNode.type === 'chapter') {
         const importance = (sourceNode.val + targetNode.val) / 6;
         return Math.max(2, Math.min(5, importance));
       }
-      
       return 2;
     }
 
-    // ===== HÀM XÁC ĐỊNH MÀU LINK =====
+    
     function getLinkColor(link) {
-        const sourceId = link.source.id || link.source;
-        const targetId = link.target.id || link.target;
-        const currentNodeId = selectedNode ? selectedNode.id : (hoveredNode ? hoveredNode.id : null);
+      // Nếu không ở trong chế độ highlight, tất cả các link đều có màu trung tính
+      if (highlightLinks.size === 0 || !highlightLinks.has(link)) {
+        return COLOR_NEUTRAL;
+      }
 
-        // Giữ nguyên màu cho các link mặc định và link phân rã
-        if (!currentNodeId || !highlightLinks.has(link)) {
-            if (link.type === 'sub_knowledge') return SUB_KNOWLEDGE_COLOR;
-            return NEUTRAL_COLOR;
+      // Khi được highlight, hiển thị màu theo ngữ nghĩa và hướng mũi tên
+      const sourceId = link.source.id || link.source;
+      const targetId = link.target.id || link.target;
+      const currentNode = selectedNode || hoveredNode;
+      const currentNodeId = currentNode ? currentNode.id : null;
+
+      // 1. LIÊN KẾT CÓ Ý NGHĨA CỐ ĐỊNH
+      if (link.type === 'sub_knowledge') return COLOR_SUB_KNOWLEDGE;
+      if (link.type === 'consolidation_link') return COLOR_CONSOLIDATION_LINK;
+
+      // 2. LIÊN KẾT PHỤ THUỘC VÀO HƯỚNG
+      // Nếu mũi tên ĐI VÀO node đang được chọn -> Nó là TIÊN QUYẾT (MÀU ĐỎ)
+      if (targetId === currentNodeId) {
+        if (link.type === 'lesson_prerequisite' || link.type === 'chapter_prerequisite') {
+          return COLOR_PREREQUISITE;
         }
-        if (link.type === 'sub_knowledge') return SUB_KNOWLEDGE_COLOR;
+        // Xử lý trường hợp liên kết giữa các chương
+        if (link.type === 'relationship') {
+           const targetNode = nodeMap.get(targetId);
+           if (targetNode && targetNode.prerequisites && targetNode.prerequisites.includes(sourceId)) {
+             return COLOR_PREREQUISITE;
+           }
+        }
+      }
 
-        // Logic tô màu thông minh
-        const sourceNode = nodeMap.get(sourceId);
-        const targetNode = nodeMap.get(targetId);
-
-        if (sourceNode && targetNode) {
-            // MÀU ĐỎ (Tiên quyết): Khi node được chọn là ĐÍCH, và node ĐÍCH có khai báo node NGUỒN là tiên quyết.
-            if (currentNodeId === targetId && targetNode.prerequisites && targetNode.prerequisites.includes(sourceId)) {
-            return PREREQUISITE_COLOR;
+      // Nếu mũi tên ĐI RA từ node đang được chọn -> Nó là ỨNG DỤNG (MÀU XANH LÁ)
+      if (sourceId === currentNodeId) {
+        // Kiến thức bài này được ứng dụng cho bài sau trong cùng chương
+        if (link.type === 'lesson_prerequisite') {
+            return COLOR_APPLICATION;
+        }
+        // Kiến thức chương này được ứng dụng cho chương sau
+        if (link.type === 'relationship') {
+            const sourceNode = nodeMap.get(sourceId);
+            if (sourceNode && sourceNode.applications && sourceNode.applications.includes(targetId)) {
+                return COLOR_APPLICATION;
             }
-            
-            // MÀU XANH (Ứng dụng): Khi node được chọn là NGUỒN, và node NGUỒN có khai báo node ĐÍCH là ứng dụng.
-            if (currentNodeId === sourceId && sourceNode.applications && sourceNode.applications.includes(targetId)) {
-            return APPLICATION_COLOR;
-            }
         }
-        
-        // Nếu không rơi vào các trường hợp trên, nó là một liên kết có liên quan nhưng không trực tiếp -> màu trung tính.
-        return NEUTRAL_COLOR;
-        }
-    
-    
-        // ===== KHỞI TẠO GRAPH =====
+      }
+
+      // Nếu không rơi vào các trường hợp trên, trả về màu trung tính
+      return COLOR_NEUTRAL;
+    }
+
     const Graph = ForceGraph3D()
       (document.getElementById('graph-container'))
         .backgroundColor('#0a0e27')
         .graphData(fullKnowledgeData)
-        .nodeLabel(node => node.type === 'lesson' ? node.name : node.id)
+        .nodeLabel(node => (node.type === 'lesson' || node.type === 'consolidation_practice') ? node.name : node.id)
         .nodeVal('val')
         .nodeThreeObject(node => {
             const group = new THREE.Group();
-            
-            // TỐI ƯU HÓA: Giảm độ phức tạp của Geometry
             const geometry = new THREE.SphereGeometry(node.val, 16, 16); 
-            
-            // Không cần thay đổi phần material
             const material = new THREE.MeshPhongMaterial({
                 color: node.color,
                 emissive: node.color,
@@ -732,16 +3109,13 @@
             const sphere = new THREE.Mesh(geometry, material);
             group.add(sphere);
 
-            // --- SỬA LỖI FONT VÀ XỬ LÝ TEXT DÀI ---
-            if (node.type === 'chapter' || node.type === 'lesson') {
+            if (node.type === 'chapter' || node.type === 'lesson' || node.type === 'consolidation_practice') {
                 const text = node.type === 'chapter' ? node.id : node.name;
                 
-                // Tự động ngắt dòng cho text dài
                 const wrapText = (text, maxWidth) => {
                     if (text.length <= maxWidth) return text;
                     const words = text.split(' ');
-                    let lines = [];
-                    let currentLine = words[0];
+                    let lines = [], currentLine = words[0];
                     for (let i = 1; i < words.length; i++) {
                         if (currentLine.length + words[i].length + 1 <= maxWidth) {
                             currentLine += ' ' + words[i];
@@ -751,27 +3125,30 @@
                         }
                     }
                     lines.push(currentLine);
-                    return lines.join('\n'); // Ký tự \n để xuống dòng
+                    return lines.join('\n');
                 };
 
-                const wrappedText = node.type === 'chapter' ? wrapText(text, 25) : text; // Chỉ ngắt dòng cho tên chương
-
+                const wrappedText = node.type === 'chapter' ? wrapText(text, 25) : text;
                 const sprite = new SpriteText(wrappedText);
-                sprite.fontFace = 'Arial'; // Chỉ định rõ ràng font Arial
+                sprite.fontFace = 'Arial';
                 sprite.fontWeight = 'bold';
 
                 if (node.type === 'chapter') {
-                    sprite.textHeight = 7;
-                    sprite.position.y = node.val + 9;
+                    sprite.textHeight = 8;
+                    sprite.position.y = node.val + 12;
+                    sprite.color = '#ffffff';
+                } else if (node.type === 'consolidation_practice') {
+                    sprite.textHeight = 8;
+                    sprite.position.y = node.val + 10;
+                    sprite.color = '#f0f0f0';
                 } else { // lesson
-                    sprite.textHeight = 4.5;
-                    sprite.position.y = node.val + 5;
+                    sprite.textHeight = 6;
+                    sprite.position.y = node.val + 8;
+                    sprite.color = '#cccccc';
                 }
                 
-                sprite.color = node.type === 'chapter' ? '#ffffff' : '#cccccc';
                 group.add(sprite);
             }
-            
             return group;
         })
         .linkColor(link => getLinkColor(link))
@@ -781,7 +3158,7 @@
           return highlightLinks.has(link) ? baseWidth * 1.5 : baseWidth * 0.3;
         })
         .linkDirectionalArrowLength(link => {
-          if (link.type === 'sub_knowledge') return 3;
+          if (link.type === 'sub_knowledge' || link.type === 'consolidation_link') return 3;
           if (highlightLinks.size === 0) return 6;
           return highlightLinks.has(link) ? 8 : 4;
         })
@@ -791,16 +3168,16 @@
           if (highlightLinks.size === 0) return 0.6;
           return highlightLinks.has(link) ? 0.9 : 0.1;
         })
-        .linkCurvature(0.2)
+        .linkCurvature(0.25)
         .linkDirectionalParticles(link => {
-          return (highlightLinks.has(link) && link.type !== 'sub_knowledge') ? 4 : 0;
+          return (highlightLinks.has(link) && link.type !== 'sub_knowledge' && link.type !== 'consolidation_link') ? 4 : 0;
         })
         .linkDirectionalParticleWidth(3)
         .linkDirectionalParticleSpeed(0.006)
         .onNodeHover(node => {
           if (!isNodeSelected) {
             hoveredNode = node;
-            if (node && node.type === 'chapter') {
+            if (node) {
               highlightNodeConnections(node, false);
             } else {
               clearHighlight();
@@ -808,7 +3185,8 @@
           }
         })
         .onNodeClick(node => {
-          if (node.type === 'chapter') {
+          // Cho phép click vào cả chapter, lesson và consolidated practice
+          if (node.type === 'chapter' || node.type === 'lesson' || node.type === 'consolidation_practice') {
             isNodeSelected = true;
             selectedNode = node;
             showNodeDetail(node);
@@ -822,12 +3200,12 @@
           hoveredNode = null;
         });
 
-    // Cấu hình lực
-    Graph.d3Force('charge').strength(-400);
-    Graph.d3Force('link').distance(link => link.type === 'sub_knowledge' ? 30 : 120);
-    Graph.d3Force('center').strength(0.2);
+    Graph.d3Force('charge').strength(-225);
+    Graph.d3Force('link').distance(link => (link.type === 'sub_knowledge' || link.type === 'consolidation_link') ? 60 : 120);
+    Graph.d3Force('center').strength(0.07);
 
-    // Lực phân tầng
+    
+
     const layerForce = (alpha) => {
       fullKnowledgeData.nodes.forEach(node => {
         let targetY = 0;
@@ -837,13 +3215,15 @@
         
         node.vy -= (node.y - targetY) * 0.8 * alpha;
         
-        const maxDistance = 300;
+        // ✨ THAY ĐỔI: Đưa "bức tường vô hình" trở lại nhưng với bán kính lớn hơn
+        const maxDistance = 400; // Giới hạn các node trong bán kính 480
         const dx = node.x;
         const dz = node.z;
         const distance = Math.sqrt(dx * dx + dz * dz);
         
         if (distance > maxDistance) {
           const scale = maxDistance / distance;
+          // Nhẹ nhàng đẩy node trở lại vào trong nếu nó vượt ra ngoài
           node.vx -= (node.x - dx * scale) * 0.15;
           node.vz -= (node.z - dz * scale) * 0.15;
         }
@@ -856,208 +3236,388 @@
     };
     Graph.d3Force('layering', layerForce);
 
-    // Thêm ánh sáng và mặt phẳng HÌNH TRÒN đã được nâng cấp
     setTimeout(() => {
       const scene = Graph.scene();
-      
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
       scene.add(ambientLight);
-      
       const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
       directionalLight1.position.set(200, 200, 200);
       scene.add(directionalLight1);
-      
       const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
       directionalLight2.position.set(-200, -200, -200);
       scene.add(directionalLight2);
 
-      // ✨ UPDATE: Hàm tạo mặt phẳng với hiệu ứng gradient và vòng sáng (glow)
       function createCirclePlane(y, label, color) {
-        const radius = 400;
+        const radius = 500; // Bán kính vòng tròn trực quan là 500
         const segments = 64;
         
-        // 1. Tạo mặt phẳng nền với gradient tinh tế
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.width = 512;
-        canvas.height = 512;
+        canvas.width = 512; canvas.height = 512;
         const gradient = context.createRadialGradient(256, 256, 0, 256, 256, 256);
-        gradient.addColorStop(0, 'rgba(40, 50, 90, 0.3)'); // Màu trung tâm
-        gradient.addColorStop(1, 'rgba(20, 25, 45, 0.1)'); // Màu rìa
+        gradient.addColorStop(0, 'rgba(40, 50, 90, 0.3)');
+        gradient.addColorStop(1, 'rgba(20, 25, 45, 0.1)');
         context.fillStyle = gradient;
         context.fillRect(0, 0, 512, 512);
-
         const planeTexture = new THREE.CanvasTexture(canvas);
-        const planeMaterial = new THREE.MeshBasicMaterial({
-            map: planeTexture,
-            transparent: true,
-            side: THREE.DoubleSide
-        });
+        const planeMaterial = new THREE.MeshBasicMaterial({ map: planeTexture, transparent: true, side: THREE.DoubleSide });
         const planeGeometry = new THREE.CircleGeometry(radius, segments);
         const circlePlane = new THREE.Mesh(planeGeometry, planeMaterial);
         circlePlane.position.set(0, y, 0);
         circlePlane.rotation.x = Math.PI / 2;
         scene.add(circlePlane);
 
-        // 2. Tạo vòng sáng (glow ring) bằng Torus và AdditiveBlending
         const ringGeometry = new THREE.TorusGeometry(radius, 2, 16, 100);
-        const ringMaterial = new THREE.MeshBasicMaterial({
-            color: color,
-            blending: THREE.AdditiveBlending, // Hiệu ứng glow
-            transparent: true,
-            opacity: 0.7
-        });
+        const ringMaterial = new THREE.MeshBasicMaterial({ color: color, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.7 });
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
         ring.position.set(0, y, 0);
         ring.rotation.x = Math.PI / 2;
         scene.add(ring);
         
-        // 3. Giữ nguyên phần label
         const labelSprite = new SpriteText(label);
         labelSprite.color = '#FFFFFF';
-        labelSprite.textHeight = 16;
+        labelSprite.textHeight = 24;
         labelSprite.fontWeight = 'bold';
         labelSprite.position.set(radius - 50, y + 20, 0);
         scene.add(labelSprite);
       }
-
       createCirclePlane(150, 'Toán 12 - Tổng hợp & Ứng dụng', 0xff8844);
       createCirclePlane(0, 'Toán 11 - Xây dựng Công cụ', 0xffdd44);
       createCirclePlane(-150, 'Toán 10 - Nền tảng', 0x8888ff);
     }, 100);
 
-    // Góc nhìn mặc định
     setTimeout(() => {
-    Graph.cameraPosition(
-        { x: 0, y: 350, z: 800 }, // <-- Giá trị mới: xa hơn (z=800), cao hơn (y=350), trực diện hơn (x=0)
-        { x: 0, y: 0, z: 0 }, // Nhìn vào trung tâm
-        1500 // Tăng thời gian chuyển động cho mượt hơn
-    );
+        Graph.cameraPosition({ x: 0, y: 350, z: 800 }, { x: 0, y: 0, z: 0 }, 1500);
     }, 500);
 
-    // ===== HÀM HIGHLIGHT NODE CONNECTIONS =====
+    // Phần còn lại của script (highlight, show detail, controls) giữ nguyên
     function highlightNodeConnections(node, isPermanent) {
-    highlightNodes.clear();
-    highlightLinks.clear();
+      highlightNodes.clear();
+      highlightLinks.clear();
 
-    if (node) {
+      if (!node) return;
+
+      // XỬ LÝ CHO CHAPTER (Logic này vốn đã đúng, giữ nguyên)
+      if (node.type === 'chapter') {
         highlightNodes.add(node.id);
-        
+        const lessonsInChapter = new Set();
+
         fullKnowledgeData.links.forEach(link => {
+          const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+          const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+
+          if (link.type === "relationship") {
+            if (sourceId === node.id) {
+              highlightLinks.add(link);
+              highlightNodes.add(targetId);
+            }
+            if (targetId === node.id) {
+              highlightLinks.add(link);
+              highlightNodes.add(sourceId);
+            }
+          }
+          else if (link.type === "sub_knowledge" && sourceId === node.id) {
+            highlightLinks.add(link);
+            highlightNodes.add(targetId);
+            lessonsInChapter.add(targetId);
+          }
+        });
+        
+        if (lessonsInChapter.size > 0) {
+          fullKnowledgeData.links.forEach(link => {
             const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
             const targetId = typeof link.target === 'object' ? link.target.id : link.target;
             
-            if (sourceId === node.id || targetId === node.id) {
+            if (link.type === "consolidation_link" && lessonsInChapter.has(sourceId)) {
+              highlightLinks.add(link);
+              highlightNodes.add(targetId);
+            }
+          });
+        }
+      } 
+      // XỬ LÝ CHO LESSON VÀ CONSOLIDATION PRACTICE (Đây là phần đã được sửa lỗi)
+      else {
+        // Tóm lại logic mới:
+        // 1. Chỉ highlight node được click, chương cha của nó.
+        // 2. Chỉ highlight các liên kết tiên quyết/hợp nhất CỦA RIÊNG node được click.
+        // 3. Không lan ra các liên kết của chương cha nữa.
+
+        highlightNodes.add(node.id);
+        
+        // Highlight chương cha và liên kết đến nó
+        if (node.parentChapter) {
+          highlightNodes.add(node.parentChapter);
+          const parentLink = fullKnowledgeData.links.find(l => 
+            (l.source.id || l.source) === node.parentChapter && (l.target.id || l.target) === node.id
+          );
+          if (parentLink) highlightLinks.add(parentLink);
+        }
+
+        // Highlight các bài học tiên quyết của chính nó
+        if (node.prerequisites_lessons) {
+          node.prerequisites_lessons.forEach(prereqId => {
+            highlightNodes.add(prereqId);
+            const prereqLink = fullKnowledgeData.links.find(l => 
+              (l.source.id || l.source) === prereqId && (l.target.id || l.target) === node.id
+            );
+            if (prereqLink) highlightLinks.add(prereqLink);
+          });
+        }
+        
+        // Nếu node này là tiên quyết cho node khác, cũng highlight
+         fullKnowledgeData.links.forEach(link => {
+            const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+            const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+            if (sourceId === node.id && (link.type === 'lesson_prerequisite' || link.type === 'consolidation_link')) {
                 highlightLinks.add(link);
-                highlightNodes.add(sourceId);
                 highlightNodes.add(targetId);
             }
         });
-    }
 
-    // --- THAY ĐỔI LỚN: KHÔNG TÁI TẠO OBJECT, CHỈ CẬP NHẬT THUỘC TÍNH ---
-    Graph.graphData().nodes.forEach(n => {
-        if (!n.__threeObj) return; // Bỏ qua nếu đối tượng 3D chưa được tạo
+        // Xử lý riêng cho trường hợp click vào bài tập cuối chương
+        if (node.type === 'consolidation_practice') {
+            // Highlight tất cả các bài học dẫn đến bài tập cuối chương này
+            fullKnowledgeData.links.forEach(link => {
+                const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                if (targetId === node.id && link.type === 'consolidation_link') {
+                    highlightLinks.add(link);
+                    highlightNodes.add(sourceId);
+                }
+            });
+        }
+      }
 
+      // Cập nhật visual (Phần này giữ nguyên, không cần sửa)
+      Graph.graphData().nodes.forEach(n => {
+        if (!n.__threeObj) return;
         const isHighlighted = highlightNodes.has(n.id);
         const shouldBeVisible = isHighlighted || highlightNodes.size === 0;
 
-        // Cập nhật Sphere (quả cầu)
         const sphere = n.__threeObj.children[0];
         if (sphere && sphere.material) {
-            sphere.material.opacity = shouldBeVisible ? 0.95 : 0.15;
-            sphere.material.emissiveIntensity = isHighlighted ? 0.4 : 0.1;
+          sphere.material.opacity = shouldBeVisible ? 0.95 : 0.15;
+          sphere.material.emissiveIntensity = isHighlighted ? 0.5 : 0.1;
         }
         
-        // Cập nhật Text (nhãn)
         const sprite = n.__threeObj.children[1];
         if (sprite && sprite.material) {
-             sprite.material.opacity = shouldBeVisible ? 1 : 0.2;
+          sprite.material.opacity = shouldBeVisible ? 1 : 0.2;
         }
-    });
+      });
 
-    // Cập nhật màu sắc và thuộc tính của Link
-    Graph.linkColor(Graph.linkColor())
-         .linkWidth(Graph.linkWidth())
-         .linkOpacity(Graph.linkOpacity())
-         .linkDirectionalParticles(Graph.linkDirectionalParticles());
-}
-
-    function clearHighlight() {
-    highlightNodes.clear();
-    highlightLinks.clear();
-    
-    // ✅ CẬP NHẬT CẢ NODE VÀ LINK
-    Graph.nodeThreeObject(Graph.nodeThreeObject());
-    Graph.linkColor(Graph.linkColor());
-    Graph.linkDirectionalArrowColor(Graph.linkDirectionalArrowColor());
+      Graph.linkColor(Graph.linkColor())
+          .linkWidth(Graph.linkWidth())
+          .linkOpacity(Graph.linkOpacity())
+          .linkDirectionalParticles(Graph.linkDirectionalParticles());
     }
 
-    // ===== HÀM HIỂN THỊ CHI TIẾT NODE =====
-    function showNodeDetail(node) {
-  if (node.type !== 'chapter') return;
-  
+    function clearHighlight() {
+        highlightNodes.clear();
+        highlightLinks.clear();
+        Graph.graphData().nodes.forEach(n => {
+            if (n.__threeObj) {
+                const sphere = n.__threeObj.children[0];
+                if(sphere && sphere.material) {
+                    sphere.material.opacity = 0.95;
+                    sphere.material.emissiveIntensity = 0.4;
+                }
+                const sprite = n.__threeObj.children[1];
+                if(sprite && sprite.material) sprite.material.opacity = 1;
+            }
+        });
+        Graph.linkColor(Graph.linkColor()).linkWidth(Graph.linkWidth()).linkOpacity(Graph.linkOpacity()).linkDirectionalParticles(Graph.linkDirectionalParticles());
+    }
+
+    // 2. SỬA HÀM showNodeDetail - Hiển thị chi tiết cho cả 3 loại node
+function showNodeDetail(node) {
   const detail = document.getElementById('node-detail');
   const content = document.getElementById('detail-content');
   
-  const badge = `<span class="badge badge-${node.group}">Lớp ${node.group}</span>`;
-  
-  let prerequisitesHTML = '';
-  if (node.prerequisites && node.prerequisites.length > 0) {
-    prerequisitesHTML = '<h3>🔴 Kiến thức tiên quyết:</h3><ul>';
-    node.prerequisites.forEach(prereq => {
-      prerequisitesHTML += `<li>${prereq}</li>`;
-    });
-    prerequisitesHTML += '</ul>';
-  }
-  
-  let applicationsHTML = '';
-  if (node.applications && node.applications.length > 0) {
-    applicationsHTML = '<h3>🟢 Kiến thức ứng dụng:</h3><ul>';
-    node.applications.forEach(app => {
-      applicationsHTML += `<li>${app}</li>`;
-    });
-    applicationsHTML += '</ul>';
-  }
-  
-  // --- PHẦN NÂNG CẤP ĐỂ HIỂN THỊ MỤC TIÊU HỌC TẬP ---
-  let lessonsHTML = '<h3>📖 Các bài học và mục tiêu:</h3>';
-  if (node.lessons && node.lessons.length > 0) {
-    // Kiểm tra xem lesson đầu tiên có phải là object không
-    if (typeof node.lessons[0] === 'object' && node.lessons[0].name) {
+  // XỬ LÝ CHO CHAPTER
+  if (node.type === 'chapter') {
+    const badge = `<span class="badge badge-${node.group}">Lớp ${node.group}</span>`;
+    
+    let prerequisitesHTML = '';
+    if (node.prerequisites && node.prerequisites.length > 0) {
+      prerequisitesHTML = '<h3>🔴 Kiến thức tiên quyết:</h3><ul>' + 
+        node.prerequisites.map(p => `<li>${p}</li>`).join('') + '</ul>';
+    }
+    
+    let applicationsHTML = '';
+    if (node.applications && node.applications.length > 0) {
+      applicationsHTML = '<h3>🟢 Kiến thức ứng dụng:</h3><ul>' + 
+        node.applications.map(a => `<li>${a}</li>`).join('') + '</ul>';
+    }
+    
+    let lessonsHTML = '<h3>📖 Các bài học trong chương:</h3>';
+    if (node.lessons && node.lessons.length > 0) {
       node.lessons.forEach(lesson => {
-        lessonsHTML += `<h4 style="color: #f5d442; font-size: 12px; margin: 10px 0 5px 0;">${lesson.name}</h4>`;
-        if (lesson.learning_objectives) {
+        let lessonTitleStyle = 'color: #f0f0f0; font-size: 12px; margin: 10px 0 5px 0;';
+        if (lesson.type === 'consolidation_practice') {
+          lessonTitleStyle = 'color: #ff8c42; background-color: rgba(255, 140, 66, 0.15); padding: 3px 5px; border-radius: 4px; display: inline-block; font-weight: bold;';
+        }
+        lessonsHTML += `<h4 style="${lessonTitleStyle}">${lesson.name}</h4>`;
+
+        if (lesson.learning_objectives && lesson.learning_objectives.length > 0) {
           lessonsHTML += '<ul style="padding-left: 10px;">';
           lesson.learning_objectives.forEach(lo => {
-            // Thêm màu sắc cho từng level
             let levelColor = '#aaa';
             if (lo.level === 'Nhận biết') levelColor = '#6CA0DC';
             if (lo.level === 'Thông hiểu') levelColor = '#77dd77';
             if (lo.level === 'Vận dụng') levelColor = '#ffd700';
             if (lo.level === 'Vận dụng cao') levelColor = '#ff6961';
             
-            lessonsHTML += `<li style="font-size: 11px; margin-bottom: 5px;"><strong style="color: ${levelColor};">[${lo.level}]</strong> ${lo.content}</li>`;
+            lessonsHTML += `<li style="font-size: 11px; margin-bottom: 5px; line-height: 1.4;">
+              <strong style="color: ${levelColor};">[${lo.level}]</strong> ${lo.content}
+            </li>`;
           });
           lessonsHTML += '</ul>';
         }
       });
-    } else { // Xử lý cấu trúc cũ (chỉ là mảng string) để không bị lỗi
-      lessonsHTML += '<ul>';
-      node.lessons.forEach(lesson => {
-        lessonsHTML += `<li>${lesson}</li>`;
-      });
-      lessonsHTML += '</ul>';
     }
+    
+    content.innerHTML = `
+      <h2>${badge} ${node.id}</h2>
+      <p style="color: #aaa; font-size: 11px; margin-bottom: 10px;">${node.description || ''}</p>
+      ${prerequisitesHTML}
+      ${applicationsHTML}
+      ${lessonsHTML}
+    `;
   }
   
-  content.innerHTML = `
-    <h2>${badge} ${node.id}</h2>
-    <p style="color: #aaa; font-size: 11px; margin-bottom: 10px;">${node.description || ''}</p>
-    ${prerequisitesHTML}
-    ${applicationsHTML}
-    ${lessonsHTML}
-  `;
+  // XỬ LÝ CHO LESSON (Bài học thông thường)
+  else if (node.type === 'lesson') {
+    const parentChapter = fullKnowledgeData.nodes.find(n => n.id === node.parentChapter);
+    const badge = parentChapter ? `<span class="badge badge-${parentChapter.group}">Lớp ${parentChapter.group}</span>` : '';
+    
+    let prerequisiteLessonsHTML = '';
+    if (node.prerequisites_lessons && node.prerequisites_lessons.length > 0) {
+      prerequisiteLessonsHTML = '<h3>🔴 Bài học tiên quyết:</h3><ul>';
+      node.prerequisites_lessons.forEach(prereqId => {
+        const prereqNode = fullKnowledgeData.nodes.find(n => n.id === prereqId);
+        if (prereqNode) {
+          // ✅ Xử lý cả chapter và lesson
+          if (prereqNode.type === 'chapter') {
+            // Nếu là chapter, hiển thị tên chapter với style đặc biệt
+            prerequisiteLessonsHTML += `<li style="color: #6ca0dc; font-weight: bold;"> ${prereqNode.id}</li>`;
+          } else {
+            // Nếu là lesson hoặc consolidation_practice, hiển thị tên bài
+            prerequisiteLessonsHTML += `<li>${prereqNode.name}</li>`;
+          }
+        }
+      });
+      prerequisiteLessonsHTML += '</ul>';
+    }
+    
+    let learningObjectivesHTML = '';
+    if (node.learning_objectives && node.learning_objectives.length > 0) {
+      learningObjectivesHTML = '<h3> Mục tiêu học tập (Kiến thức, Kỹ năng):</h3><ul style="padding-left: 10px;">';
+      node.learning_objectives.forEach(lo => {
+        let levelColor = '#aaa';
+        let levelIcon = '○';
+        if (lo.level === 'Nhận biết') {
+          levelColor = '#6CA0DC';
+          levelIcon = '';
+        }
+        if (lo.level === 'Thông hiểu') {
+          levelColor = '#77dd77';
+          levelIcon = '';
+        }
+        if (lo.level === 'Vận dụng') {
+          levelColor = '#ffd700';
+          levelIcon = '';
+        }
+        if (lo.level === 'Vận dụng cao') {
+          levelColor = '#ff6961';
+          levelIcon = '';
+        }
+        
+        learningObjectivesHTML += `
+          <li style="font-size: 11px; margin-bottom: 8px; line-height: 1.5;">
+            <strong style="color: ${levelColor}; font-size: 12px;">${levelIcon} ${lo.level}</strong><br>
+            <span style="color: #ddd; margin-left: 15px;">${lo.content}</span>
+          </li>`;
+      });
+      learningObjectivesHTML += '</ul>';
+    }
+    
+    content.innerHTML = `
+      <h2>${badge} ${node.name}</h2>
+      <p style="color: #888; font-size: 10px; margin-bottom: 10px;">
+        ${parentChapter ? `Thuộc: <strong style="color: #6ca0dc;">${parentChapter.id}</strong>` : ''}
+      </p>
+      ${prerequisiteLessonsHTML}
+      ${learningObjectivesHTML}
+    `;
+  }
+  
+  // XỬ LÝ CHO CONSOLIDATION PRACTICE (Bài tập cuối chương)
+  else if (node.type === 'consolidation_practice') {
+    const parentChapter = fullKnowledgeData.nodes.find(n => n.id === node.parentChapter);
+    const badge = parentChapter ? `<span class="badge badge-${parentChapter.group}">Lớp ${parentChapter.group}</span>` : '';
+    let prerequisiteLessonsHTML = '';
+    if (node.prerequisites_lessons && node.prerequisites_lessons.length > 0) {
+      prerequisiteLessonsHTML = '<h3> Bài học tiên quyết:</h3>';
+      prerequisiteLessonsHTML += '<p style="color: #888; font-size: 10px; font-style: italic; margin-bottom: 8px;">Cần hoàn thành các bài học sau trước khi làm bài tập này:</p>';
+      prerequisiteLessonsHTML += '<ul style="padding-left: 10px;">';
+      
+      node.prerequisites_lessons.forEach(prereqId => {
+        const prereqNode = fullKnowledgeData.nodes.find(n => n.id === prereqId);
+        if (prereqNode) {
+          if (prereqNode.type === 'chapter') {
+            prerequisiteLessonsHTML += `<li style="color: #6ca0dc; font-weight: bold;">📚 ${prereqNode.id}</li>`;
+          } else {
+            prerequisiteLessonsHTML += `<li style="color: #ddd;">${prereqNode.name}</li>`;
+          }
+        }
+      });
+      prerequisiteLessonsHTML += '</ul>';
+    }
+    let learningObjectivesHTML = '';
+    if (node.learning_objectives && node.learning_objectives.length > 0) {
+      learningObjectivesHTML = '<h3> Mục tiêu đánh giá năng lực:</h3>';
+      learningObjectivesHTML += '<p style="color: #aaa; font-size: 10px; font-style: italic; margin-bottom: 10px;">Bài tập cuối chương tổng hợp toàn bộ kiến thức và kỹ năng đã học</p>';
+      learningObjectivesHTML += '<ul style="padding-left: 10px;">';
+      
+      node.learning_objectives.forEach(lo => {
+        let levelColor = '#aaa';
+        let levelIcon = ' ';
+        if (lo.level === 'Nhận biết') {
+          levelColor = '#6CA0DC';
+          levelIcon = ' ';
+        }
+        if (lo.level === 'Thông hiểu') {
+          levelColor = '#77dd77';
+          levelIcon = ' ';
+        }
+        if (lo.level === 'Vận dụng') {
+          levelColor = '#ffd700';
+          levelIcon = ' ';
+        }
+        if (lo.level === 'Vận dụng cao') {
+          levelColor = '#ff6961';
+          levelIcon = ' ';
+        }
+        
+        learningObjectivesHTML += `
+          <li style="font-size: 11px; margin-bottom: 10px; line-height: 1.5; background-color: rgba(255, 140, 66, 0.08); padding: 5px 5px 5px 20px; border-radius: 3px;">
+            <strong style="color: ${levelColor}; font-size: 12px;">${levelIcon} ${lo.level}</strong><br>
+            <span style="color: #ddd; margin-left: 15px;">${lo.content}</span>
+          </li>`;
+      });
+      learningObjectivesHTML += '</ul>';
+    }
+    
+    content.innerHTML = `
+      <h2 style="color: #ff8c42;">${badge} ${node.name}</h2>
+      <p style="color: #888; font-size: 10px; margin-bottom: 10px;">
+        ${parentChapter ? `Thuộc: <strong style="color: #6ca0dc;">${parentChapter.id}</strong>` : ''}
+      </p>
+      ${prerequisiteLessonsHTML}  <!-- ⬅️ THÊM DÒNG NÀY -->
+      ${learningObjectivesHTML}
+    `;
+  }
   
   detail.classList.add('active');
 }
@@ -1068,61 +3628,50 @@
     }
 
     function searchNode(query) {
-      if (!query) {
-        clearHighlight();
-        isNodeSelected = false;
-        hoveredNode = null;
-        closeDetail();
-        return;
-      }
-      
-      const found = fullKnowledgeData.nodes.find(node => 
-        node.type === 'chapter' && node.id.toLowerCase().includes(query.toLowerCase())
-      );
-      
-      if (found) {
-        isNodeSelected = true;
-        highlightNodeConnections(found, true);
-        showNodeDetail(found);
-        Graph.cameraPosition(
-          { x: found.x + 100, y: found.y + 50, z: found.z + 100 },
-          { x: found.x, y: found.y, z: found.z },
-          1000
-        );
-      }
-    }
+  if (!query) {
+    clearHighlight();
+    isNodeSelected = false;
+    hoveredNode = null;
+    closeDetail();
+    return;
+  }
+  
+  // Tìm trong chapter trước
+  let found = fullKnowledgeData.nodes.find(node => 
+    node.type === 'chapter' && node.id.toLowerCase().includes(query.toLowerCase())
+  );
+  
+  // Nếu không tìm thấy chapter, tìm trong lesson
+  if (!found) {
+    found = fullKnowledgeData.nodes.find(node => 
+      (node.type === 'lesson' || node.type === 'consolidation_practice') && 
+      node.name.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+  
+  if (found) {
+    selectedNode = found;
+    isNodeSelected = true;
+    highlightNodeConnections(found, true);
+    showNodeDetail(found);
+    Graph.cameraPosition(
+      { x: found.x + 100, y: found.y + 50, z: found.z + 100 },
+      { x: found.x, y: found.y, z: found.z },
+      1000
+    );
+  }
+}
 
-    
-
-    function viewAngle() {
-        Graph.cameraPosition(
-            { x: 0, y: 350, z: 800 },
-            { x: 0, y: 0, z: 0 },
-            1000
-        );
-        }
-
-    function viewTop() {
-      Graph.cameraPosition(
-        { x: 0, y: 600, z: 0 },
-        { x: 0, y: 0, z: 0 },
-        1000
-      );
-    }
-
-    function viewSide() {
-      Graph.cameraPosition(
-        { x: 600, y: 0, z: 0 },
-        { x: 0, y: 0, z: 0 },
-        1000
-      );
-    }
+    function viewAngle() { Graph.cameraPosition({ x: 0, y: 350, z: 800 }, { x: 0, y: 0, z: 0 }, 1000); }
+    function viewTop() { Graph.cameraPosition({ x: 0, y: 800, z: 0 }, { x: 0, y: 0, z: 0 }, 1000); }
+    function viewSide() { Graph.cameraPosition({ x: 800, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }, 1000); }
 
     function resetView() {
       clearHighlight();
       closeDetail();
       isNodeSelected = false;
       hoveredNode = null;
+      selectedNode = null;
       document.getElementById('search-input').value = '';
       viewAngle();
     }
@@ -1131,7 +3680,7 @@
     function togglePhysics() {
       physicsEnabled = !physicsEnabled;
       if (physicsEnabled) {
-        Graph.d3ReheatSimulation();
+        Graph.d3ReheatSimulation()
       } else {
         Graph.d3AlphaDecay(1);
       }
